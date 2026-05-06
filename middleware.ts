@@ -10,10 +10,8 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         getAll() { return request.cookies.getAll() },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
@@ -26,22 +24,15 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  // Redirect unauthenticated users away from protected routes
   const protectedRoutes = ['/dashboard', '/inquiry', '/planning', '/contract']
-  const isProtected = protectedRoutes.some(r => pathname.startsWith(r))
-
-  if (isProtected && !user) {
+  if (protectedRoutes.some(r => pathname.startsWith(r)) && !user) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Redirect admin routes to login if not the admin email
-  if (pathname.startsWith('/admin')) {
-    if (!user || user.email !== process.env.ADMIN_EMAIL) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
-    }
+  if (pathname.startsWith('/admin') && (!user || user.email !== process.env.ADMIN_EMAIL)) {
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Already logged in? Don't show auth pages
   if (user && (pathname === '/auth/login' || pathname === '/auth/signup')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
