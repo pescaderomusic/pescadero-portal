@@ -161,20 +161,30 @@ export default function HomePage() {
         borderBottom: scrolled ? '1px solid rgba(79,185,175,0.1)' : 'none',
         transition: 'all 0.3s ease',
       }}>
-        {/* Logo */}
-        <div style={{ cursor: 'pointer' }} onClick={() => scrollTo('hero')}>
-          <div style={{
-            fontFamily: 'Lora, serif', fontStyle: 'italic',
-            fontSize: 20, fontWeight: 700, color: RED,
-            textShadow: '0 0 20px rgba(214,48,49,0.4)',
-            lineHeight: 1,
-          }}>Pescadero</div>
-          <div style={{
-            fontFamily: 'monospace', fontSize: 8, fontWeight: 700,
-            letterSpacing: '5px', color: TEAL,
-            textShadow: '0 0 10px rgba(79,185,175,0.5)',
-            textTransform: 'uppercase',
-          }}>MUSIC</div>
+        {/* Logo — image + wordmark side by side */}
+        <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }} onClick={() => scrollTo('hero')}>
+          <img
+            src="data:image/png;base64,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"
+            alt="Pescadero Music"
+            style={{
+              width: 44, height: 44,
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 0 8px rgba(214,48,49,0.35))',
+            }}
+          />
+          <div style={{ lineHeight: 1 }}>
+            <div style={{
+              fontFamily: 'Lora, serif', fontStyle: 'italic',
+              fontSize: 18, fontWeight: 700, color: RED,
+              textShadow: '0 0 16px rgba(214,48,49,0.4)',
+            }}>Pescadero</div>
+            <div style={{
+              fontFamily: 'monospace', fontSize: 7, fontWeight: 700,
+              letterSpacing: '5px', color: TEAL,
+              textShadow: '0 0 8px rgba(79,185,175,0.5)',
+              textTransform: 'uppercase',
+            }}>MUSIC</div>
+          </div>
         </div>
 
         {/* Desktop nav */}
@@ -430,7 +440,12 @@ export default function HomePage() {
       </section>
 
       {/* ── ABOUT ───────────────────────────────────────────── */}
-      <section id="about" style={{ padding: '100px 40px', background: '#0A1828' }}>
+      <section id="about" style={{
+        padding: '100px 40px',
+        background: '#F5F0E4',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
         <div style={{
           maxWidth: 1100, margin: '0 auto',
           display: 'grid', gridTemplateColumns: '1fr 1fr',
@@ -455,7 +470,7 @@ export default function HomePage() {
             {/* Quote card */}
             <div style={{
               position: 'absolute', bottom: -24, right: -24,
-              background: NAVY, border: `1px solid rgba(79,185,175,0.2)`,
+              background: '#0F1F35',
               borderRadius: 12, padding: '20px 24px',
               maxWidth: 240,
               boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
@@ -491,7 +506,7 @@ export default function HomePage() {
             <div style={{ width: 40, height: 2, background: RED, marginBottom: 28 }} />
 
             <p style={{
-              fontSize: 15, lineHeight: 1.8, color: 'rgba(232,224,213,0.65)',
+              fontSize: 15, lineHeight: 1.8, color: 'rgba(15,31,53,0.65)',
               marginBottom: 20,
             }}>
               Pescadero Music delivers professional live sound for small to medium-sized weddings
@@ -499,7 +514,7 @@ export default function HomePage() {
               and on-site expertise.
             </p>
             <p style={{
-              fontSize: 15, lineHeight: 1.8, color: 'rgba(232,224,213,0.65)',
+              fontSize: 15, lineHeight: 1.8, color: 'rgba(15,31,53,0.65)',
               marginBottom: 36,
             }}>
               I believe great audio is invisible — you shouldn't notice it, you should just feel it.
@@ -521,8 +536,8 @@ export default function HomePage() {
                   background: TEAL, flexShrink: 0, marginTop: 6,
                 }} />
                 <div>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: 'white', marginBottom: 2 }}>{title}</p>
-                  <p style={{ fontSize: 12, color: 'rgba(232,224,213,0.45)' }}>{desc}</p>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#0F1F35', marginBottom: 2 }}>{title}</p>
+                  <p style={{ fontSize: 12, color: 'rgba(15,31,53,0.5)' }}>{desc}</p>
                 </div>
               </div>
             ))}
