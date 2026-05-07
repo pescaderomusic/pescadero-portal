@@ -37,7 +37,7 @@ function statusColor(s: string) {
   return '#4A5568'
 }
 
-export default function AdminDashboard({ bookings, inquiries }: { bookings: any[], inquiries: any[] }) {
+export default function AdminDashboard({ bookings, inquiries, profiles }: { bookings: any[], inquiries: any[], profiles: any[] }) {
   const supabase = createClient()
   const [tab, setTab] = useState<'inquiries' | 'bookings'>('inquiries')
   const [saving, setSaving] = useState<string | null>(null)
