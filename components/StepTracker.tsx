@@ -226,18 +226,31 @@ export default function StepTracker({ booking, clientName }: Props) {
               Step {activeStep.num}: <strong>{activeStep.title}</strong> — {activeStep.subtitle}
             </p>
           </div>
-          <button
-            onClick={() => setExpanded(activeStep.id)}
-            style={{
-              background: RED, color: 'white', border: 'none',
+          {activeStep.href ? (
+            <Link href={activeStep.href} style={{
+              display: 'inline-flex', alignItems: 'center',
+              background: RED, color: 'white', textDecoration: 'none',
               borderRadius: 8, padding: '8px 16px',
-              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+              fontSize: 12, fontWeight: 700,
               fontFamily: 'Poppins, sans-serif',
               boxShadow: '0 4px 16px rgba(214,48,49,0.35)',
-            }}
-          >
-            Open →
-          </button>
+            }}>
+              Open →
+            </Link>
+          ) : (
+            <button
+              onClick={() => setExpanded(activeStep.id)}
+              style={{
+                background: RED, color: 'white', border: 'none',
+                borderRadius: 8, padding: '8px 16px',
+                fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                fontFamily: 'Poppins, sans-serif',
+                boxShadow: '0 4px 16px rgba(214,48,49,0.35)',
+              }}
+            >
+              Open →
+            </button>
+          )}
         </div>
       )}
 
