@@ -47,8 +47,8 @@ export default function StepTracker({ booking, clientName }: Props) {
         : 'Your inquiry has been received. Garrett will follow up via your preferred contact method to confirm availability.',
       status: noBooking ? 'active' as const : getStepStatus(booking.step_inquiry),
       actionLabel: noBooking ? 'Submit Your Inquiry →' : 'View Your Inquiry',
-      href: noBooking ? '/inquiry.html' : '/inquiry/view',
-      external: noBooking,
+      href: noBooking ? '/inquiry' : '/inquiry/view',
+      external: false,
     },
     {
       id: 'contract',
