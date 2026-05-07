@@ -5,21 +5,15 @@ import AdminDashboard from '@/components/AdminDashboard'
 export default async function AdminPage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.email !== process.env.ADMIN_EMAIL) redirect('/auth/login')
 
-  if (!user || user.email !== process.env.ADMIN_EMAIL) {
-    redirect('/auth/login')
-  }
-
-  // Use admin client to fetch all bookings with profile info
   const admin = createAdminClient()
-  const { data: bookings } = await admin
-    .from('bookings')
-    .select(`
-      *,
-      profiles ( full_name, phone, preferred_contact ),
-      inquiries ( event_type, services_requested, budget_range, additional_notes, submitted_at )
-    `)
-    .order('created_at', { ascending: false })
 
-  return <AdminDashboard bookings={bookings || []} />
+  const [{ data: bookings }, { data: inquiries }, { data: profiles }] = await Promise.all([
+    admin.from('bookings').select('*, profiles ( full_name, phone, preferred_contact )').order('created_at', { ascending: false }),
+    admin.from('inquiry_submissions').select('*').order('submitted_at', { ascending: false }),
+    admin.from('profiles').select('*').order('created_at', { ascending: false }),
+  ])
+
+  return <AdminDashboard bookings={bookings || []} inquiries={inquiries || []} profiles={profiles || []} />
 }
