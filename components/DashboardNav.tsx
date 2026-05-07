@@ -1,5 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 interface Props {
@@ -27,8 +28,8 @@ export default function DashboardNav({ userName, userInitials }: Props) {
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       height: 64,
     }}>
-      {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {/* Logo + home link */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         <div style={{ lineHeight: 1 }}>
           <div style={{
             fontFamily: 'Georgia, serif', fontStyle: 'italic',
@@ -39,8 +40,17 @@ export default function DashboardNav({ userName, userInitials }: Props) {
             fontFamily: 'monospace', fontSize: 8, fontWeight: 700,
             letterSpacing: '4px', color: '#4FB9AF',
             textTransform: 'uppercase',
-          }}>MUSIC</div>
+          }}>CLIENT PORTAL</div>
         </div>
+        <Link href="/" style={{
+          fontSize: 11, color: 'rgba(232,224,213,0.35)',
+          textDecoration: 'none', letterSpacing: '1px',
+          textTransform: 'uppercase', fontFamily: 'Poppins, sans-serif',
+          borderLeft: '1px solid rgba(255,255,255,0.08)',
+          paddingLeft: 20,
+        }}>
+          ← Home
+        </Link>
       </div>
 
       {/* Right side */}

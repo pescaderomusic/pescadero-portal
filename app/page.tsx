@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 const NAVY  = '#0F1F35'
 const TEAL  = '#4FB9AF'
@@ -20,11 +21,24 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', date: '', message: '' })
   const [sent, setSent] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [userName, setUserName] = useState('')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user)
+        const name = user.user_metadata?.full_name || user.email || ''
+        setUserName(name.split(' ')[0])
+      }
+    })
   }, [])
 
   function scrollTo(id: string) {
@@ -194,13 +208,37 @@ export default function HomePage() {
 
         {/* CTA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Link href="/auth/login" className="nav-link hide-mobile" style={{ color: 'rgba(232,224,213,0.5)' }}>
-            Sign In
-          </Link>
-          <button className="btn-primary" onClick={() => scrollTo('contact')}
-            style={{ padding: '9px 20px', fontSize: 12 }}>
-            Book Now
-          </button>
+          {user ? (
+            <>
+              <Link href="/dashboard" className="nav-link hide-mobile" style={{
+                color: TEAL, display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <span style={{ fontSize: 12 }}>✦</span> My Dashboard
+              </Link>
+              <Link href="/dashboard" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: 'rgba(79,185,175,0.12)',
+                border: '1px solid rgba(79,185,175,0.35)',
+                color: TEAL, textDecoration: 'none',
+                borderRadius: 8, padding: '8px 16px',
+                fontSize: 12, fontWeight: 600,
+                fontFamily: 'Poppins, sans-serif',
+                letterSpacing: '0.5px',
+              }}>
+                {userName || 'Dashboard'} →
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" className="nav-link hide-mobile" style={{ color: 'rgba(232,224,213,0.5)' }}>
+                Sign In
+              </Link>
+              <button className="btn-primary" onClick={() => scrollTo('contact')}
+                style={{ padding: '9px 20px', fontSize: 12 }}>
+                Book Now
+              </button>
+            </>
+          )}
         </div>
       </nav>
 
