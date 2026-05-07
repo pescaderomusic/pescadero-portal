@@ -177,7 +177,7 @@ export default function HomePage() {
             fontFamily: 'monospace',
             fontSize: 7,
             fontWeight: 700,
-            letterSpacing: '5px',
+            letterSpacing: '3px',
             color: TEAL,
             textShadow: '0 0 8px rgba(79,185,175,0.5)',
             textTransform: 'uppercase',
