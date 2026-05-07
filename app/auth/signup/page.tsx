@@ -36,7 +36,7 @@ export default function SignupPage() {
       await supabase.from('profiles').update({ phone }).eq('id', data.user.id)
     }
 
-    router.push('/inquiry')
+    router.push('/dashboard')
     router.refresh()
   }
 

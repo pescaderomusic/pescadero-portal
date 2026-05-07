@@ -22,7 +22,7 @@ interface Booking {
 }
 
 interface Props {
-  booking: Booking
+  booking: Booking | null
   clientName: string
 }
 
@@ -33,27 +33,33 @@ function getStepStatus(val: string): 'complete' | 'active' | 'locked' {
 }
 
 export default function StepTracker({ booking, clientName }: Props) {
+  // No booking yet — Step 1 is active, everything else locked
+  const noBooking = !booking
+
   const steps = [
     {
       id: 'inquiry',
       num: '01',
       title: 'Inquiry',
       subtitle: 'Tell us about your event',
-      description: 'Your inquiry has been received. Garrett will follow up via your preferred contact method to confirm availability.',
-      status: getStepStatus(booking.step_inquiry),
-      actionLabel: 'View Your Inquiry',
-      href: '/inquiry/view',
+      description: noBooking
+        ? "Start here — submit your inquiry so we can learn about your event, check availability, and get the conversation going. Garrett will follow up personally."
+        : 'Your inquiry has been received. Garrett will follow up via your preferred contact method to confirm availability.',
+      status: noBooking ? 'active' as const : getStepStatus(booking.step_inquiry),
+      actionLabel: noBooking ? 'Submit Your Inquiry →' : 'View Your Inquiry',
+      href: noBooking ? 'https://inquiries.pescaderomusic.com' : '/inquiry/view',
+      external: noBooking,
     },
     {
       id: 'contract',
       num: '02',
       title: 'Service Agreement',
-      subtitle: 'Review & acknowledge your contract',
-      description: booking.step_contract === 'sent'
-        ? 'Your service agreement is ready to review. Read through the terms and acknowledge below.'
-        : 'Your personalized service agreement will appear here once Garrett has confirmed your booking details.',
-      status: getStepStatus(booking.step_contract),
-      actionLabel: 'Review Contract',
+      subtitle: 'Review & sign your contract',
+      description: !noBooking && booking.step_contract === 'sent'
+        ? 'Your service agreement is ready to review. Read through the terms and sign below.'
+        : "Once Garrett reviews your inquiry and confirms availability, your personalized service agreement will appear here.",
+      status: noBooking ? 'locked' as const : getStepStatus(booking.step_contract),
+      actionLabel: 'Review & Sign Contract',
       href: '/contract',
     },
     {
@@ -61,8 +67,8 @@ export default function StepTracker({ booking, clientName }: Props) {
       num: '03',
       title: 'Deposit',
       subtitle: '$100 non-refundable deposit',
-      description: 'Secure your date with a $100 deposit. This is non-refundable and locks in your booking.',
-      status: getStepStatus(booking.step_deposit),
+      description: 'Secure your date with a $100 deposit. Payment is collected at the time of signing — your date isn\'t locked until this is received.',
+      status: noBooking ? 'locked' as const : getStepStatus(booking.step_deposit),
       actionLabel: 'Pay Deposit',
       payLinks: [
         { label: 'Venmo', url: 'https://venmo.com/u/pescaderomusic', color: '#008CFF' },
@@ -75,9 +81,9 @@ export default function StepTracker({ booking, clientName }: Props) {
       num: '04',
       title: 'Planning Form',
       subtitle: 'Timeline, music & event details',
-      description: 'Fill out your complete event timeline, music preferences, MC announcements, vendor contacts, and more.',
-      status: getStepStatus(booking.step_planning),
-      actionLabel: booking.step_planning === 'submitted' ? 'Edit Planning Form' : 'Open Planning Form',
+      description: 'Fill out your complete event timeline, music preferences, MC announcements, vendor contacts, and more. You can edit this anytime.',
+      status: noBooking ? 'locked' as const : getStepStatus(booking.step_planning),
+      actionLabel: !noBooking && booking.step_planning === 'submitted' ? 'Edit Planning Form' : 'Open Planning Form',
       href: '/planning',
     },
     {
@@ -86,9 +92,10 @@ export default function StepTracker({ booking, clientName }: Props) {
       title: 'Playlist Consultation',
       subtitle: 'Build your perfect soundtrack',
       description: "Garrett will reach out to schedule a short call to finalize your playlist and walk through the event flow together.",
-      status: getStepStatus(booking.step_consultation),
+      status: noBooking ? 'locked' as const : getStepStatus(booking.step_consultation),
       actionLabel: 'Schedule a Call',
       href: 'mailto:garrett@pescaderomusic.com?subject=Playlist Consultation',
+      external: true,
     },
     {
       id: 'event',
@@ -96,7 +103,7 @@ export default function StepTracker({ booking, clientName }: Props) {
       title: 'Event Day',
       subtitle: "It's your day — enjoy every moment",
       description: "Everything is locked in. Your Pescadero Music technician will arrive 45 minutes before start time. All you have to do is show up.",
-      status: getStepStatus(booking.step_event),
+      status: noBooking ? 'locked' as const : getStepStatus(booking.step_event),
       actionLabel: 'View Day-Of Summary',
     },
   ]
@@ -117,7 +124,7 @@ export default function StepTracker({ booking, clientName }: Props) {
 
   return (
     <div>
-      {/* Event card */}
+      {/* Welcome / event card */}
       <div style={{
         background: 'rgba(255,255,255,0.03)',
         border: '1px solid rgba(79,185,175,0.18)',
@@ -131,35 +138,41 @@ export default function StepTracker({ booking, clientName }: Props) {
             fontFamily: 'Poppins, sans-serif', fontSize: 10,
             letterSpacing: '3px', textTransform: 'uppercase',
             color: TEAL, margin: '0 0 8px',
-          }}>Your Event</p>
+          }}>{noBooking ? 'Welcome' : 'Your Event'}</p>
           <h1 style={{
             fontFamily: 'Lora, serif', fontStyle: 'italic',
             fontSize: 24, fontWeight: 700, margin: '0 0 6px', color: 'white',
-          }}>{clientName || 'Your Event'}</h1>
+          }}>
+            {noBooking ? `Welcome, ${clientName.split(' ')[0] || 'there'}!` : clientName}
+          </h1>
           <p style={{
             margin: 0, fontSize: 13, color: 'rgba(232,224,213,0.6)',
             fontFamily: 'Poppins, sans-serif',
           }}>
-            {formatDate(booking.event_date)}
-            {booking.venue_name && ` · ${booking.venue_name}`}
+            {noBooking
+              ? "Let's get started — submit your inquiry below to kick things off."
+              : `${formatDate(booking?.event_date || null)}${booking?.venue_name ? ` · ${booking.venue_name}` : ''}`
+            }
           </p>
         </div>
-        <div style={{
-          background: 'rgba(200,169,110,0.1)',
-          border: `1px solid ${GOLD}`,
-          borderRadius: 8, padding: '10px 18px',
-          textAlign: 'right',
-        }}>
-          <p style={{
-            margin: 0, fontSize: 9, letterSpacing: '2px',
-            textTransform: 'uppercase', color: GOLD,
-            fontFamily: 'Poppins, sans-serif',
-          }}>Package</p>
-          <p style={{
-            margin: '4px 0 0', fontSize: 13, fontWeight: 600,
-            color: 'white', fontFamily: 'Poppins, sans-serif',
-          }}>{booking.package}</p>
-        </div>
+        {!noBooking && (
+          <div style={{
+            background: 'rgba(200,169,110,0.1)',
+            border: `1px solid ${GOLD}`,
+            borderRadius: 8, padding: '10px 18px',
+            textAlign: 'right',
+          }}>
+            <p style={{
+              margin: 0, fontSize: 9, letterSpacing: '2px',
+              textTransform: 'uppercase', color: GOLD,
+              fontFamily: 'Poppins, sans-serif',
+            }}>Package</p>
+            <p style={{
+              margin: '4px 0 0', fontSize: 13, fontWeight: 600,
+              color: 'white', fontFamily: 'Poppins, sans-serif',
+            }}>{booking?.package}</p>
+          </div>
+        )}
       </div>
 
       {/* Progress bar */}
@@ -206,15 +219,22 @@ export default function StepTracker({ booking, clientName }: Props) {
               margin: '0 0 3px', fontSize: 9, letterSpacing: '2px',
               textTransform: 'uppercase', color: RED,
               fontFamily: 'Poppins, sans-serif', fontWeight: 600,
-            }}>Action Required</p>
+            }}>
+              {noBooking ? 'Start Here' : 'Action Required'}
+            </p>
             <p style={{ margin: 0, fontSize: 13, color: 'white', fontFamily: 'Poppins, sans-serif' }}>
               Step {activeStep.num}: <strong>{activeStep.title}</strong> — {activeStep.subtitle}
             </p>
           </div>
           <button
             onClick={() => setExpanded(activeStep.id)}
-            className="btn-primary"
-            style={{ fontSize: 12, padding: '8px 16px' }}
+            style={{
+              background: RED, color: 'white', border: 'none',
+              borderRadius: 8, padding: '8px 16px',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+              fontFamily: 'Poppins, sans-serif',
+              boxShadow: '0 4px 16px rgba(214,48,49,0.35)',
+            }}
           >
             Open →
           </button>
@@ -237,7 +257,7 @@ export default function StepTracker({ booking, clientName }: Props) {
               opacity: isLocked ? 0.6 : 1,
               transition: 'all 0.2s',
             }}>
-              {/* Header row */}
+              {/* Header */}
               <div
                 onClick={() => !isLocked && setExpanded(isExpanded ? null : step.id)}
                 style={{
@@ -246,7 +266,6 @@ export default function StepTracker({ booking, clientName }: Props) {
                   cursor: isLocked ? 'default' : 'pointer',
                 }}
               >
-                {/* Step badge */}
                 <div style={{
                   width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -259,7 +278,6 @@ export default function StepTracker({ booking, clientName }: Props) {
                   {isComplete ? '✓' : step.num}
                 </div>
 
-                {/* Text */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span style={{
@@ -280,7 +298,7 @@ export default function StepTracker({ booking, clientName }: Props) {
                         display: 'inline-block',
                         boxShadow: isActive ? `0 0 6px ${RED}` : 'none',
                       }} />
-                      {isComplete ? 'Complete' : isActive ? 'Action Required' : 'Upcoming'}
+                      {isComplete ? 'Complete' : isActive ? (noBooking && step.id === 'inquiry' ? 'Start Here' : 'Action Required') : 'Upcoming'}
                     </span>
                   </div>
                   <p style={{
@@ -353,11 +371,34 @@ export default function StepTracker({ booking, clientName }: Props) {
                       </p>
                     </div>
                   ) : step.href ? (
-                    <Link href={step.href} className="btn-primary" style={{
-                      display: 'inline-flex', fontSize: 13, padding: '10px 22px',
-                    }}>
-                      {step.actionLabel} →
-                    </Link>
+                    step.external ? (
+                      <a
+                        href={step.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 8,
+                          background: RED, color: 'white',
+                          textDecoration: 'none', borderRadius: 8,
+                          padding: '11px 24px', fontSize: 13, fontWeight: 700,
+                          fontFamily: 'Poppins, sans-serif',
+                          boxShadow: '0 4px 20px rgba(214,48,49,0.4)',
+                        }}
+                      >
+                        {step.actionLabel}
+                      </a>
+                    ) : (
+                      <Link href={step.href} style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 8,
+                        background: RED, color: 'white',
+                        textDecoration: 'none', borderRadius: 8,
+                        padding: '11px 24px', fontSize: 13, fontWeight: 700,
+                        fontFamily: 'Poppins, sans-serif',
+                        boxShadow: '0 4px 20px rgba(214,48,49,0.4)',
+                      }}>
+                        {step.actionLabel}
+                      </Link>
+                    )
                   ) : (
                     <div style={{
                       padding: '10px 14px',
