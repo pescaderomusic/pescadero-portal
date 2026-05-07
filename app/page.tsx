@@ -609,56 +609,13 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Contact options */}
-          <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr',
-            gap: 16, marginBottom: 40,
-          }} className="grid-2">
-            <a href="mailto:garrett@pescaderomusic.com" style={{
-              display: 'flex', alignItems: 'center', gap: 14,
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 10, padding: '18px 20px',
-              textDecoration: 'none', transition: 'all 0.2s',
-              color: 'inherit',
-            }}>
-              <span style={{ fontSize: 22 }}>✉️</span>
-              <div>
-                <p style={{ fontSize: 11, color: TEAL, fontWeight: 600, marginBottom: 2 }}>EMAIL</p>
-                <p style={{ fontSize: 12, color: 'rgba(232,224,213,0.7)' }}>garrett@pescaderomusic.com</p>
-              </div>
-            </a>
-            <a href="tel:2107279328" style={{
-              display: 'flex', alignItems: 'center', gap: 14,
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 10, padding: '18px 20px',
-              textDecoration: 'none', transition: 'all 0.2s',
-              color: 'inherit',
-            }}>
-              <span style={{ fontSize: 22 }}>📱</span>
-              <div>
-                <p style={{ fontSize: 11, color: TEAL, fontWeight: 600, marginBottom: 2 }}>PHONE / TEXT</p>
-                <p style={{ fontSize: 12, color: 'rgba(232,224,213,0.7)' }}>(210) 727-9328</p>
-              </div>
-            </a>
-          </div>
-
-          {/* Divider */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 16, marginBottom: 40,
-          }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
-            <span style={{ fontSize: 11, color: 'rgba(232,224,213,0.25)', letterSpacing: '2px' }}>OR</span>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
-          </div>
-
-          {/* CTA to create account */}
+          {/* Primary CTA — book first */}
           <div style={{
             background: `linear-gradient(135deg, rgba(214,48,49,0.1), rgba(79,185,175,0.05))`,
             border: '1px solid rgba(214,48,49,0.2)',
             borderRadius: 12, padding: '36px',
             textAlign: 'center',
+            marginBottom: 40,
           }}>
             <h3 style={{
               fontFamily: 'Lora, serif', fontSize: 22,
@@ -668,8 +625,8 @@ export default function HomePage() {
               fontSize: 13, color: 'rgba(232,224,213,0.5)',
               marginBottom: 24, lineHeight: 1.6,
             }}>
-              Create your client account to submit an inquiry, track your booking,
-              review your contract, and manage everything in one place.
+              Create a free account to submit your inquiry, track your booking,
+              sign your contract, and manage everything in one place.
             </p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link href="/auth/signup" className="btn-primary">
@@ -678,6 +635,48 @@ export default function HomePage() {
               <Link href="/auth/login" className="btn-ghost">
                 Sign In
               </Link>
+            </div>
+          </div>
+
+          {/* Secondary — questions */}
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <p style={{
+              fontSize: 13, color: 'rgba(232,224,213,0.35)',
+              fontFamily: 'Poppins, sans-serif', fontStyle: 'italic',
+              marginBottom: 20,
+            }}>
+              Questions? Feel free to reach out directly.
+            </p>
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr',
+              gap: 12,
+            }} className="grid-2">
+              <a href="mailto:garrett@pescaderomusic.com" style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 10, padding: '14px 16px',
+                textDecoration: 'none', color: 'inherit',
+              }}>
+                <span style={{ fontSize: 18 }}>✉️</span>
+                <div>
+                  <p style={{ fontSize: 10, color: TEAL, fontWeight: 600, marginBottom: 1 }}>EMAIL</p>
+                  <p style={{ fontSize: 11, color: 'rgba(232,224,213,0.55)' }}>garrett@pescaderomusic.com</p>
+                </div>
+              </a>
+              <a href="tel:2107279328" style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 10, padding: '14px 16px',
+                textDecoration: 'none', color: 'inherit',
+              }}>
+                <span style={{ fontSize: 18 }}>📱</span>
+                <div>
+                  <p style={{ fontSize: 10, color: TEAL, fontWeight: 600, marginBottom: 1 }}>PHONE / TEXT</p>
+                  <p style={{ fontSize: 11, color: 'rgba(232,224,213,0.55)' }}>(210) 727-9328</p>
+                </div>
+              </a>
             </div>
           </div>
         </div>
