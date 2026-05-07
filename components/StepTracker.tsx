@@ -13,6 +13,7 @@ interface Booking {
   event_date: string | null
   venue_name: string | null
   venue_address: string | null
+  event_type: string | null
   package: string
   step_inquiry: string
   step_contract: string
