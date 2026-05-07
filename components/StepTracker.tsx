@@ -47,7 +47,7 @@ export default function StepTracker({ booking, clientName }: Props) {
         : 'Your inquiry has been received. Garrett will follow up via your preferred contact method to confirm availability.',
       status: noBooking ? 'active' as const : getStepStatus(booking.step_inquiry),
       actionLabel: noBooking ? 'Submit Your Inquiry →' : 'View Your Inquiry',
-      href: noBooking ? 'https://inquiries.pescaderomusic.com' : '/inquiry/view',
+      href: noBooking ? '/inquiry.html' : '/inquiry/view',
       external: noBooking,
     },
     {
