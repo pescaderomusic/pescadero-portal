@@ -1,7 +1,22 @@
-import { redirect } from 'next/navigation'
+'use client'
+import { useEffect } from 'react'
 
-// The inquiry form is served as a static HTML file
-// This redirect sends users to the static page
 export default function InquiryPage() {
-  redirect('/inquiry.html')
+  useEffect(() => {
+    window.location.href = '/inquiry.html'
+  }, [])
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#0D1B2A',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#F5EFE0',
+      fontFamily: 'sans-serif',
+    }}>
+      Loading...
+    </div>
+  )
 }
