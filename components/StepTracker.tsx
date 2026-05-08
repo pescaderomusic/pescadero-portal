@@ -21,6 +21,8 @@ interface Booking {
   step_planning: string
   step_consultation: string
   step_event: string
+  step_final_payment?: string
+  final_payment_due?: string
 }
 
 interface Props {
@@ -98,7 +100,16 @@ export default function StepTracker({ booking, clientName }: Props) {
       actionLabel: 'Schedule a Call',
     },
     {
-      id: 'event', num: '06', title: 'Event Day', subtitle: 'Sit back and enjoy',
+      id: 'final_payment', num: '06', title: 'Final Payment', subtitle: 'Balance due before your event',
+      description: !noBooking && booking.final_payment_due
+        ? `Your remaining balance is due by ${new Date(booking.final_payment_due + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Once received your booking is fully confirmed.`
+        : 'Your remaining balance will be due 7 days before your event.',
+      status: noBooking ? 'locked' as const : getStepStatus(booking.step_final_payment || 'locked'),
+      href: '/contract/final-payment',
+      actionLabel: 'Pay Final Balance →',
+    },
+    {
+      id: 'event', num: '07', title: 'Event Day', subtitle: 'Sit back and enjoy',
       description: 'Everything is locked in. Your technician arrives 45 min early. All you have to do is show up.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_event),
     },
