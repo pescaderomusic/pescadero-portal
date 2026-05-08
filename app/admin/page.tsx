@@ -9,11 +9,12 @@ export default async function AdminPage() {
 
   const admin = createAdminClient()
 
-  const [{ data: bookings }, { data: inquiries }, { data: profiles }] = await Promise.all([
-    admin.from('bookings').select('*, profiles ( full_name, phone, preferred_contact )').order('created_at', { ascending: false }),
+  const [{ data: bookings }, { data: inquiries }, { data: profiles }, { data: contracts }] = await Promise.all([
+    admin.from('bookings').select('*, profiles ( full_name, phone, preferred_contact, email )').order('created_at', { ascending: false }),
     admin.from('inquiry_submissions').select('*').order('submitted_at', { ascending: false }),
     admin.from('profiles').select('*').order('created_at', { ascending: false }),
+    admin.from('contracts').select('*').order('created_at', { ascending: false }),
   ])
 
-  return <AdminDashboard bookings={bookings || []} inquiries={inquiries || []} profiles={profiles || []} />
+  return <AdminDashboard bookings={bookings || []} inquiries={inquiries || []} profiles={profiles || []} contracts={contracts || []} />
 }
