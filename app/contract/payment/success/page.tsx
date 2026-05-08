@@ -1,7 +1,24 @@
+import { redirect } from 'next/navigation'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 
-export default function PaymentSuccessPage({ searchParams }: { searchParams: { type: string } }) {
+export default async function PaymentSuccessPage({ searchParams }: { searchParams: { type: string, contract: string } }) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
   const isDeposit = searchParams.type === 'deposit'
+  const contractId = searchParams.contract
+  const admin = createAdminClient()
+
+  // Fallback: update steps in case webhook hasn't fired yet
+  if (contractId && isDeposit) {
+    await admin.from('contracts').update({ status: 'deposit_paid', deposit_paid_at: new Date().toISOString() }).eq('id', contractId)
+    await admin.from('bookings').update({ step_deposit: 'paid', step_planning: 'pending' }).eq('client_id', user.id)
+  } else if (contractId && !isDeposit) {
+    await admin.from('contracts').update({ status: 'complete' }).eq('id', contractId)
+    await admin.from('bookings').update({ step_final_payment: 'paid', step_event: 'pending' }).eq('client_id', user.id)
+  }
 
   return (
     <div style={{

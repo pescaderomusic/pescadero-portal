@@ -117,6 +117,7 @@ export default function StepTracker({ booking, clientName }: Props) {
 
   const completedCount = steps.filter(s => s.status === 'complete').length
   const activeStep = steps.find(s => s.status === 'active')
+  const [expandedStep, setExpandedStep] = useState<string | null>(null)
 
   const formatDate = (d: string | null) => {
     if (!d) return 'Date TBD'
@@ -296,13 +297,16 @@ export default function StepTracker({ booking, clientName }: Props) {
                 </div>
 
                 {/* Content */}
-                <div style={{
-                  flex: 1, paddingBottom: isLast ? 0 : 8,
-                  opacity: isLocked ? 0.5 : 1,
-                  transition: 'opacity 0.2s',
-                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-                  minHeight: 0,
-                }}>
+                <div
+                  onClick={() => isComplete && setExpandedStep(isExpanded ? null : step.id)}
+                  style={{
+                    flex: 1, paddingBottom: isLast ? 0 : 8,
+                    opacity: isLocked ? 0.5 : 1,
+                    transition: 'opacity 0.2s',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+                    minHeight: 0,
+                    cursor: isComplete ? 'pointer' : 'default',
+                  }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <div>
                       <span style={{
@@ -332,7 +336,10 @@ export default function StepTracker({ booking, clientName }: Props) {
                       }}>{step.actionLabel}</Link>
                     )}
                     {isComplete && (
-                      <span style={{ fontSize: 9, color: TEAL, fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Done ✓</span>
+                      <span style={{ fontSize: 9, color: TEAL, fontFamily: 'Poppins, sans-serif', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        Done ✓
+                        <span style={{ fontSize: 7, opacity: 0.6, transform: isExpanded ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform 0.2s' }}>▼</span>
+                      </span>
                     )}
                     {isLocked && (
                       <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.1)' }}>🔒</span>
@@ -343,6 +350,28 @@ export default function StepTracker({ booking, clientName }: Props) {
                     color: isLocked ? 'rgba(232,224,213,0.2)' : 'rgba(232,224,213,0.4)',
                     fontFamily: 'Poppins, sans-serif', lineHeight: 1.4,
                   }}>{step.subtitle}</p>
+
+                  {/* Expanded info for completed steps */}
+                  {isExpanded && isComplete && (
+                    <div style={{
+                      marginTop: 10,
+                      background: 'rgba(79,185,175,0.06)',
+                      border: '1px solid rgba(79,185,175,0.15)',
+                      borderRadius: 8, padding: '10px 12px',
+                    }}>
+                      <p style={{ margin: '0 0 6px', fontSize: 11, color: 'rgba(232,224,213,0.7)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>
+                        {step.description}
+                      </p>
+                      {step.href && step.id !== 'inquiry' && (
+                        <Link href={step.href} style={{
+                          fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif',
+                          textDecoration: 'none', fontWeight: 600,
+                        }}>
+                          View {step.title} →
+                        </Link>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )
