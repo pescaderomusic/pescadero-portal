@@ -267,6 +267,7 @@ export default function StepTracker({ booking, clientName }: Props) {
             const isActive = step.status === 'active'
             const isLocked = step.status === 'locked'
             const isLast = i === steps.length - 1
+            const isExpanded = expandedStep === step.id
 
             return (
               <div key={step.id} style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0 }}>
