@@ -1,7 +1,7 @@
-import Link from 'next/link'
 'use client'
-import Link from 'next/link'import { useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 const TEAL = '#4FB9AF'
