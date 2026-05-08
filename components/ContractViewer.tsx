@@ -94,14 +94,31 @@ export default function ContractViewer({ contract }: Props) {
     setSigning(true)
     setError('')
 
-    // Save editable fields + signature
-    await supabase.from('contracts').update({
-      ...editableFields,
-      client_signature: signatureName,
-      client_signed_name: signatureName,
-      client_signed_at: new Date().toISOString(),
-      status: 'client_signed',
-    }).eq('id', contract.id)
+    // Save editable fields + signature via API
+    await fetch('/api/client/save-contract', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contractId: contract.id,
+        fields: {
+          ...editableFields,
+          client_signature: signatureName,
+          client_signed_name: signatureName,
+          client_signed_at: new Date().toISOString(),
+          status: 'client_signed',
+        }
+      }),
+    })
+
+    // Update booking step — contract signed, deposit now pending
+    await fetch('/api/client/update-booking-step', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        step_contract: 'signed',
+        step_deposit: 'pending',
+      }),
+    })
 
     setSigned(true)
     setSigning(false)
