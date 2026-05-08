@@ -78,13 +78,10 @@ export default function StepTracker({ booking, clientName }: Props) {
     },
     {
       id: 'deposit', num: '03', title: 'Deposit', subtitle: '$100 to secure your date',
-      description: 'Secure your date with a $100 deposit via Venmo, PayPal, or CashApp.',
+      description: 'Secure your date with a $100 non-refundable deposit. Your date is not officially locked until payment is received.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_deposit),
-      payLinks: [
-        { label: 'Venmo', url: 'https://venmo.com/u/pescaderomusic', color: '#008CFF' },
-        { label: 'PayPal', url: 'https://paypal.me/pescaderomusic', color: '#003087' },
-        { label: 'CashApp', url: 'https://cash.app/$pescaderomusic', color: '#00D632' },
-      ],
+      href: '/contract/payment',
+      actionLabel: 'Make Deposit →',
     },
     {
       id: 'planning', num: '04', title: 'Planning Form', subtitle: 'Timeline & music details',
@@ -315,25 +312,13 @@ export default function StepTracker({ booking, clientName }: Props) {
                       )}
                     </div>
                     {/* Action */}
-                    {isActive && (
-                      step.payLinks ? (
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          {step.payLinks.map(pl => (
-                            <a key={pl.label} href={pl.url} target="_blank" rel="noopener noreferrer" style={{
-                              background: pl.color, color: 'white', textDecoration: 'none',
-                              borderRadius: 5, padding: '3px 8px', fontSize: 9, fontWeight: 700,
-                              fontFamily: 'Poppins, sans-serif',
-                            }}>{pl.label}</a>
-                          ))}
-                        </div>
-                      ) : step.href ? (
-                        <Link href={step.href} style={{
-                          background: RED, color: 'white', textDecoration: 'none',
-                          borderRadius: 6, padding: '4px 10px', fontSize: 10, fontWeight: 700,
-                          fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap',
-                          boxShadow: '0 2px 10px rgba(214,48,49,0.35)',
-                        }}>{step.actionLabel}</Link>
-                      ) : null
+                    {isActive && step.href && (
+                      <Link href={step.href} style={{
+                        background: RED, color: 'white', textDecoration: 'none',
+                        borderRadius: 6, padding: '4px 10px', fontSize: 10, fontWeight: 700,
+                        fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap',
+                        boxShadow: '0 2px 10px rgba(214,48,49,0.35)',
+                      }}>{step.actionLabel}</Link>
                     )}
                     {isComplete && (
                       <span style={{ fontSize: 9, color: TEAL, fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Done ✓</span>
