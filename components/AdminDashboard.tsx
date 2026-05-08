@@ -38,7 +38,7 @@ function statusColor(s: string) {
   return '#4A5568'
 }
 
-export default function AdminDashboard({ bookings, inquiries, profiles }: { bookings: any[], inquiries: any[], profiles: any[] }) {
+export default function AdminDashboard({ bookings, inquiries }: { bookings: any[], inquiries: any[] }) {
   const supabase = createClient()
   const [tab, setTab] = useState<'inquiries' | 'bookings'>('inquiries')
   const [saving, setSaving] = useState<string | null>(null)
@@ -57,11 +57,17 @@ export default function AdminDashboard({ bookings, inquiries, profiles }: { book
 
   async function updateStep(bookingId: string, field: string, value: string) {
     setSaving(bookingId + field)
-    const updates: Record<string, string> = { [field]: value }
-    if (field === 'step_deposit' && value === 'paid') updates.step_planning = 'pending'
-    if (field === 'step_planning' && value === 'submitted') updates.step_consultation = 'pending'
-    const { error } = await supabase.from('bookings').update(updates).eq('id', bookingId)
-    if (!error) setLocalBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...updates } : b))
+    try {
+      const res = await fetch('/api/admin/update-step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId, field, value }),
+      })
+      const data = await res.json()
+      if (data.updates) {
+        setLocalBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...data.updates } : b))
+      }
+    } catch(err) { console.error(err) }
     setSaving(null)
   }
 
