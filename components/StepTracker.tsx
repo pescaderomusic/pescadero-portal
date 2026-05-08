@@ -260,8 +260,8 @@ export default function StepTracker({ booking, clientName }: Props) {
           <div style={{ height: '100%', width: `${(completedCount / steps.length) * 100}%`, background: `linear-gradient(90deg, ${TEAL}, ${RED})`, borderRadius: 3, transition: 'width 0.6s ease' }} />
         </div>
 
-        {/* Steps — vertical timeline, no scroll */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, overflow: 'hidden' }}>
+        {/* Steps — vertical timeline */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, overflowY: 'auto', overflowX: 'hidden' }}>
           {steps.map((step, i) => {
             const isComplete = step.status === 'complete'
             const isActive = step.status === 'active'
@@ -270,7 +270,7 @@ export default function StepTracker({ booking, clientName }: Props) {
             const isExpanded = expandedStep === step.id
 
             return (
-              <div key={step.id} style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0 }}>
+              <div key={step.id} style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
                 {/* Timeline spine */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
                   {/* Dot */}
@@ -355,20 +355,32 @@ export default function StepTracker({ booking, clientName }: Props) {
                   {/* Expanded info for completed steps */}
                   {isExpanded && isComplete && (
                     <div style={{
-                      marginTop: 10,
+                      marginTop: 8, marginBottom: 4,
                       background: 'rgba(79,185,175,0.06)',
                       border: '1px solid rgba(79,185,175,0.15)',
                       borderRadius: 8, padding: '10px 12px',
                     }}>
-                      <p style={{ margin: '0 0 6px', fontSize: 11, color: 'rgba(232,224,213,0.7)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>
+                      <p style={{ margin: '0 0 8px', fontSize: 11, color: 'rgba(232,224,213,0.6)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>
                         {step.description}
                       </p>
-                      {step.href && step.id !== 'inquiry' && (
-                        <Link href={step.href} style={{
-                          fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif',
-                          textDecoration: 'none', fontWeight: 600,
-                        }}>
-                          View {step.title} →
+                      {step.id === 'inquiry' && (
+                        <Link href="/inquiry" style={{ fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
+                          View My Inquiry →
+                        </Link>
+                      )}
+                      {step.id === 'contract' && (
+                        <Link href="/contract" style={{ fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
+                          View My Contract →
+                        </Link>
+                      )}
+                      {step.id === 'deposit' && (
+                        <Link href="/contract/payment" style={{ fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
+                          View Payment Details →
+                        </Link>
+                      )}
+                      {step.id === 'planning' && (
+                        <Link href="/planning" style={{ fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
+                          View My Planning Form →
                         </Link>
                       )}
                     </div>
