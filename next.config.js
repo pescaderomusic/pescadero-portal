@@ -5,6 +5,15 @@ const nextConfig = {
       { protocol: 'https', hostname: 'kngjfhugorxhnwydnftc.supabase.co' },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/inquiry.html',
+        destination: '/',
+        permanent: false,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig
