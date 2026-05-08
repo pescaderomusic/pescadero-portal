@@ -80,7 +80,7 @@ export default function SignupPage() {
               type="text"
               value={fullName}
               onChange={e => setFullName(e.target.value)}
-              placeholder="Sarah & James Wersland"
+              placeholder="Jane & John Doe"
               required
             />
           </div>
