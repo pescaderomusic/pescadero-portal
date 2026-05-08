@@ -71,10 +71,10 @@ export default function StepTracker({ booking, clientName }: Props) {
     {
       id: 'contract', num: '02', title: 'Service Agreement', subtitle: 'Review & sign your contract',
       description: !noBooking && booking.step_contract === 'sent'
-        ? 'Your contract is ready to review and sign.'
-        : 'Your contract will appear here once Garrett confirms availability.',
+        ? 'Your contract is ready to review and sign. Click below to open it.'
+        : 'Your contract will appear here once Garrett reviews your inquiry and confirms your booking.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_contract),
-      href: '/contract', actionLabel: 'Review Contract',
+      href: '/contract', actionLabel: 'Open Contract →',
     },
     {
       id: 'deposit', num: '03', title: 'Deposit', subtitle: '$100 to secure your date',

@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 const TEAL = '#4FB9AF'
@@ -37,7 +38,7 @@ function statusColor(s: string) {
   return '#4A5568'
 }
 
-export default function AdminDashboard({ bookings, inquiries, profiles }: { bookings: any[], inquiries: any[], profiles: any[] }) {
+export default function AdminDashboard({ bookings, inquiries }: { bookings: any[], inquiries: any[] }) {
   const supabase = createClient()
   const [tab, setTab] = useState<'inquiries' | 'bookings'>('inquiries')
   const [saving, setSaving] = useState<string | null>(null)
@@ -167,19 +168,18 @@ export default function AdminDashboard({ bookings, inquiries, profiles }: { book
                           background: `${statusColor(inq.status)}18`, border: `1px solid ${statusColor(inq.status)}40`,
                           color: statusColor(inq.status), fontFamily: 'Poppins, sans-serif',
                         }}>{inq.contract_sent ? 'Contract Sent' : inq.status}</span>
-                        {!inq.contract_sent && inq.status !== 'declined' && (
-                          <button onClick={e => { e.stopPropagation(); sendContract(inq) }}
-                            disabled={sendingContract === inq.id || !inq.client_id}
-                            style={{
-                              background: inq.client_id ? RED : 'rgba(255,255,255,0.08)',
-                              color: 'white', border: 'none', borderRadius: 7,
-                              padding: '7px 14px', fontSize: 11, fontWeight: 700,
-                              cursor: inq.client_id ? 'pointer' : 'not-allowed',
-                              fontFamily: 'Poppins, sans-serif',
-                            }}>
-                            {sendingContract === inq.id ? 'Sending…' : inq.client_id ? 'Send Contract →' : 'No Account'}
-                          </button>
-                        )}
+                        <Link
+                          href={`/admin/contract/${inq.id}`}
+                          onClick={e => e.stopPropagation()}
+                          style={{
+                            background: 'rgba(79,185,175,0.1)', color: TEAL,
+                            border: '1px solid rgba(79,185,175,0.25)', borderRadius: 7,
+                            padding: '7px 14px', fontSize: 11, fontWeight: 700,
+                            textDecoration: 'none', fontFamily: 'Poppins, sans-serif',
+                            display: 'inline-flex', alignItems: 'center',
+                          }}>
+                          {inq.contract_sent ? '📋 Edit Contract' : '📋 Review & Send →'}
+                        </Link>
                       </div>
                       <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.2)', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>▼</span>
                     </div>
