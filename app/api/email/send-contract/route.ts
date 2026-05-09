@@ -3,15 +3,14 @@ export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { sendContractReady } from '@/lib/email'
+import { Resend } from 'resend'
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     const admin = createAdminClient()
-    const { data: profile } = await admin
-      .from('profiles').select('is_admin').eq('id', user?.id).single()
+    const { data: profile } = await admin.from('profiles').select('is_admin').eq('id', user?.id).single()
     if (!profile?.is_admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
 
     const { contractId } = await req.json()
@@ -22,10 +21,15 @@ export async function POST(req: NextRequest) {
     if (!contract) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     const client = contract.profiles
-    await sendContractReady(client.email, client.first_name, contract.event_name ?? 'your event', contract.event_date ?? '', contract.deposit_amount ?? 100)
+    const resend = new Resend(process.env.RESEND_API_KEY!)
+    await resend.emails.send({
+      from: 'Pescadero Music <garrett@pescaderomusic.com>',
+      to: client.email,
+      subject: `Your Pescadero Music contract is ready — ${contract.event_name ?? 'your event'}`,
+      html: `<p>Hi ${client.first_name}, your contract is ready. <a href="https://pescaderomusic.com/dashboard">View it here →</a></p>`,
+    })
     return NextResponse.json({ sent: true })
   } catch (err: any) {
-    console.error(err)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
