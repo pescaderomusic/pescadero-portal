@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic"
 export const dynamic = 'force-dynamic'
 
 // app/api/email/send-contract/route.ts
@@ -11,7 +10,6 @@ export async function POST(req: NextRequest) {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Must be admin (garrett)
     const admin = createAdminClient()
     const { data: profile } = await admin
       .from('profiles')
