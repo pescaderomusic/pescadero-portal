@@ -4,7 +4,7 @@
 
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY!)
+const getResend = () => new Resend(process.env.RESEND_API_KEY!)
 
 const FROM    = 'Pescadero Music <garrett@pescaderomusic.com>'
 const GARRETT = 'garrett@pescaderomusic.com'
@@ -134,7 +134,7 @@ export async function sendWelcomeEmail(to: string, firstName: string) {
     ${signOff()}
   `)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: 'Welcome to Pescadero Music — Your account is ready',
@@ -157,7 +157,7 @@ export async function sendInquiryConfirmation(to: string, firstName: string, eve
     ${signOff()}
   `)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `Inquiry received — ${eventName}`,
@@ -188,7 +188,7 @@ export async function sendGarrettInquiryAlert(client: {
     ${btn('Review in Admin Panel', 'https://pescaderomusic.com/admin')}
   `)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: GARRETT,
     subject: `🎵 New inquiry — ${client.firstName} ${client.lastName} · ${client.eventDate}`,
@@ -212,7 +212,7 @@ export async function sendContractReady(to: string, firstName: string, eventName
     ${signOff()}
   `)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `Your Pescadero Music contract is ready — ${eventName}`,
@@ -238,7 +238,7 @@ export async function sendGarrettContractSigned(client: {
     ${btn('View in Admin Panel', 'https://pescaderomusic.com/admin')}
   `)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: GARRETT,
     subject: `✅ Signed + paid — ${client.firstName} ${client.lastName} · ${client.eventDate}`,
@@ -263,7 +263,7 @@ export async function sendDepositConfirmation(to: string, firstName: string, eve
     ${signOff()}
   `)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `Booking confirmed — ${eventName} on ${eventDate}`,
@@ -286,7 +286,7 @@ export async function sendGarrettPlanningFormAlert(client: {
     ${btn('Review Planning Form', 'https://pescaderomusic.com/admin')}
   `)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: GARRETT,
     subject: `📋 Planning form submitted — ${client.firstName} ${client.lastName} · ${client.eventDate}`,
@@ -310,7 +310,7 @@ export async function sendFinalPaymentConfirmation(to: string, firstName: string
     ${signOff()}
   `)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `Payment complete — ${eventName} on ${eventDate}`,
