@@ -149,6 +149,17 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           ✓ {paymentType === 'deposit' ? 'Deposit received — your date is locked in!' : 'Final payment received — fully confirmed!'}
         </div>
       )}
+      {justPaid && (
+        <div style={{
+          position: 'fixed', top: 72, left: '50%', transform: 'translateX(-50%)',
+          background: '#44BEC7', color: '#0D1B2A', borderRadius: 10,
+          padding: '12px 28px', fontFamily: 'Poppins, sans-serif',
+          fontSize: 13, fontWeight: 700, zIndex: 999,
+          boxShadow: '0 4px 20px rgba(68,190,199,0.4)',
+        }}>
+          ✓ {paymentType === 'deposit' ? 'Deposit received — your date is locked in!' : 'Final payment received — fully confirmed!'}
+        </div>
+      )}
       {/* ── LEFT COLUMN ─────────────────────────── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, overflow: 'hidden' }}>
 
