@@ -47,13 +47,13 @@ export async function handlePayment(contract_id: string, client_id: string, paym
 }
 
 async function sendDepositEmails(admin: any, contract_id: string, client_id: string) {
-  const { data: profile } = await admin.from('profiles').select('first_name, last_name, email').eq('id', client_id).single()
+  const { data: profile } = await admin.from('profiles').select('full_name, email').eq('id', client_id).single()
   const { data: contract } = await admin.from('contracts').select('event_type, event_date, deposit_amount').eq('id', contract_id).single()
   if (!profile || !contract) { console.error('[emails] profile or contract not found'); return }
   const { Resend } = await import('resend')
   const resend = new Resend(process.env.RESEND_API_KEY!)
   const eventName = contract.event_type ?? 'your event'
   const eventDate = contract.event_date ?? ''
-  await resend.emails.send({ from: 'Pescadero Music <garrett@pescaderomusic.com>', to: profile.email, subject: `Booking confirmed — ${eventName}`, html: `<p>Hi ${profile.first_name}, your $${contract.deposit_amount ?? 100} deposit is received and your date is locked in!</p><p><a href="https://pescaderomusic.com/dashboard">View dashboard →</a></p>` })
-  await resend.emails.send({ from: 'Pescadero Music <garrett@pescaderomusic.com>', to: 'garrett@pescaderomusic.com', subject: `✅ Deposit — ${profile.first_name} ${profile.last_name} · ${eventDate}`, html: `<p>${profile.first_name} ${profile.last_name} paid the deposit for <strong>${eventName}</strong> on ${eventDate}.</p>` })
+  await resend.emails.send({ from: 'Pescadero Music <garrett@pescaderomusic.com>', to: profile.email, subject: `Booking confirmed — ${eventName}`, html: `<p>Hi ${profile.full_name?.split(' ')[0] ?? 'there'}, your $${contract.deposit_amount ?? 100} deposit is received and your date is locked in!</p><p><a href="https://pescaderomusic.com/dashboard">View dashboard →</a></p>` })
+  await resend.emails.send({ from: 'Pescadero Music <garrett@pescaderomusic.com>', to: 'garrett@pescaderomusic.com', subject: `✅ Deposit — ${profile.full_name} · ${eventDate}`, html: `<p>${profile.full_name} paid the deposit for <strong>${eventName}</strong> on ${eventDate}.</p>` })
 }
