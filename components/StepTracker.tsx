@@ -1,12 +1,11 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const TEAL = '#4FB9AF'
-const RED  = '#D63031'
-const GOLD = '#C8A96E'
-const NAVY = '#0F1F35'
-const NAVY2 = '#162840'
+const BLUE  = '#44BEC7'
+const RED   = '#D62828'
+const NAVY  = '#0D1B2A'
+const NAVY2 = '#152032'
 
 interface Booking {
   id: string
@@ -128,7 +127,41 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
 
   const firstName = clientName.split(' ')[0] || 'there'
 
+  // ── justPaid banner ─────────────────────────────────
+  const [showBanner, setShowBanner] = React.useState(justPaid)
+  React.useEffect(() => {
+    if (!justPaid) return
+    const t = setTimeout(() => setShowBanner(false), 6000)
+    return () => clearTimeout(t)
+  }, [justPaid])
+
   return (
+    <>
+    {showBanner && (
+      <div style={{
+        position: 'fixed', top: 72, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 999, background: '#0D1B2A',
+        border: '1px solid rgba(68,190,199,0.5)',
+        borderRadius: 12, padding: '12px 24px',
+        display: 'flex', alignItems: 'center', gap: 12,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        fontFamily: 'Poppins, sans-serif',
+        animation: 'slideDown 0.4s ease',
+      }}>
+        <span style={{ fontSize: 20 }}>🎉</span>
+        <div>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'white' }}>
+            {paymentType === 'deposit' ? 'Deposit received!' : 'Payment complete!'}
+          </p>
+          <p style={{ margin: 0, fontSize: 11, color: 'rgba(68,190,199,0.8)' }}>
+            {paymentType === 'deposit' ? 'Your date is officially locked in. 🎵' : 'Your booking is fully confirmed.'}
+          </p>
+        </div>
+        <button onClick={() => setShowBanner(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 16, padding: 0, marginLeft: 8 }}>✕</button>
+      </div>
+    )}
+    <style>{`@keyframes slideDown { from { opacity:0; transform:translateX(-50%) translateY(-16px) } to { opacity:1; transform:translateX(-50%) translateY(0) } }`}</style>
+    (
     <div style={{
       height: 'calc(100vh - 64px)',
       display: 'grid',
@@ -170,7 +203,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           overflow: 'hidden',
           position: 'relative',
           height: '42%',
-          border: '1px solid rgba(79,185,175,0.15)',
+          border: '1px solid rgba(68,190,199,0.15)',
         }}>
           <img src={PHOTO_SRC} alt="Pescadero Music" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           {/* Overlay with logo + tagline */}
@@ -183,7 +216,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <img src={LOGO_SRC} alt="logo" style={{ width: 32, height: 32, objectFit: 'contain', filter: 'drop-shadow(0 0 6px rgba(214,48,49,0.4))' }} />
               <div>
-                <div style={{ fontFamily: 'monospace', fontSize: 8, fontWeight: 700, letterSpacing: '3px', color: TEAL, textTransform: 'uppercase' }}>PESCADERO MUSIC</div>
+                <div style={{ fontFamily: 'monospace', fontSize: 8, fontWeight: 700, letterSpacing: '3px', color: BLUE, textTransform: 'uppercase' }}>PESCADERO MUSIC</div>
                 <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 11, color: 'rgba(232,224,213,0.6)' }}>Your day. Your music. Our sound.</div>
               </div>
             </div>
@@ -194,7 +227,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         <div style={{
           flex: 1,
           background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(79,185,175,0.15)',
+          border: '1px solid rgba(68,190,199,0.15)',
           borderRadius: 14,
           padding: '20px 22px',
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -221,16 +254,16 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
             <p style={{ fontSize: 13, color: 'rgba(232,224,213,0.4)', fontFamily: 'Poppins, sans-serif' }}>Event date not set yet</p>
           ) : daysUntil > 0 ? (
             <>
-              <p style={{ fontSize: 10, letterSpacing: '3px', textTransform: 'uppercase', color: TEAL, fontFamily: 'Poppins, sans-serif', marginBottom: 8, fontWeight: 600 }}>Countdown</p>
+              <p style={{ fontSize: 10, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontFamily: 'Poppins, sans-serif', marginBottom: 8, fontWeight: 600 }}>Countdown</p>
               <div style={{ fontFamily: 'Lora, serif', fontSize: 72, fontWeight: 700, color: 'white', lineHeight: 1 }}>{daysUntil}</div>
               <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 12, color: 'rgba(232,224,213,0.5)', marginTop: 6, marginBottom: 14 }}>
                 {daysUntil === 1 ? 'day' : 'days'} until your event
               </div>
               <div style={{
-                background: 'rgba(79,185,175,0.08)', border: '1px solid rgba(79,185,175,0.2)',
+                background: 'rgba(68,190,199,0.08)', border: '1px solid rgba(68,190,199,0.2)',
                 borderRadius: 8, padding: '8px 14px',
               }}>
-                <p style={{ margin: 0, fontSize: 11, color: TEAL, fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                <p style={{ margin: 0, fontSize: 11, color: BLUE, fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
                   {formatDate(booking.event_date)}
                 </p>
                 {booking.venue_name && (
@@ -244,12 +277,12 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
             <>
               <div style={{ fontSize: 40, marginBottom: 12 }}>🎉</div>
               <h2 style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 22, color: 'white' }}>It's today!</h2>
-              <p style={{ fontSize: 12, color: TEAL, fontFamily: 'Poppins, sans-serif', marginTop: 8 }}>Your technician is on the way. Enjoy every moment.</p>
+              <p style={{ fontSize: 12, color: BLUE, fontFamily: 'Poppins, sans-serif', marginTop: 8 }}>Your technician is on the way. Enjoy every moment.</p>
             </>
           ) : (
             <>
               <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
-              <h2 style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 20, color: TEAL }}>Event Complete</h2>
+              <h2 style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 20, color: BLUE }}>Event Complete</h2>
               <p style={{ fontSize: 12, color: 'rgba(232,224,213,0.4)', fontFamily: 'Poppins, sans-serif', marginTop: 8 }}>Thank you for trusting Pescadero Music.</p>
             </>
           )}
@@ -268,20 +301,20 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexShrink: 0 }}>
           <div>
-            <p style={{ margin: 0, fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL, fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>Your Progress</p>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>Your Progress</p>
             <h2 style={{ margin: '4px 0 0', fontFamily: 'Lora, serif', fontSize: 18, color: 'white' }}>
               {noBooking ? 'Getting Started' : (booking.event_type || clientName || 'Your Booking')}
             </h2>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: 0, fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>{completedCount}/{steps.length}</p>
+            <p style={{ margin: 0, fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>{completedCount}/{steps.length}</p>
             <p style={{ margin: '2px 0 0', fontSize: 9, color: 'rgba(232,224,213,0.3)', fontFamily: 'Poppins, sans-serif', letterSpacing: '1px', textTransform: 'uppercase' }}>complete</p>
           </div>
         </div>
 
         {/* Progress bar */}
         <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 3, marginBottom: 16, flexShrink: 0 }}>
-          <div style={{ height: '100%', width: `${(completedCount / steps.length) * 100}%`, background: `linear-gradient(90deg, ${TEAL}, ${RED})`, borderRadius: 3, transition: 'width 0.6s ease' }} />
+          <div style={{ height: '100%', width: `${(completedCount / steps.length) * 100}%`, background: `linear-gradient(90deg, ${BLUE}, ${RED})`, borderRadius: 3, transition: 'width 0.6s ease' }} />
         </div>
 
         {/* Steps — vertical timeline */}
@@ -301,10 +334,10 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                   <div style={{
                     width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: isComplete ? `rgba(79,185,175,0.15)` : isActive ? `rgba(214,48,49,0.12)` : 'rgba(255,255,255,0.04)',
-                    border: `1.5px solid ${isComplete ? TEAL : isActive ? RED : 'rgba(255,255,255,0.1)'}`,
+                    background: isComplete ? `rgba(68,190,199,0.15)` : isActive ? `rgba(214,48,49,0.12)` : 'rgba(255,255,255,0.04)',
+                    border: `1.5px solid ${isComplete ? BLUE : isActive ? RED : 'rgba(255,255,255,0.1)'}`,
                     fontSize: isComplete ? 12 : 9, fontWeight: 700,
-                    color: isComplete ? TEAL : isActive ? RED : '#4A5568',
+                    color: isComplete ? BLUE : isActive ? RED : '#4A5568',
                     fontFamily: 'Poppins, sans-serif',
                     boxShadow: isActive ? `0 0 10px rgba(214,48,49,0.25)` : 'none',
                     transition: 'all 0.3s',
@@ -315,7 +348,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                   {!isLast && (
                     <div style={{
                       flex: 1, width: 1.5, marginTop: 3,
-                      background: isComplete ? `rgba(79,185,175,0.3)` : 'rgba(255,255,255,0.06)',
+                      background: isComplete ? `rgba(68,190,199,0.3)` : 'rgba(255,255,255,0.06)',
                       transition: 'background 0.3s',
                     }} />
                   )}
@@ -361,7 +394,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                       }}>{step.actionLabel}</Link>
                     )}
                     {isComplete && (
-                      <span style={{ fontSize: 9, color: TEAL, fontFamily: 'Poppins, sans-serif', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ fontSize: 9, color: BLUE, fontFamily: 'Poppins, sans-serif', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
                         Done ✓
                         <span style={{ fontSize: 7, opacity: 0.6, transform: isExpanded ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform 0.2s' }}>▼</span>
                       </span>
@@ -380,30 +413,29 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                   {isExpanded && isComplete && (
                     <div style={{
                       marginTop: 8, marginBottom: 4,
-                      background: 'rgba(79,185,175,0.06)',
-                      border: '1px solid rgba(79,185,175,0.15)',
+                      background: 'rgba(68,190,199,0.06)',
+                      border: '1px solid rgba(68,190,199,0.15)',
                       borderRadius: 8, padding: '10px 12px',
                     }}>
                       <p style={{ margin: '0 0 8px', fontSize: 11, color: 'rgba(232,224,213,0.6)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>
                         {step.description}
                       </p>
                       {step.id === 'inquiry' && (
-                        <Link href="/inquiry" style={{ fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
+                        <Link href="/inquiry" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
                           View My Inquiry →
                         </Link>
                       )}
                       {step.id === 'contract' && (
-                        <Link href="/contract" style={{ fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
+                        <Link href="/contract" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
                           View My Contract →
                         </Link>
                       )}
                       {step.id === 'deposit' && (
-                        <Link href="/contract/payment" style={{ fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
-                          View Payment Details →
+                        <Link href="/receipt" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>View My Receipt →
                         </Link>
                       )}
                       {step.id === 'planning' && (
-                        <Link href="/planning" style={{ fontSize: 10, color: TEAL, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
+                        <Link href="/planning" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
                           View My Planning Form →
                         </Link>
                       )}
@@ -423,5 +455,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         </div>
       </div>
     </div>
+    )
+  </>
   )
 }

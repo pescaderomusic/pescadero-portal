@@ -1,21 +1,20 @@
 'use client'
-// app/contract/payment/page.tsx
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link'
 
 const NAVY  = '#0D1B2A'
 const RED   = '#D62828'
 const BLUE  = '#44BEC7'
-const CREAM = '#F5EFE0'
 
 function PaymentContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [contract, setContract] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [paying, setPaying] = useState(false)
-  const [error, setError] = useState('')
+  const [loading, setLoading]   = useState(true)
+  const [paying, setPaying]     = useState(false)
+  const [error, setError]       = useState('')
   const cancelled = searchParams.get('cancelled')
 
   useEffect(() => {
@@ -63,8 +62,13 @@ function PaymentContent() {
 
   const depositAmount = contract?.deposit_amount ?? 100
   const finalAmount   = contract?.final_payment_amount ?? 0
-  const depositPaid   = contract?.deposit_paid ?? false
-  const finalPaid     = contract?.final_payment_paid ?? false
+
+  // ✅ Fixed: use status or deposit_paid_at — NOT the missing deposit_paid column
+  const depositPaid = contract?.status === 'deposit_paid'
+    || contract?.status === 'fully_paid'
+    || !!contract?.deposit_paid_at
+
+  const finalPaid = contract?.status === 'fully_paid'
 
   return (
     <div style={{
@@ -74,6 +78,7 @@ function PaymentContent() {
       fontFamily: 'Poppins, sans-serif', padding: '24px',
     }}>
       <div style={{ maxWidth: 500, width: '100%' }}>
+
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <p style={{ fontSize: 11, letterSpacing: '2px', color: BLUE, textTransform: 'uppercase', marginBottom: 8 }}>
@@ -106,15 +111,14 @@ function PaymentContent() {
 
         {/* Stripe trust notice */}
         <div style={{
-          background: 'rgba(68,190,199,0.08)',
-          border: '1px solid rgba(68,190,199,0.2)',
+          background: 'rgba(68,190,199,0.08)', border: '1px solid rgba(68,190,199,0.2)',
           borderRadius: 10, padding: '14px 18px', marginBottom: 24,
           display: 'flex', alignItems: 'flex-start', gap: 12,
         }}>
           <span style={{ fontSize: 20, flexShrink: 0 }}>🔒</span>
           <p style={{ fontSize: 12, color: 'rgba(232,224,213,0.7)', lineHeight: 1.6, margin: 0 }}>
             You'll be redirected to <strong style={{ color: BLUE }}>Stripe</strong>, our secure payment processor.
-            Pescadero Music never stores your card details — all payments are handled directly and securely by Stripe.
+            Pescadero Music never stores your card details — all payments are handled directly by Stripe.
           </p>
         </div>
 
@@ -141,8 +145,16 @@ function PaymentContent() {
             Secures your date and confirms your booking.
           </p>
           {depositPaid ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: BLUE, fontSize: 13 }}>
-              <span>✓</span> <span>Deposit received — date secured!</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: BLUE, fontSize: 13 }}>
+                <span>✓</span> <span>Deposit received — date secured!</span>
+              </div>
+              <Link href="/receipt" style={{
+                fontSize: 11, color: BLUE, textDecoration: 'none', fontWeight: 600,
+                border: `1px solid rgba(68,190,199,0.3)`, borderRadius: 6, padding: '5px 12px',
+              }}>
+                View Receipt →
+              </Link>
             </div>
           ) : (
             <button
@@ -174,9 +186,7 @@ function PaymentContent() {
                 <p style={{ fontSize: 11, color: BLUE, letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 4px' }}>
                   Step 2
                 </p>
-                <h3 style={{ color: 'white', fontSize: 17, margin: 0, fontWeight: 600 }}>
-                  Final Payment
-                </h3>
+                <h3 style={{ color: 'white', fontSize: 17, margin: 0, fontWeight: 600 }}>Final Payment</h3>
               </div>
               <span style={{ fontSize: 24, fontWeight: 700, color: finalPaid ? BLUE : 'white' }}>
                 ${finalAmount}
