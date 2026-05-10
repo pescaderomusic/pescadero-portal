@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { LOGO_SRC, BRAND_NAME, BRAND_TAGLINE, BRAND_EMAIL } from '@/lib/brand'
 
 const NAVY  = '#0D1B2A'
 const RED   = '#D62828'
@@ -75,10 +76,41 @@ export default function ReceiptPage() {
         <Link href="/dashboard" className="no-print" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           color: 'rgba(255,255,255,0.4)', textDecoration: 'none',
-          fontSize: 12, marginBottom: 32,
+          fontSize: 12, marginBottom: 28,
         }}>
           ← Back to Dashboard
         </Link>
+
+        {/* Branded header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginBottom: 28, paddingBottom: 20,
+          borderBottom: '1px solid rgba(68,190,199,0.15)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <img
+              src={LOGO_SRC}
+              alt="Pescadero Music Logo"
+              style={{ width: 52, height: 52, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(214,40,40,0.35))' }}
+            />
+            <div>
+              <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: 'white', letterSpacing: '0.5px', fontFamily: 'Poppins, sans-serif' }}>
+                {BRAND_NAME}
+              </p>
+              <p style={{ margin: 0, fontSize: 11, color: 'rgba(68,190,199,0.7)', fontFamily: 'Lora, serif', fontStyle: 'italic' }}>
+                {BRAND_TAGLINE}
+              </p>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)', fontFamily: 'Poppins, sans-serif' }}>
+              {BRAND_EMAIL}
+            </p>
+            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>
+              Prepared for: <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{fullName}</span>
+            </p>
+          </div>
+        </div>
 
         {/* Receipt card */}
         <div style={{
