@@ -319,9 +319,9 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         {/* Steps — vertical timeline */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, overflowY: 'auto', overflowX: 'hidden' }}>
           {steps.map((step, i) => {
-            const isComplete = step.status === 'complete'
-            const isActive = step.status === 'active'
-            const isLocked = step.status === 'locked'
+            const isComplete = step?.status === 'complete'
+            const isActive = step?.status === 'active'
+            const isLocked = step?.status === 'locked'
             const isLast = i === steps.length - 1
             const isExpanded = expandedStep === step.id
 
