@@ -54,7 +54,16 @@ export default function SignupPage() {
           textShadow: '0 0 8px rgba(79,185,175,0.5)',
           textTransform: 'uppercase', marginTop: 2,
         }}>MUSIC</div>
-        <p style={{
+        
+        {/* Back to home */}
+        <a href="/" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          color: 'rgba(255,255,255,0.4)', textDecoration: 'none',
+          fontSize: 12, fontFamily: 'Poppins, sans-serif', marginBottom: 24,
+        }}>
+          ← Back to Home
+        </a>
+        <<p style={{
           marginTop: 16, fontSize: 13, color: 'rgba(232,224,213,0.5)',
           fontFamily: 'Poppins, sans-serif',
         }}>Create your client account</p>

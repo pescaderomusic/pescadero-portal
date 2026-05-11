@@ -42,7 +42,16 @@ export default function LoginPage() {
           textShadow: '0 0 8px rgba(79,185,175,0.5)',
           textTransform: 'uppercase', marginTop: 2,
         }}>MUSIC</div>
-        <p style={{
+        
+        {/* Back to home */}
+        <a href="/" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          color: 'rgba(255,255,255,0.4)', textDecoration: 'none',
+          fontSize: 12, fontFamily: 'Poppins, sans-serif', marginBottom: 24,
+        }}>
+          ← Back to Home
+        </a>
+        <<p style={{
           marginTop: 16, fontSize: 13, color: 'rgba(232,224,213,0.5)',
           fontFamily: 'Poppins, sans-serif',
         }}>Client Portal</p>
@@ -76,6 +85,16 @@ export default function LoginPage() {
               placeholder="••••••••"
               required
             />
+
+              {/* Forgot password */}
+              <div style={{ textAlign: 'right', marginTop: -8, marginBottom: 8 }}>
+                <a href="/auth/forgot-password" style={{
+                  fontSize: 11, color: 'rgba(68,190,199,0.7)', textDecoration: 'none',
+                  fontFamily: 'Poppins, sans-serif',
+                }}>
+                  Forgot your password?
+                </a>
+              </div>
           </div>
 
           {error && <div className="pm-error">{error}</div>}

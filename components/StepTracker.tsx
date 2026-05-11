@@ -72,7 +72,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       actionLabel: noBooking ? 'Submit Inquiry →' : 'View Inquiry',
     },
     {
-      id: 'contract', num: '02', title: 'Service Agreement', subtitle: 'Review & sign your contract',
+      id: 'consultation_call', num: '03', title: 'Service Agreement', subtitle: 'Review & sign your contract',
       description: !noBooking && booking.step_contract === 'sent'
         ? 'Your contract is ready to review and sign. Click below to open it.'
         : 'Your contract will appear here once Garrett reviews your inquiry and confirms your booking.',
@@ -80,21 +80,21 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       href: '/contract', actionLabel: 'Open Contract →',
     },
     {
-      id: 'deposit', num: '03', title: 'Deposit', subtitle: '$100 to secure your date',
+      id: 'deposit', num: '04', title: 'Deposit', subtitle: '$100 to secure your date',
       description: 'Secure your date with a $100 non-refundable deposit. Your date is not officially locked until payment is received.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_deposit),
       href: '/contract/payment',
       actionLabel: 'Make Deposit →',
     },
     {
-      id: 'planning', num: '04', title: 'Planning Form', subtitle: 'Timeline & music details',
+      id: 'planning', num: '05', title: 'Planning & Music', subtitle: 'Timeline & music details',
       description: 'Fill out your event timeline, music preferences, MC announcements, and vendor contacts.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_planning),
       href: '/planning',
       actionLabel: !noBooking && booking.step_planning === 'submitted' ? 'Edit Form' : 'Open Form',
     },
     {
-      id: 'consultation', num: '05', title: 'Playlist Consultation', subtitle: 'Build your soundtrack',
+      id: 'consultation', num: '02', title: 'Initial Consultation', subtitle: 'Quick call to go over your request',
       description: 'Garrett will reach out to finalize your playlist and walk through the event flow.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_consultation),
       href: 'mailto:garrett@pescaderomusic.com?subject=Playlist Consultation',
