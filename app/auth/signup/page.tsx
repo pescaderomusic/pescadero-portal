@@ -4,15 +4,18 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
+const BLUE = '#44BEC7'
+const RED  = '#D62828'
+
 export default function SignupPage() {
   const router = useRouter()
   const supabase = createClient()
   const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
+  const [email, setEmail]       = useState('')
+  const [phone, setPhone]       = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
@@ -31,7 +34,6 @@ export default function SignupPage() {
       return
     }
 
-    // Update profile with phone
     if (data.user) {
       await supabase.from('profiles').update({ phone }).eq('id', data.user.id)
     }
@@ -42,38 +44,47 @@ export default function SignupPage() {
 
   return (
     <div>
+      {/* Logo + back */}
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <div style={{
           fontFamily: 'Georgia, serif', fontStyle: 'italic',
-          fontSize: 28, fontWeight: 700, color: '#D63031',
-          textShadow: '0 0 16px rgba(214,48,49,0.4)', lineHeight: 1,
-        }}>Pescadero</div>
+          fontSize: 28, fontWeight: 700, color: RED,
+          textShadow: `0 0 16px rgba(214,40,40,0.4)`, lineHeight: 1,
+        }}>
+          Pescadero
+        </div>
         <div style={{
           fontFamily: 'monospace', fontSize: 10, fontWeight: 700,
-          letterSpacing: '5px', color: '#4FB9AF',
-          textShadow: '0 0 8px rgba(79,185,175,0.5)',
+          letterSpacing: '5px', color: BLUE,
+          textShadow: `0 0 8px rgba(68,190,199,0.5)`,
           textTransform: 'uppercase', marginTop: 2,
-        }}>MUSIC</div>
-        
-        {/* Back to home */}
+        }}>
+          MUSIC
+        </div>
+
+        <p style={{
+          marginTop: 16, fontSize: 13, color: 'rgba(232,224,213,0.5)',
+          fontFamily: 'Poppins, sans-serif',
+        }}>
+          Create your client account
+        </p>
+
         <a href="/" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
-          color: 'rgba(255,255,255,0.4)', textDecoration: 'none',
-          fontSize: 12, fontFamily: 'Poppins, sans-serif', marginBottom: 24,
+          color: 'rgba(255,255,255,0.35)', textDecoration: 'none',
+          fontSize: 11, fontFamily: 'Poppins, sans-serif', marginTop: 8,
         }}>
           ← Back to Home
         </a>
-        <<p style={{
-          marginTop: 16, fontSize: 13, color: 'rgba(232,224,213,0.5)',
-          fontFamily: 'Poppins, sans-serif',
-        }}>Create your client account</p>
       </div>
 
-      <div className="pm-card" style={{ border: '1px solid rgba(79,185,175,0.15)' }}>
+      <div className="pm-card" style={{ border: '1px solid rgba(68,190,199,0.15)' }}>
         <h1 style={{
           fontFamily: 'Lora, serif', fontSize: 22, fontWeight: 600,
           color: 'white', marginBottom: 8,
-        }}>Let's get started</h1>
+        }}>
+          Let's get started
+        </h1>
         <p style={{
           fontSize: 13, color: 'rgba(232,224,213,0.45)',
           marginBottom: 24, fontFamily: 'Poppins, sans-serif',
@@ -129,8 +140,13 @@ export default function SignupPage() {
 
           {error && <div className="pm-error">{error}</div>}
 
-          <button className="btn-primary" type="submit" disabled={loading} style={{ width: '100%', marginTop: 4 }}>
-            {loading ? 'Creating account...' : 'Create Account →'}
+          <button
+            className="btn-primary"
+            type="submit"
+            disabled={loading}
+            style={{ width: '100%', marginTop: 4 }}
+          >
+            {loading ? 'Creating account…' : 'Create Account →'}
           </button>
         </form>
 
@@ -140,7 +156,7 @@ export default function SignupPage() {
           fontFamily: 'Poppins, sans-serif',
         }}>
           Already have an account?{' '}
-          <Link href="/auth/login" style={{ color: '#4FB9AF', textDecoration: 'none', fontWeight: 500 }}>
+          <Link href="/auth/login" style={{ color: BLUE, textDecoration: 'none', fontWeight: 500 }}>
             Sign in
           </Link>
         </p>
