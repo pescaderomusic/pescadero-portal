@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ContractViewer from '@/components/ContractViewer'
+import PrintDownloadButton from '@/components/PrintDownloadButton'
 
 export default async function ContractPage() {
   const supabase = createClient()
@@ -32,5 +33,15 @@ export default async function ContractPage() {
     )
   }
 
-  return <ContractViewer contract={contract} />
+  return (
+    <div>
+      {/* Print button — floats above ContractViewer, hidden on print */}
+      <div className="no-print" style={{
+        position: 'fixed', bottom: 28, right: 28, zIndex: 200,
+      }}>
+        <PrintDownloadButton label="🖨 Save Contract as PDF" variant="blue" />
+      </div>
+      <ContractViewer contract={contract} />
+    </div>
+  )
 }

@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import PrintDownloadButton from '@/components/PrintDownloadButton'
 
-const TEAL = '#4FB9AF'
-const RED = '#D63031'
-const GOLD = '#C8A96E'
-const NAVY = '#0F1F35'
+const BLUE = '#44BEC7'
+const RED  = '#D62828'
+const NAVY = '#0D1B2A'
 
 function fmtDate(d: string | null) {
   if (!d) return 'TBD'
@@ -31,7 +31,7 @@ export default async function ViewInquiryPage() {
     display: 'block' as const,
     fontSize: 9, fontWeight: 600 as const,
     letterSpacing: '1.5px', textTransform: 'uppercase' as const,
-    color: TEAL, marginBottom: 5,
+    color: BLUE, marginBottom: 5,
     fontFamily: 'Poppins, sans-serif',
   }
 
@@ -63,19 +63,19 @@ export default async function ViewInquiryPage() {
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(10,24,40,0.92)', backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(79,185,175,0.12)',
+        borderBottom: '1px solid rgba(68,190,199,0.12)',
         padding: '0 24px', height: 64,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: TEAL, textTransform: 'uppercase' }}>PESCADERO MUSIC</span>
+        <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textTransform: 'uppercase' }}>PESCADERO MUSIC</span>
         <Link href="/dashboard" style={{ fontSize: 11, color: 'rgba(232,224,213,0.4)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>← Dashboard</Link>
       </nav>
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '28px 24px 80px' }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 28 }}>
-          <p style={{ margin: '0 0 8px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL }}>Your Submitted Inquiry</p>
+        <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column' }}>
+          <p style={{ margin: '0 0 8px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Your Submitted Inquiry</p>
           <h1 style={{ margin: '0 0 6px', fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 26, color: 'white' }}>
             {inquiry.couple_names || `${inquiry.first_name} ${inquiry.last_name}`}
           </h1>
@@ -87,11 +87,11 @@ export default async function ViewInquiryPage() {
         {/* Submitted badge */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
-          background: 'rgba(79,185,175,0.08)', border: '1px solid rgba(79,185,175,0.2)',
+          background: 'rgba(68,190,199,0.08)', border: '1px solid rgba(68,190,199,0.2)',
           borderRadius: 8, padding: '10px 14px', marginBottom: 24,
         }}>
           <span style={{ fontSize: 16 }}>✓</span>
-          <p style={{ margin: 0, fontSize: 12, color: TEAL, fontFamily: 'Poppins, sans-serif' }}>
+          <p style={{ margin: 0, fontSize: 12, color: BLUE, fontFamily: 'Poppins, sans-serif' }}>
             Your inquiry has been received. Garrett will follow up shortly via your preferred contact method.
           </p>
         </div>
@@ -147,8 +147,8 @@ export default async function ViewInquiryPage() {
               {inquiry.services_requested.map((s: string) => (
                 <span key={s} style={{
                   fontSize: 11, padding: '5px 12px', borderRadius: 6,
-                  background: 'rgba(79,185,175,0.1)', border: '1px solid rgba(79,185,175,0.25)',
-                  color: TEAL, fontFamily: 'Poppins, sans-serif',
+                  background: 'rgba(68,190,199,0.1)', border: '1px solid rgba(68,190,199,0.25)',
+                  color: BLUE, fontFamily: 'Poppins, sans-serif',
                 }}>{s}</span>
               ))}
             </div>
