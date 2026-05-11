@@ -4,13 +4,17 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
+const NAVY = '#0D1B2A'
+const BLUE = '#44BEC7'
+const RED  = '#D62828'
+
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
-  const [email, setEmail] = useState('')
+  const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -28,40 +32,48 @@ export default function LoginPage() {
 
   return (
     <div>
-      {/* Logo */}
+      {/* Logo + back */}
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <div style={{
           fontFamily: 'Georgia, serif', fontStyle: 'italic',
-          fontSize: 28, fontWeight: 700, color: '#D63031',
-          textShadow: '0 0 16px rgba(214,48,49,0.4)',
+          fontSize: 28, fontWeight: 700, color: RED,
+          textShadow: `0 0 16px rgba(214,40,40,0.4)`,
           lineHeight: 1,
-        }}>Pescadero</div>
+        }}>
+          Pescadero
+        </div>
         <div style={{
           fontFamily: 'monospace', fontSize: 10, fontWeight: 700,
-          letterSpacing: '5px', color: '#4FB9AF',
-          textShadow: '0 0 8px rgba(79,185,175,0.5)',
+          letterSpacing: '5px', color: BLUE,
+          textShadow: `0 0 8px rgba(68,190,199,0.5)`,
           textTransform: 'uppercase', marginTop: 2,
-        }}>MUSIC</div>
-        
-        {/* Back to home */}
+        }}>
+          MUSIC
+        </div>
+
+        <p style={{
+          marginTop: 16, fontSize: 13, color: 'rgba(232,224,213,0.5)',
+          fontFamily: 'Poppins, sans-serif',
+        }}>
+          Client Portal
+        </p>
+
         <a href="/" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
-          color: 'rgba(255,255,255,0.4)', textDecoration: 'none',
-          fontSize: 12, fontFamily: 'Poppins, sans-serif', marginBottom: 24,
+          color: 'rgba(255,255,255,0.35)', textDecoration: 'none',
+          fontSize: 11, fontFamily: 'Poppins, sans-serif', marginTop: 8,
         }}>
           ← Back to Home
         </a>
-        <<p style={{
-          marginTop: 16, fontSize: 13, color: 'rgba(232,224,213,0.5)',
-          fontFamily: 'Poppins, sans-serif',
-        }}>Client Portal</p>
       </div>
 
-      <div className="pm-card" style={{ border: '1px solid rgba(79,185,175,0.15)' }}>
+      <div className="pm-card" style={{ border: '1px solid rgba(68,190,199,0.15)' }}>
         <h1 style={{
           fontFamily: 'Lora, serif', fontSize: 22, fontWeight: 600,
           color: 'white', marginBottom: 24,
-        }}>Welcome back</h1>
+        }}>
+          Welcome back
+        </h1>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
@@ -75,6 +87,7 @@ export default function LoginPage() {
               required
             />
           </div>
+
           <div>
             <label className="pm-label">Password</label>
             <input
@@ -85,22 +98,25 @@ export default function LoginPage() {
               placeholder="••••••••"
               required
             />
-
-              {/* Forgot password */}
-              <div style={{ textAlign: 'right', marginTop: -8, marginBottom: 8 }}>
-                <a href="/auth/forgot-password" style={{
-                  fontSize: 11, color: 'rgba(68,190,199,0.7)', textDecoration: 'none',
-                  fontFamily: 'Poppins, sans-serif',
-                }}>
-                  Forgot your password?
-                </a>
-              </div>
+            <div style={{ textAlign: 'right', marginTop: 6 }}>
+              <a href="/auth/forgot-password" style={{
+                fontSize: 11, color: `rgba(68,190,199,0.7)`, textDecoration: 'none',
+                fontFamily: 'Poppins, sans-serif',
+              }}>
+                Forgot your password?
+              </a>
+            </div>
           </div>
 
           {error && <div className="pm-error">{error}</div>}
 
-          <button className="btn-primary" type="submit" disabled={loading} style={{ width: '100%', marginTop: 4 }}>
-            {loading ? 'Signing in...' : 'Sign In →'}
+          <button
+            className="btn-primary"
+            type="submit"
+            disabled={loading}
+            style={{ width: '100%', marginTop: 4 }}
+          >
+            {loading ? 'Signing in…' : 'Sign In →'}
           </button>
         </form>
 
@@ -110,7 +126,7 @@ export default function LoginPage() {
           fontFamily: 'Poppins, sans-serif',
         }}>
           New client?{' '}
-          <Link href="/auth/signup" style={{ color: '#4FB9AF', textDecoration: 'none', fontWeight: 500 }}>
+          <Link href="/auth/signup" style={{ color: BLUE, textDecoration: 'none', fontWeight: 500 }}>
             Create your account
           </Link>
         </p>
