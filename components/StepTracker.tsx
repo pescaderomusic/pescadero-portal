@@ -161,7 +161,6 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       </div>
     )}
     <style>{`@keyframes slideDown { from { opacity:0; transform:translateX(-50%) translateY(-16px) } to { opacity:1; transform:translateX(-50%) translateY(0) } }`}</style>
-    (
     <div style={{
       height: 'calc(100vh - 64px)',
       display: 'grid',
