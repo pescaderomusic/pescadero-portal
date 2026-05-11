@@ -116,8 +116,8 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
     },
   ]
 
-  const completedCount = steps.filter(s => s.status === 'complete').length
-  const activeStep = steps.find(s => s.status === 'active')
+  const completedCount = steps.filter(s => s?.status === 'complete').length
+  const activeStep = steps.find(s => s?.status === 'active')
   const [expandedStep, setExpandedStep] = useState<string | null>(null)
 
   const formatDate = (d: string | null) => {
