@@ -323,10 +323,10 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
             const isActive = step?.status === 'active'
             const isLocked = step?.status === 'locked'
             const isLast = i === steps.length - 1
-            const isExpanded = expandedStep === step.id
+            const isExpanded = expandedStep === step?.id
 
             return (
-              <div key={step.id} style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
+              <div key={step?.id} style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
                 {/* Timeline spine */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
                   {/* Dot */}
@@ -341,7 +341,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                     boxShadow: isActive ? `0 0 10px rgba(214,48,49,0.25)` : 'none',
                     transition: 'all 0.3s',
                   }}>
-                    {isComplete ? '✓' : step.num}
+                    {isComplete ? '✓' : step?.num}
                   </div>
                   {/* Line */}
                   {!isLast && (
@@ -355,7 +355,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
 
                 {/* Content */}
                 <div
-                  onClick={() => isComplete && setExpandedStep(isExpanded ? null : step.id)}
+                  onClick={() => isComplete && setExpandedStep(isExpanded ? null : step?.id ?? null)}
                   style={{
                     flex: 1, paddingBottom: isLast ? 0 : 8,
                     opacity: isLocked ? 0.5 : 1,
@@ -370,7 +370,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                         fontSize: 12, fontWeight: 600,
                         color: isLocked ? '#4A5568' : 'white',
                         fontFamily: 'Lora, serif',
-                      }}>{step.title}</span>
+                      }}{step?.title}</span>
                       {isActive && (
                         <span style={{
                           marginLeft: 8, fontSize: 8, fontWeight: 700, letterSpacing: '1.5px',
@@ -384,13 +384,13 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                       )}
                     </div>
                     {/* Action */}
-                    {isActive && step.href && (
-                      <Link href={step.href} style={{
+                    {isActive && step?.href && (
+                      <Link href={step?.href ?? '/'}  style={{
                         background: RED, color: 'white', textDecoration: 'none',
                         borderRadius: 6, padding: '4px 10px', fontSize: 10, fontWeight: 700,
                         fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap',
                         boxShadow: '0 2px 10px rgba(214,48,49,0.35)',
-                      }}>{step.actionLabel}</Link>
+                      }}{step?.actionLabel}</Link>
                     )}
                     {isComplete && (
                       <span style={{ fontSize: 9, color: BLUE, fontFamily: 'Poppins, sans-serif', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -406,7 +406,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                     margin: '2px 0 0', fontSize: 10,
                     color: isLocked ? 'rgba(232,224,213,0.2)' : 'rgba(232,224,213,0.4)',
                     fontFamily: 'Poppins, sans-serif', lineHeight: 1.4,
-                  }}>{step.subtitle}</p>
+                  }}{step?.subtitle}</p>
 
                   {/* Expanded info for completed steps */}
                   {isExpanded && isComplete && (
@@ -419,21 +419,21 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                       <p style={{ margin: '0 0 8px', fontSize: 11, color: 'rgba(232,224,213,0.6)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>
                         {step.description}
                       </p>
-                      {step.id === 'inquiry' && (
+                      {step?.id === 'inquiry' && (
                         <Link href="/inquiry" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
                           View My Inquiry →
                         </Link>
                       )}
-                      {step.id === 'contract' && (
+                      {step?.id === 'contract' && (
                         <Link href="/contract" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
                           View My Contract →
                         </Link>
                       )}
-                      {step.id === 'deposit' && (
+                      {step?.id === 'deposit' && (
                         <Link href="/receipt" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>View My Receipt →
                         </Link>
                       )}
-                      {step.id === 'planning' && (
+                      {step?.id === 'planning' && (
                         <Link href="/planning" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
                           View My Planning Form →
                         </Link>
