@@ -242,7 +242,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
               <p style={{ fontSize: 12, color: 'rgba(232,224,213,0.45)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.6, maxWidth: 220 }}>
                 Submit your inquiry to get started. We'll take it from there.
               </p>
-              <Link href="/inquiry" style={{
+              <Link href="/inquiry/view" style={{
                 marginTop: 16, display: 'inline-flex', alignItems: 'center',
                 background: RED, color: 'white', textDecoration: 'none',
                 borderRadius: 8, padding: '9px 20px', fontSize: 12, fontWeight: 700,
@@ -420,7 +420,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                         {step.description}
                       </p>
                       {step.id === 'inquiry' && (
-                        <Link href="/inquiry" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
+                        <Link href="/inquiry/view" style={{ fontSize: 10, color: BLUE, fontFamily: 'Poppins, sans-serif', textDecoration: 'none', fontWeight: 600 }}>
                           View My Inquiry →
                         </Link>
                       )}
