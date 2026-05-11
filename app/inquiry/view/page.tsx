@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import PrintDownloadButton from '@/components/PrintDownloadButton'
 
@@ -25,14 +25,14 @@ function fmtDate(d: string | null) {
   })
 }
 
-function Row({ label, value }: { label: string; value: string | null | undefined }) {
+function Row({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null
   return (
     <div style={{ marginBottom: 16 }}>
-      <p style={{ margin: '0 0 4px', fontSize: 10, fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase', color: BLUE, fontFamily: 'Poppins, sans-serif' }}>
+      <p style={{ margin: '0 0 4px', fontSize: 10, fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' as const, color: BLUE, fontFamily: 'Poppins, sans-serif' }}>
         {label}
       </p>
-      <p style={{ margin: 0, fontSize: 13, color: 'rgba(232,224,213,0.85)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>
+      <p style={{ margin: 0, fontSize: 13, color: 'rgba(232,224,213,0.85)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.6, whiteSpace: 'pre-wrap' as const }}>
         {value}
       </p>
     </div>
@@ -41,12 +41,8 @@ function Row({ label, value }: { label: string; value: string | null | undefined
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.07)',
-      borderRadius: 10, padding: '20px 22px', marginBottom: 16,
-    }}>
-      <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '20px 22px', marginBottom: 16 }}>
+      <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>
         {title}
       </p>
       {children}
@@ -55,13 +51,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default async function ViewInquiryPage() {
+  // Auth check
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  // Use admin client to bypass RLS
+  // Always use admin client to bypass RLS — never fails silently
   const admin = getAdmin()
-  const { data: inquiry, error } = await admin
+  const { data: inquiry } = await admin
     .from('inquiry_submissions')
     .select('*')
     .eq('client_id', user.id)
@@ -69,67 +66,69 @@ export default async function ViewInquiryPage() {
     .limit(1)
     .single()
 
-  if (!inquiry) redirect('/inquiry')
+  // No redirect on missing data — show friendly empty state instead
+  if (!inquiry) {
+    return (
+      <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Poppins, sans-serif', padding: 24 }}>
+        <div style={{ maxWidth: 480, textAlign: 'center' }}>
+          <p style={{ fontSize: 48, marginBottom: 20 }}>📋</p>
+          <h2 style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', color: 'white', fontSize: 24, margin: '0 0 12px' }}>No inquiry on file</h2>
+          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, lineHeight: 1.7, margin: '0 0 28px' }}>
+            We don't have a submitted inquiry for this account yet. If you already submitted one, contact Garrett and he'll sort it out.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/inquiry" style={{ padding: '11px 24px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 700 }}>
+              Submit Inquiry →
+            </Link>
+            <Link href="/dashboard" style={{ padding: '11px 24px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: 13 }}>
+              Back to Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const submittedDate = inquiry.submitted_at
-    ? new Date(inquiry.submitted_at).toLocaleDateString('en-US', {
-        month: 'long', day: 'numeric', year: 'numeric',
-        hour: 'numeric', minute: '2-digit',
-      })
+    ? new Date(inquiry.submitted_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })
     : ''
 
   const services = Array.isArray(inquiry.services_requested)
     ? inquiry.services_requested.join(', ')
-    : inquiry.services_requested
+    : (inquiry.services_requested || '')
 
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
+      <style>{`@media print { .no-print { display: none !important; } }`}</style>
 
       {/* Nav */}
-      <nav className="no-print" style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(10,24,40,0.92)', backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(68,190,199,0.12)',
-        padding: '0 24px', height: 64,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textTransform: 'uppercase' }}>
-          PESCADERO MUSIC
-        </span>
-        <Link href="/dashboard" style={{ fontSize: 11, color: 'rgba(232,224,213,0.4)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>
-          ← Dashboard
-        </Link>
+      <nav className="no-print" style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(68,190,199,0.12)', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textTransform: 'uppercase' }}>PESCADERO MUSIC</span>
+        <Link href="/dashboard" style={{ fontSize: 11, color: 'rgba(232,224,213,0.4)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>← Dashboard</Link>
       </nav>
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '28px 24px 80px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px 80px' }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <p style={{ margin: '0 0 8px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>
-              Your Submitted Inquiry
-            </p>
+            <p style={{ margin: '0 0 6px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Submitted Inquiry</p>
             <h1 style={{ margin: '0 0 6px', fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 26, color: 'white' }}>
-              {inquiry.couple_names || `${inquiry.first_name} ${inquiry.last_name}`}
+              {inquiry.couple_names || `${inquiry.first_name || ''} ${inquiry.last_name || ''}`.trim()}
             </h1>
             {submittedDate && (
-              <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.4)' }}>
-                Submitted {submittedDate}
-              </p>
+              <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.4)' }}>Submitted {submittedDate}</p>
             )}
           </div>
-          <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-            <span style={{
-              background: 'rgba(68,190,199,0.12)', border: '1px solid rgba(68,190,199,0.3)',
-              borderRadius: 20, padding: '4px 12px', fontSize: 11, color: BLUE, fontWeight: 600,
-            }}>
+          <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ background: 'rgba(68,190,199,0.12)', border: '1px solid rgba(68,190,199,0.3)', borderRadius: 20, padding: '4px 12px', fontSize: 11, color: BLUE, fontWeight: 600 }}>
               ✓ Received
             </span>
             <PrintDownloadButton label="🖨 Save as PDF" />
           </div>
         </div>
 
-        {/* Contact info */}
+        {/* Contact */}
         <Section title="Contact Information">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
             <Row label="First Name" value={inquiry.first_name} />
@@ -140,32 +139,31 @@ export default async function ViewInquiryPage() {
           </div>
         </Section>
 
-        {/* Event details */}
+        {/* Event */}
         <Section title="Event Details">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
-            <Row label="Couple Names" value={inquiry.couple_names} />
+            <Row label="Couple / Client Names" value={inquiry.couple_names} />
             <Row label="Event Name" value={inquiry.event_name} />
             <Row label="Event Date" value={fmtDate(inquiry.event_date)} />
             <Row label="Start Time" value={inquiry.start_time} />
             <Row label="End Time" value={inquiry.end_time} />
             <Row label="Indoor / Outdoor" value={inquiry.indoor_outdoor} />
-            <Row label="Expected Attendance" value={inquiry.attendance} />
+            <Row label="Expected Attendance" value={inquiry.attendance?.toString()} />
           </div>
         </Section>
 
         {/* Venue */}
         <Section title="Venue">
           <Row label="Venue Name" value={inquiry.venue_name} />
-          <Row label="Venue Address" value={inquiry.venue_address} />
+          <Row label="Address" value={inquiry.venue_address} />
         </Section>
 
-        {/* Services & budget */}
+        {/* Services */}
         <Section title="Services & Budget">
           <Row label="Services Requested" value={services} />
-          <Row label="Budget Range" value={inquiry.budget} />
+          <Row label="Budget" value={inquiry.budget} />
         </Section>
 
-        {/* Additional notes */}
         {inquiry.additional_notes && (
           <Section title="Additional Notes">
             <p style={{ margin: 0, fontSize: 13, color: 'rgba(232,224,213,0.75)', lineHeight: 1.7, fontFamily: 'Poppins, sans-serif', whiteSpace: 'pre-wrap' }}>
@@ -175,23 +173,14 @@ export default async function ViewInquiryPage() {
         )}
 
         {/* Read-only notice */}
-        <div className="no-print" style={{
-          background: 'rgba(68,190,199,0.06)', border: '1px solid rgba(68,190,199,0.15)',
-          borderRadius: 8, padding: '12px 16px', marginTop: 8,
-          display: 'flex', alignItems: 'center', gap: 10,
-        }}>
+        <div className="no-print" style={{ background: 'rgba(68,190,199,0.06)', border: '1px solid rgba(68,190,199,0.15)', borderRadius: 8, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 16 }}>🔒</span>
-          <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.5)', lineHeight: 1.5 }}>
-            This is a read-only view of your submitted inquiry. Need to make changes?{' '}
-            <a href="mailto:garrett@pescaderomusic.com" style={{ color: BLUE, textDecoration: 'none' }}>
-              Email Garrett directly.
-            </a>
+          <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.45)', lineHeight: 1.5 }}>
+            This is a read-only view of your submitted inquiry. Need changes?{' '}
+            <a href="mailto:garrett@pescaderomusic.com" style={{ color: BLUE, textDecoration: 'none' }}>Email Garrett directly.</a>
           </p>
         </div>
-
       </div>
-
-      <style>{`@media print { .no-print { display: none !important; } nav { display: none !important; } }`}</style>
     </div>
   )
 }
