@@ -71,8 +71,15 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       href: noBooking ? '/inquiry' : '/inquiry/view',
       actionLabel: noBooking ? 'Submit Inquiry →' : 'View Inquiry',
     },
-    {
-      id: 'consultation_call', num: '03', title: 'Service Agreement', subtitle: 'Review & sign your contract',
+          {
+      id: 'consultation', num: '02', title: 'Initial Consultation', subtitle: 'Quick call to go over your request',
+      description: 'Garrett will reach out to finalize your playlist and walk through the event flow.',
+      status: noBooking ? 'locked' as const : getStepStatus(booking.step_consultation),
+      href: null,
+      actionLabel: 'Schedule a Call',
+    },
+      {
+      id: 'contract',           num: '03', title: 'Service Agreement', subtitle: 'Review & sign your contract',
       description: !noBooking && booking.step_contract === 'sent'
         ? 'Your contract is ready to review and sign. Click below to open it.'
         : 'Your contract will appear here once Garrett reviews your inquiry and confirms your booking.',
@@ -92,14 +99,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_planning),
       href: '/planning',
       actionLabel: !noBooking && booking.step_planning === 'submitted' ? 'Edit Form' : 'Open Form',
-    },
-    {
-      id: 'consultation', num: '02', title: 'Initial Consultation', subtitle: 'Quick call to go over your request',
-      description: 'Garrett will reach out to finalize your playlist and walk through the event flow.',
-      status: noBooking ? 'locked' as const : getStepStatus(booking.step_consultation),
-      href: 'mailto:garrett@pescaderomusic.com?subject=Playlist Consultation',
-      actionLabel: 'Schedule a Call',
-    },
+    },,
     {
       id: 'final_payment', num: '06', title: 'Final Payment', subtitle: 'Balance due before your event',
       description: !noBooking && booking.final_payment_due
@@ -161,7 +161,6 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       </div>
     )}
     <style>{`@keyframes slideDown { from { opacity:0; transform:translateX(-50%) translateY(-16px) } to { opacity:1; transform:translateX(-50%) translateY(0) } }`}</style>
-    (
     <div style={{
       height: 'calc(100vh - 64px)',
       display: 'grid',
