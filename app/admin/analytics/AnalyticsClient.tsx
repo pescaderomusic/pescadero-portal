@@ -97,8 +97,8 @@ export default function AnalyticsClient({ contracts, bookings, inquiries }: { co
   const activeClients   = bookings.filter(b => b.step_event !== 'complete').length
 
   // Monthly revenue for chart (last 6 months)
-  const monthLabels = []
-  const monthRevenue = []
+  const monthLabels: string[] = []
+  const monthRevenue: number[] = []
   for (let i = 5; i >= 0; i--) {
     const d = new Date(thisYear, thisMonth - i, 1)
     const label = d.toLocaleDateString('en-US', { month: 'short' })
