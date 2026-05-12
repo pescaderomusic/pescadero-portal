@@ -73,6 +73,11 @@ export default async function AdminClientPage({ params }: { params: { clientId: 
           <Link href="/admin" style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textDecoration: 'none' }}>← ADMIN</Link>
           <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{fullName}</span>
         </div>
+        <Link href={`/admin/contract/${clientId}`} style={{ padding: '7px 16px', borderRadius: 7, border: '1px solid rgba(68,190,199,0.3)', background: 'rgba(68,190,199,0.1)', color: '#44BEC7', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
+          📄 Prepare Contract →
+        </Link>
+        <div style={{ display: 'none' }}>
+        </div>
       </nav>
 
       <div style={{ maxWidth: 920, margin: '0 auto', padding: '28px 24px 80px' }}>
