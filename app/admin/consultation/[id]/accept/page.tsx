@@ -18,7 +18,7 @@ export default async function AcceptPage({ params }: { params: { id: string } })
 
   if (consultReq) {
     await admin.from('consultation_requests').update({ status: 'accepted' }).eq('id', params.id)
-    await admin.from('bookings').update({ step_consultation: 'complete', step_contract: 'pending' }).eq('client_id', consultReq.client_id)
+    await admin.from('bookings').update({ step_consultation: 'scheduled' }).eq('client_id', consultReq.client_id)
 
     // Email client
     const { data: userData } = await admin.auth.admin.getUserById(consultReq.client_id)

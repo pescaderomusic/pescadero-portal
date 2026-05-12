@@ -33,7 +33,7 @@ interface Props {
 
 function getStepStatus(val: string): 'complete' | 'active' | 'locked' {
   if (['complete','signed','paid','submitted'].includes(val)) return 'complete'
-  if (['pending','sent'].includes(val)) return 'active'
+  if (['pending','sent','scheduled'].includes(val)) return 'active'
   return 'locked'
 }
 
@@ -113,8 +113,8 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       id: 'event', num: '07', title: 'Event Day', subtitle: 'Sit back and enjoy',
       description: 'Everything is locked in. Your technician arrives 45 min early. All you have to do is show up.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_event),
-      href: '/review',
-      actionLabel: 'Leave a Review →',
+      href: noBooking ? null : (booking.step_event === 'complete' ? '/review' : null),
+      actionLabel: noBooking ? null : (booking.step_event === 'complete' ? 'Leave a Review →' : null),
     },
   ]
 

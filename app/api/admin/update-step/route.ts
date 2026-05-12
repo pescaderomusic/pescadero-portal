@@ -31,11 +31,8 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Auto-progression logic
-  if (stepKey === 'step_consultation' && value === 'complete') {
-    // Unlock contract step
-    await admin.from('bookings').update({ step_contract: 'pending' }).eq('client_id', clientId).eq('step_contract', 'locked')
-  }
+  // Auto-progression: ONLY deposit unlocks when contract is signed
+  // Contract unlock is manual — Garrett prepares and pushes contract himself
   if (stepKey === 'step_contract' && value === 'signed') {
     await admin.from('bookings').update({ step_deposit: 'pending' }).eq('client_id', clientId).eq('step_deposit', 'locked')
   }
