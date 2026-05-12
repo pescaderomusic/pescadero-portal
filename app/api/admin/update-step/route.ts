@@ -6,7 +6,7 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
 const VALID_STEPS = ['step_inquiry','step_consultation','step_contract','step_deposit','step_planning','step_final_payment','step_event']
-const VALID_VALUES = ['locked','pending','sent','complete','signed','paid','submitted']
+const VALID_VALUES = ['locked','pending','sent','complete','signed','paid','submitted','scheduled']
 
 function getAdmin() {
   return createAdmin(

@@ -5,44 +5,75 @@ const BLUE  = '#44BEC7'
 const RED   = '#D62828'
 const GOLD  = '#F5A623'
 const GREEN = '#4CAF50'
+const NAVY2 = '#152032'
 
-// What each step value means in plain English
+// Full status flow for each step
 const STEP_CONFIG: Record<string, {
-  label: string
   num: string
-  completeValue: string  // what "done" looks like for this step
-  actions: { label: string; value: string; color: string }[]
-  completedLabel: string
+  label: string
+  statuses: { value: string; label: string; color: string; description: string }[]
 }> = {
-  step_inquiry:       { label: 'Inquiry',             num: '01', completeValue: 'complete',  completedLabel: 'Submitted', actions: [{ label: 'Mark Received', value: 'complete', color: GREEN }] },
-  step_consultation:  { label: 'Initial Consultation', num: '02', completeValue: 'complete',  completedLabel: 'Done',      actions: [{ label: 'Mark Call Done', value: 'complete', color: GREEN }] },
-  step_contract:      { label: 'Service Agreement',   num: '03', completeValue: 'signed',    completedLabel: 'Signed',    actions: [{ label: 'Mark Sent to Client', value: 'sent', color: GOLD }, { label: 'Mark Signed', value: 'signed', color: GREEN }] },
-  step_deposit:       { label: 'Deposit',             num: '04', completeValue: 'paid',      completedLabel: 'Paid',      actions: [{ label: 'Mark Paid (bypass Stripe)', value: 'paid', color: GREEN }] },
-  step_planning:      { label: 'Planning & Music',    num: '05', completeValue: 'submitted', completedLabel: 'Submitted', actions: [{ label: 'Mark Submitted', value: 'submitted', color: GREEN }] },
-  step_final_payment: { label: 'Final Payment',       num: '06', completeValue: 'paid',      completedLabel: 'Paid',      actions: [{ label: 'Mark Paid (bypass Stripe)', value: 'paid', color: GREEN }] },
-  step_event:         { label: 'Event Day',           num: '07', completeValue: 'complete',  completedLabel: 'Done!',     actions: [{ label: 'Mark Event Complete', value: 'complete', color: GREEN }] },
+  step_inquiry: {
+    num: '01', label: 'Inquiry',
+    statuses: [
+      { value: 'locked',   label: 'Not Started',    color: 'rgba(255,255,255,0.2)', description: 'Client hasn\'t submitted yet' },
+      { value: 'complete', label: 'Received ✓',     color: GREEN,                  description: 'Inquiry submitted and received' },
+    ],
+  },
+  step_consultation: {
+    num: '02', label: 'Initial Consultation',
+    statuses: [
+      { value: 'locked',    label: 'Locked',          color: 'rgba(255,255,255,0.2)', description: 'Not yet available to client' },
+      { value: 'pending',   label: 'Awaiting Request', color: GOLD,                  description: 'Client can request a call time' },
+      { value: 'scheduled', label: 'Call Scheduled',  color: BLUE,                  description: 'Time confirmed, call upcoming' },
+      { value: 'complete',  label: 'Call Done ✓',    color: GREEN,                  description: 'Consultation completed' },
+    ],
+  },
+  step_contract: {
+    num: '03', label: 'Service Agreement',
+    statuses: [
+      { value: 'locked',  label: 'Locked',             color: 'rgba(255,255,255,0.2)', description: 'Not yet available to client' },
+      { value: 'pending', label: 'Not Sent',            color: GOLD,                  description: 'Contract not sent yet' },
+      { value: 'sent',    label: 'Sent to Client',     color: BLUE,                  description: 'Awaiting client signature' },
+      { value: 'signed',  label: 'Signed ✓',           color: GREEN,                  description: 'Contract fully signed' },
+    ],
+  },
+  step_deposit: {
+    num: '04', label: 'Deposit',
+    statuses: [
+      { value: 'locked',  label: 'Locked',       color: 'rgba(255,255,255,0.2)', description: 'Not yet available' },
+      { value: 'pending', label: 'Awaiting Payment', color: GOLD,               description: 'Client can pay deposit' },
+      { value: 'paid',    label: 'Paid ✓',        color: GREEN,                  description: 'Deposit received' },
+    ],
+  },
+  step_planning: {
+    num: '05', label: 'Planning & Music',
+    statuses: [
+      { value: 'locked',     label: 'Locked',          color: 'rgba(255,255,255,0.2)', description: 'Not yet available' },
+      { value: 'pending',    label: 'Form Open',        color: GOLD,                  description: 'Client can fill out form' },
+      { value: 'submitted',  label: 'Submitted ✓',     color: GREEN,                  description: 'Planning form received' },
+    ],
+  },
+  step_final_payment: {
+    num: '06', label: 'Final Payment',
+    statuses: [
+      { value: 'locked',  label: 'Locked',          color: 'rgba(255,255,255,0.2)', description: 'Not yet available' },
+      { value: 'pending', label: 'Awaiting Payment', color: GOLD,                  description: 'Balance due, client can pay' },
+      { value: 'paid',    label: 'Paid ✓',           color: GREEN,                  description: 'Final payment received' },
+    ],
+  },
+  step_event: {
+    num: '07', label: 'Event Day',
+    statuses: [
+      { value: 'locked',   label: 'Locked',      color: 'rgba(255,255,255,0.2)', description: 'Event not yet happened' },
+      { value: 'pending',  label: 'Upcoming',    color: BLUE,                   description: 'Event day approaching' },
+      { value: 'complete', label: 'Complete ✓', color: GREEN,                   description: 'Event done — send review link' },
+    ],
+  },
 }
 
 const STEP_KEYS = ['step_inquiry','step_consultation','step_contract','step_deposit','step_planning','step_final_payment','step_event']
-
-function isComplete(key: string, val: string) {
-  return val === STEP_CONFIG[key]?.completeValue
-}
-
-function statusColor(key: string, val: string) {
-  if (!val || val === 'locked') return 'rgba(255,255,255,0.2)'
-  if (isComplete(key, val)) return GREEN
-  if (['pending','sent'].includes(val)) return GOLD
-  return GOLD
-}
-
-function statusLabel(key: string, val: string) {
-  if (!val || val === 'locked') return null
-  if (isComplete(key, val)) return STEP_CONFIG[key]?.completedLabel
-  if (val === 'sent') return 'Sent — awaiting signature'
-  if (val === 'pending') return 'Pending'
-  return val
-}
+const VALID_VALUES = ['locked','pending','sent','complete','signed','paid','submitted','scheduled']
 
 interface Props {
   clientId: string
@@ -53,11 +84,10 @@ interface Props {
 }
 
 export default function StepControls({ clientId, booking, steps, email, firstName }: Props) {
-  const [local, setLocal]       = useState<any>(booking || {})
-  const [saving, setSaving]     = useState<string | null>(null)
-  const [msg, setMsg]           = useState('')
-  const [testMode, setTestMode] = useState(false)
-  const [resetting, setResetting] = useState(false)
+  const [local, setLocal]   = useState<any>(booking || {})
+  const [saving, setSaving] = useState<string | null>(null)
+  const [msg, setMsg]       = useState('')
+  const [expanded, setExpanded] = useState<string | null>(null)
 
   const update = async (stepKey: string, value: string) => {
     setSaving(stepKey)
@@ -68,16 +98,18 @@ export default function StepControls({ clientId, booking, steps, email, firstNam
     })
     if (res.ok) {
       setLocal((p: any) => ({ ...p, [stepKey]: value }))
-      setMsg(`✓ ${STEP_CONFIG[stepKey]?.label} updated`)
+      setMsg(`✓ ${STEP_CONFIG[stepKey]?.label} → ${value}`)
+      setExpanded(null)
     } else {
-      setMsg('❌ Update failed — try again')
+      setMsg('❌ Update failed')
     }
     setSaving(null)
     setTimeout(() => setMsg(''), 3000)
   }
 
-  const resetSteps = async () => {
-    setResetting(true)
+  const resetAll = async () => {
+    if (!confirm('Reset all steps to fresh state? This cannot be undone.')) return
+    setSaving('all')
     const defaults: Record<string, string> = {
       step_inquiry: 'complete', step_consultation: 'pending',
       step_contract: 'locked', step_deposit: 'locked',
@@ -88,125 +120,115 @@ export default function StepControls({ clientId, booking, steps, email, firstNam
     }
     setLocal(defaults)
     setMsg('✓ Reset to fresh state')
-    setResetting(false)
-    setTimeout(() => setMsg(''), 3000)
-  }
-
-  const unlockAll = async () => {
-    const all: Record<string, string> = {
-      step_inquiry: 'complete', step_consultation: 'complete', step_contract: 'signed',
-      step_deposit: 'paid', step_planning: 'pending', step_final_payment: 'pending', step_event: 'pending',
-    }
-    for (const [k, v] of Object.entries(all)) {
-      await fetch('/api/admin/update-step', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, stepKey: k, value: v }) })
-    }
-    setLocal(all)
-    setMsg('✓ All steps unlocked')
+    setSaving(null)
     setTimeout(() => setMsg(''), 3000)
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* Step cards */}
-      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '18px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      {/* Step controls */}
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+
+        <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <p style={{ margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>Booking Steps</p>
-          <button onClick={() => setTestMode(!testMode)} style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 6, border: `1px solid ${testMode ? 'rgba(245,166,35,0.4)' : 'rgba(255,255,255,0.1)'}`, background: testMode ? 'rgba(245,166,35,0.1)' : 'transparent', color: testMode ? GOLD : 'rgba(255,255,255,0.3)', cursor: 'pointer', fontFamily: 'Poppins, sans-serif' }}>
-            {testMode ? '⚡ Test Mode ON' : 'Test Mode'}
-          </button>
+          <p style={{ margin: 0, fontSize: 10, color: 'rgba(255,255,255,0.25)', fontFamily: 'Poppins, sans-serif' }}>Click any step to change</p>
         </div>
 
         {msg && (
-          <div style={{ padding: '8px 12px', borderRadius: 7, marginBottom: 12, fontSize: 12, fontFamily: 'Poppins, sans-serif', background: msg.startsWith('✓') ? 'rgba(76,175,80,0.1)' : 'rgba(214,40,40,0.1)', color: msg.startsWith('✓') ? GREEN : '#FF8A80' }}>
+          <div style={{ padding: '10px 20px', fontSize: 12, fontFamily: 'Poppins, sans-serif', background: msg.startsWith('✓') ? 'rgba(76,175,80,0.1)' : 'rgba(214,40,40,0.1)', color: msg.startsWith('✓') ? GREEN : '#FF8A80', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
             {msg}
           </div>
         )}
 
-        {STEP_KEYS.map(key => {
-          const config = STEP_CONFIG[key]
+        {STEP_KEYS.map((key, i) => {
+          const config  = STEP_CONFIG[key]
           if (!config) return null
-          const val    = local[key] || 'locked'
-          const done   = isComplete(key, val)
-          const locked = val === 'locked'
-          const color  = statusColor(key, val)
-          const slabel = statusLabel(key, val)
+          const val     = local[key] || 'locked'
+          const current = config.statuses.find(s => s.value === val) || config.statuses[0]
+          const isOpen  = expanded === key
+          const isLast  = i === STEP_KEYS.length - 1
 
           return (
-            <div key={key} style={{
-              padding: '12px 0',
-              borderBottom: '1px solid rgba(255,255,255,0.05)',
-              opacity: locked ? 0.45 : 1,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: done || locked ? 0 : 8 }}>
+            <div key={key}>
+              {/* Step row — always clickable */}
+              <button
+                onClick={() => setExpanded(isOpen ? null : key)}
+                style={{ width: '100%', background: isOpen ? 'rgba(68,190,199,0.06)' : 'transparent', border: 'none', borderBottom: isLast && !isOpen ? 'none' : '1px solid rgba(255,255,255,0.05)', padding: '13px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' as const }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: current.color, width: 22, fontFamily: 'Poppins, sans-serif' }}>{config.num}</span>
+                  <div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: val === 'locked' ? 'rgba(255,255,255,0.35)' : 'white', fontFamily: 'Poppins, sans-serif' }}>{config.label}</span>
+                    {saving === key && <span style={{ marginLeft: 8, fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>Saving…</span>}
+                  </div>
+                </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color, width: 22, fontFamily: 'Poppins, sans-serif' }}>{config.num}</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: done ? 'white' : locked ? 'rgba(255,255,255,0.35)' : 'white', fontFamily: 'Poppins, sans-serif' }}>{config.label}</span>
+                  <span style={{ fontSize: 11, padding: '2px 10px', borderRadius: 10, background: `${current.color}18`, color: current.color, border: `1px solid ${current.color}30`, fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>
+                    {current.label}
+                  </span>
+                  <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>{isOpen ? '▲' : '▼'}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {slabel && (
-                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: `${color}18`, color, border: `1px solid ${color}30`, fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>
-                      {done ? '✓ ' : ''}{slabel}
-                    </span>
-                  )}
-                  {locked && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontFamily: 'Poppins, sans-serif' }}>🔒 Locked</span>}
-                </div>
-              </div>
+              </button>
 
-              {/* Action buttons — only show if not done and not locked, OR test mode */}
-              {(!done && !locked) || testMode ? (
-                <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
-                  {config.actions.map(action => (
-                    <button
-                      key={action.value}
-                      disabled={saving === key}
-                      onClick={() => update(key, action.value)}
-                      style={{ padding: '6px 14px', borderRadius: 7, border: `1px solid ${action.color}35`, background: `${action.color}12`, color: action.color, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Poppins, sans-serif', opacity: saving === key ? 0.5 : 1 }}
-                    >
-                      {saving === key ? '…' : action.label}
-                    </button>
-                  ))}
-                  {done && testMode && (
-                    <button onClick={() => update(key, 'locked')} style={{ padding: '6px 14px', borderRadius: 7, border: '1px solid rgba(214,40,40,0.3)', background: 'rgba(214,40,40,0.08)', color: RED, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Poppins, sans-serif' }}>
-                      Undo / Lock
-                    </button>
-                  )}
+              {/* Expanded — show all status options */}
+              {isOpen && (
+                <div style={{ background: 'rgba(0,0,0,0.2)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '12px 20px' }}>
+                  <p style={{ margin: '0 0 10px', fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>
+                    Set status for {config.label}:
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {config.statuses.map(status => (
+                      <button
+                        key={status.value}
+                        disabled={saving === key}
+                        onClick={() => update(key, status.value)}
+                        style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                          padding: '10px 14px', borderRadius: 8, border: `1px solid ${status.color}${val === status.value ? '60' : '20'}`,
+                          background: val === status.value ? `${status.color}18` : 'rgba(255,255,255,0.03)',
+                          cursor: saving === key ? 'not-allowed' : 'pointer',
+                          textAlign: 'left' as const,
+                        }}
+                      >
+                        <div>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: status.color, fontFamily: 'Poppins, sans-serif' }}>
+                            {val === status.value ? '● ' : '○ '}{status.label}
+                          </span>
+                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginLeft: 8, fontFamily: 'Poppins, sans-serif' }}>
+                            — {status.description}
+                          </span>
+                        </div>
+                        {val === status.value && (
+                          <span style={{ fontSize: 10, color: status.color, fontFamily: 'Poppins, sans-serif', fontWeight: 700 }}>CURRENT</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              ) : done && testMode ? (
-                <div style={{ marginTop: 8 }}>
-                  <button onClick={() => update(key, 'locked')} style={{ padding: '6px 14px', borderRadius: 7, border: '1px solid rgba(214,40,40,0.3)', background: 'rgba(214,40,40,0.08)', color: RED, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Poppins, sans-serif' }}>
-                    Undo / Lock
-                  </button>
-                </div>
-              ) : null}
+              )}
             </div>
           )
         })}
       </div>
 
-      {/* Test mode tools */}
-      {testMode && (
-        <div style={{ background: 'rgba(245,166,35,0.05)', border: '1px solid rgba(245,166,35,0.2)', borderRadius: 12, padding: '16px 20px' }}>
-          <p style={{ margin: '0 0 12px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: GOLD, fontFamily: 'Poppins, sans-serif' }}>⚡ Test Tools</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <button onClick={unlockAll} style={tb(GOLD)}>🔓 Unlock all steps at once</button>
-            <button onClick={resetSteps} disabled={resetting} style={tb(RED)}>{resetting ? 'Resetting…' : '🔄 Reset to fresh state (start over)'}</button>
-          </div>
-        </div>
-      )}
-
-      {/* Quick contact */}
+      {/* Quick actions */}
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '16px 20px' }}>
-        <p style={{ margin: '0 0 12px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>Contact</p>
-        <a href={`mailto:${email}`} style={{ display: 'block', padding: '9px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 700, textDecoration: 'none', textAlign: 'center' as const, fontFamily: 'Poppins, sans-serif' }}>
-          ✉️ Email {firstName}
-        </a>
+        <p style={{ margin: '0 0 12px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>Actions</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <a href={`mailto:${email}`} style={{ display: 'block', padding: '9px 14px', borderRadius: 8, border: '1px solid rgba(68,190,199,0.25)', background: 'rgba(68,190,199,0.08)', color: BLUE, fontSize: 12, fontWeight: 700, textDecoration: 'none', textAlign: 'center' as const, fontFamily: 'Poppins, sans-serif' }}>
+            ✉️ Email {firstName}
+          </a>
+          <button
+            onClick={resetAll}
+            disabled={saving === 'all'}
+            style={{ padding: '9px 14px', borderRadius: 8, border: '1px solid rgba(214,40,40,0.25)', background: 'rgba(214,40,40,0.06)', color: RED, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Poppins, sans-serif' }}
+          >
+            🔄 Reset All Steps to Fresh State
+          </button>
+        </div>
       </div>
 
     </div>
   )
-}
-
-function tb(color: string): React.CSSProperties {
-  return { width: '100%', padding: '9px 14px', borderRadius: 8, border: `1px solid ${color}35`, background: `${color}10`, color, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Poppins, sans-serif', textAlign: 'left' }
 }
