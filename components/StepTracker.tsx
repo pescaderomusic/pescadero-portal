@@ -115,8 +115,6 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_event),
       href: '/review',
       actionLabel: 'Leave a Review →',
-      href: '/review',
-      actionLabel: 'Leave a Review →',
     },
   ]
 
