@@ -75,8 +75,8 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       id: 'consultation', num: '02', title: 'Initial Consultation', subtitle: 'Quick call before your contract',
       description: 'Garrett will reach out to schedule a brief call to walk through your event, answer any questions, and make sure everything is a perfect fit before sending your contract.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_consultation),
-      href: null,
-      actionLabel: null,
+      href: '/consultation',
+      actionLabel: 'Request a Call →',
     },
     {
       id: 'contract', num: '03', title: 'Service Agreement', subtitle: 'Review & sign your contract',

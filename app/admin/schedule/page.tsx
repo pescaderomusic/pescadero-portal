@@ -79,16 +79,12 @@ export default async function SchedulePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
             {showActions && (
               <>
-                <form action={`/api/admin/consultation/${req.id}/accept`} method="POST">
-                  <button type="submit" style={{ width: '100%', padding: '7px 16px', borderRadius: 7, border: 'none', background: GREEN, color: 'white', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
-                    ✓ Accept
-                  </button>
-                </form>
-                <form action={`/api/admin/consultation/${req.id}/decline`} method="POST">
-                  <button type="submit" style={{ width: '100%', padding: '7px 16px', borderRadius: 7, border: '1px solid rgba(214,40,40,0.3)', background: 'transparent', color: RED, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
-                    ✕ Decline
-                  </button>
-                </form>
+                <Link href={`/admin/consultation/${req.id}/accept`} style={{ display: 'block', width: '100%', padding: '7px 16px', borderRadius: 7, background: GREEN, color: 'white', fontSize: 11, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', textAlign: 'center' as const, boxSizing: 'border-box' as const }}>
+                  ✓ Accept
+                </Link>
+                <Link href={`/admin/consultation/${req.id}/decline`} style={{ display: 'block', width: '100%', padding: '7px 16px', borderRadius: 7, border: '1px solid rgba(214,40,40,0.3)', background: 'transparent', color: RED, fontSize: 11, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', textAlign: 'center' as const, boxSizing: 'border-box' as const }}>
+                  ✕ Decline
+                </Link>
               </>
             )}
             {phone && (
