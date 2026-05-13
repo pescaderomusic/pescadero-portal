@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 const NAVY  = '#0D1B2A'
 const BLUE  = '#44BEC7'
@@ -85,49 +86,60 @@ export default function AdminContractPage() {
   const finalAmt  = totalDue - (Number(form.deposit_amount) || 0)
 
   useEffect(() => {
-    fetch(`/api/admin/client/${clientId}`, { credentials: 'include' })
-      .then(r => {
-        if (!r.ok) throw new Error(`API error: ${r.status}`)
-        return r.json()
-      })
-      .then(d => {
-        setProfile(d.profile)
-        setEmail(d.email || '')
-        const c = d.contract
-        const inq = d.inquiry
-        if (c) {
-          setContract(c)
+    const supabase = createClient()
+    async function load() {
+      try {
+        const [
+          { data: prof },
+          { data: con },
+          { data: inq },
+        ] = await Promise.all([
+          supabase.from('profiles').select('full_name').eq('id', clientId).single(),
+          supabase.from('contracts').select('*').eq('client_id', clientId).order('created_at', { ascending: false }).limit(1).single(),
+          supabase.from('inquiry_submissions').select('*').eq('client_id', clientId).order('submitted_at', { ascending: false }).limit(1).single(),
+        ])
+
+        // Get email from auth
+        const { data: { user } } = await supabase.auth.getUser()
+        // We need the client email — use profile or inquiry
+        const clientEmail = inq?.email || ''
+
+        setProfile(prof)
+        setEmail(clientEmail)
+
+        if (con) {
+          setContract(con)
           setForm(f => ({
             ...f,
-            client_name:          c.client_name || d.profile?.full_name || '',
-            client_email:         c.client_email || d.email || '',
-            client_phone:         c.client_phone || inq?.phone || '',
-            event_date:           c.event_date || inq?.event_date || '',
-            event_type:           c.event_type || inq?.event_name || '',
-            event_start_time:     c.event_start_time || inq?.start_time || '',
-            event_end_time:       c.event_end_time || inq?.end_time || '',
-            venue_name:           c.venue_name || inq?.venue_name || '',
-            venue_address:        c.venue_address || inq?.venue_address || '',
-            expected_attendance:  c.expected_attendance || inq?.attendance || '',
-            indoor_outdoor:       c.indoor_outdoor || inq?.indoor_outdoor || '',
-            day_of_contact_name:  c.day_of_contact_name || '',
-            day_of_contact_phone: c.day_of_contact_phone || '',
-            package:              c.package || 'Basic DJ Package',
-            package_price:        c.package_price?.toString() || '400',
-            travel_fee:           c.travel_fee?.toString() || '0',
-            overtime_rate:        c.overtime_rate?.toString() || '100',
-            deposit_amount:       c.deposit_amount?.toString() || '100',
-            deposit_due_date:     c.deposit_due_date || '',
-            final_payment_amount: c.final_payment_amount?.toString() || '300',
-            final_payment_due:    c.final_payment_due || '',
-            contracted_hours:     c.contracted_hours || '4',
-            sales_tax_rate:       c.sales_tax_rate?.toString() || '0',
-            special_notes:        c.special_notes || '',
-            garrett_message:      c.garrett_message || '',
-            venue_distance:       c.venue_distance || '',
+            client_name:          con.client_name || prof?.full_name || '',
+            client_email:         con.client_email || clientEmail || '',
+            client_phone:         con.client_phone || inq?.phone || '',
+            event_date:           con.event_date || inq?.event_date || '',
+            event_type:           con.event_type || inq?.event_name || '',
+            event_start_time:     con.event_start_time || inq?.start_time || '',
+            event_end_time:       con.event_end_time || inq?.end_time || '',
+            venue_name:           con.venue_name || inq?.venue_name || '',
+            venue_address:        con.venue_address || inq?.venue_address || '',
+            expected_attendance:  con.expected_attendance || inq?.attendance || '',
+            indoor_outdoor:       con.indoor_outdoor || inq?.indoor_outdoor || '',
+            day_of_contact_name:  con.day_of_contact_name || '',
+            day_of_contact_phone: con.day_of_contact_phone || '',
+            package:              con.package || 'Basic DJ Package',
+            package_price:        con.package_price?.toString() || '400',
+            travel_fee:           con.travel_fee?.toString() || '0',
+            overtime_rate:        con.overtime_rate?.toString() || '100',
+            deposit_amount:       con.deposit_amount?.toString() || '100',
+            deposit_due_date:     con.deposit_due_date || '',
+            final_payment_amount: con.final_payment_amount?.toString() || '300',
+            final_payment_due:    con.final_payment_due || '',
+            contracted_hours:     con.contracted_hours || '4',
+            sales_tax_rate:       con.sales_tax_rate?.toString() || '0',
+            special_notes:        con.special_notes || '',
+            garrett_message:      con.garrett_message || '',
+            venue_distance:       con.venue_distance || '',
           }))
-          if (c.additional_charges?.length) {
-            const padded = [...c.additional_charges.map((ch: any) => ({
+          if (con.additional_charges?.length) {
+            const padded = [...con.additional_charges.map((ch: any) => ({
               description: ch.description || '',
               amount: ch.amount?.toString() || '',
               approved_by: ch.approved_by || '',
@@ -138,22 +150,27 @@ export default function AdminContractPage() {
         } else if (inq) {
           setForm(f => ({
             ...f,
-            client_name: d.profile?.full_name || '',
-            client_email: d.email || '',
-            client_phone: inq.phone || '',
-            event_date: inq.event_date || '',
-            event_type: inq.event_name || '',
-            event_start_time: inq.start_time || '',
-            event_end_time: inq.end_time || '',
-            venue_name: inq.venue_name || '',
-            venue_address: inq.venue_address || '',
+            client_name:         prof?.full_name || '',
+            client_email:        clientEmail || '',
+            client_phone:        inq.phone || '',
+            event_date:          inq.event_date || '',
+            event_type:          inq.event_name || '',
+            event_start_time:    inq.start_time || '',
+            event_end_time:      inq.end_time || '',
+            venue_name:          inq.venue_name || '',
+            venue_address:       inq.venue_address || '',
             expected_attendance: inq.attendance || '',
-            indoor_outdoor: inq.indoor_outdoor || '',
+            indoor_outdoor:      inq.indoor_outdoor || '',
           }))
         }
+      } catch (e) {
+        console.error('Contract load error:', e)
+        setMsg('❌ Failed to load — check console')
+      } finally {
         setLoading(false)
-      })
-      .catch(e => { console.error('Contract load error:', e); setLoading(false); setMsg('❌ Failed to load client data — check console') })
+      }
+    }
+    load()
   }, [clientId])
 
   const buildPayload = () => ({
