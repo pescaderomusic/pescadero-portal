@@ -116,7 +116,7 @@ export default async function AdminPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE }}>PESCADERO ADMIN</span>
           <Link href="/admin/availability" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📅 Availability</Link>
-          <Link href="/admin/schedule" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📞 Schedule</Link>
+          <Link href="/admin/schedule" style={{ fontSize: 11, color: consultPending > 0 ? '#F5A623' : 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: consultPending > 0 ? 700 : 400 }}>📞 Schedule{consultPending > 0 ? ` (${consultPending})` : ''}</Link>
         </div>
         <Link href="/dashboard?client=true" style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '5px 12px' }}>
           Switch to Client View →
@@ -177,8 +177,15 @@ export default async function AdminPage() {
                         <span style={{ fontSize: 12, color: 'white', fontWeight: 600 }}>{profile?.full_name || email}</span>
                         <span style={{ fontSize: 11, color: GOLD, marginLeft: 10 }}>— {action}</span>
                       </div>
-                      <Link href={`/admin/client/${b.client_id}`} style={{ fontSize: 10, color: GOLD, textDecoration: 'none', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 5, padding: '3px 10px' }}>
-                        Take Action →
+                      <Link
+                        href={
+                          b.step_consultation === 'pending'
+                            ? '/admin/schedule'
+                            : `/admin/client/${b.client_id}`
+                        }
+                        style={{ fontSize: 10, color: GOLD, textDecoration: 'none', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 5, padding: '3px 10px' }}
+                      >
+                        {b.step_consultation === 'pending' ? 'View Request →' : 'Take Action →'}
                       </Link>
                     </div>
                   )
