@@ -16,11 +16,16 @@ export async function POST(req: NextRequest) {
   const { clientId, ...fields } = await req.json()
   const admin = getAdmin()
 
-  // Get existing booking for booking_id
   const { data: booking } = await admin.from('bookings').select('id').eq('client_id', clientId).single()
+  const { data: existing } = await admin.from('contracts').select('id, status').eq('client_id', clientId).single()
 
-  // Check if contract exists
-  const { data: existing } = await admin.from('contracts').select('id').eq('client_id', clientId).single()
+  // Calculate total
+  const pkg      = Number(fields.package_price) || 0
+  const travel   = Number(fields.travel_fee) || 0
+  const addl     = (fields.additional_charges || []).reduce((s: number, c: any) => s + (Number(c.amount) || 0), 0)
+  const taxRate  = Number(fields.sales_tax_rate) || 0
+  const taxAmt   = Math.round(((pkg + travel + addl) * taxRate / 100) * 100) / 100
+  const total    = pkg + travel + addl + taxAmt
 
   const contractData = {
     client_id:            clientId,
@@ -39,26 +44,32 @@ export async function POST(req: NextRequest) {
     day_of_contact_name:  fields.day_of_contact_name,
     day_of_contact_phone: fields.day_of_contact_phone,
     package:              fields.package,
-    package_price:        Number(fields.package_price) || 0,
-    travel_fee:           Number(fields.travel_fee) || 0,
-    overtime_rate:        Number(fields.overtime_rate) || 0,
+    package_price:        pkg,
+    travel_fee:           travel,
+    overtime_rate:        Number(fields.overtime_rate) || 100,
     deposit_amount:       Number(fields.deposit_amount) || 100,
     deposit_due_date:     fields.deposit_due_date || null,
     final_payment_amount: Number(fields.final_payment_amount) || 0,
     final_payment_due:    fields.final_payment_due || null,
-    contracted_hours:     fields.contracted_hours,
-    special_notes:        fields.special_notes,
-    garrett_message:      fields.garrett_message,
+    contracted_hours:     fields.contracted_hours || '4',
+    additional_charges:   fields.additional_charges || [],
+    sales_tax_rate:       taxRate,
+    sales_tax_amount:     taxAmt,
+    total_due:            total,
+    special_notes:        fields.special_notes || null,
+    garrett_message:      fields.garrett_message || null,
     updated_at:           new Date().toISOString(),
   }
 
   let contract
-  if (existing) {
+  if (existing && !['signed','fully_paid','deposit_paid'].includes(existing.status || '')) {
     const { data } = await admin.from('contracts').update(contractData).eq('id', existing.id).select().single()
     contract = data
-  } else {
+  } else if (!existing) {
     const { data } = await admin.from('contracts').insert({ ...contractData, status: 'pending', created_at: new Date().toISOString() }).select().single()
     contract = data
+  } else {
+    contract = existing
   }
 
   return NextResponse.json({ ok: true, contract })
