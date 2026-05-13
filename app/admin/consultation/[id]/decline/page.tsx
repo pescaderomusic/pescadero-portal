@@ -33,5 +33,5 @@ export default async function DeclinePage({ params }: { params: { id: string } }
     }
   }
 
-  redirect('/admin/schedule')
+  redirect('/admin/schedule?declined=1')
 }

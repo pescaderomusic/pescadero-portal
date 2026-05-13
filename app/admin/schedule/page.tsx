@@ -24,7 +24,7 @@ function fmtDateTime(d: string) {
   return new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 }
 
-export default async function SchedulePage() {
+export default async function SchedulePage({ searchParams }: { searchParams: { accepted?: string; declined?: string } }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.id !== GARRETT_ID) redirect('/dashboard')
@@ -114,6 +114,26 @@ export default async function SchedulePage() {
       </nav>
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px 80px' }}>
+
+        {searchParams.accepted && (
+          <div style={{ background: 'rgba(76,175,80,0.12)', border: '1px solid rgba(76,175,80,0.3)', borderRadius: 10, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 20 }}>✅</span>
+            <div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#4CAF50', fontFamily: 'Poppins, sans-serif' }}>Consultation Accepted!</p>
+              <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.5)', fontFamily: 'Poppins, sans-serif' }}>Client has been notified by email. The call is now confirmed — you'll initiate it.</p>
+            </div>
+          </div>
+        )}
+
+        {searchParams.declined && (
+          <div style={{ background: 'rgba(214,40,40,0.1)', border: '1px solid rgba(214,40,40,0.25)', borderRadius: 10, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 20 }}>✕</span>
+            <div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#FF8A80', fontFamily: 'Poppins, sans-serif' }}>Request Declined</p>
+              <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.5)', fontFamily: 'Poppins, sans-serif' }}>Client has been notified to choose a new time.</p>
+            </div>
+          </div>
+        )}
         <div style={{ marginBottom: 28 }}>
           <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Consultation Requests</p>
           <h1 style={{ margin: 0, fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 26, color: 'white' }}>Schedule</h1>

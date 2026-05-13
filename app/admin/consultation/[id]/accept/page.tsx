@@ -46,5 +46,5 @@ export default async function AcceptPage({ params }: { params: { id: string } })
     }
   }
 
-  redirect('/admin/schedule')
+  redirect('/admin/schedule?accepted=1')
 }
