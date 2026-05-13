@@ -32,9 +32,33 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Auto-progression: ONLY deposit unlocks when contract is signed
-  // Contract unlock is manual — Garrett prepares and pushes contract himself
   if (stepKey === 'step_contract' && value === 'signed') {
     await admin.from('bookings').update({ step_deposit: 'pending' }).eq('client_id', clientId).eq('step_deposit', 'locked')
+  }
+
+  // When backtracking consultation to pending/locked — cancel existing requests
+  // so client can re-submit from their dashboard
+  if (stepKey === 'step_consultation' && ['pending', 'locked'].includes(value)) {
+    await admin.from('consultation_requests')
+      .update({ status: 'cancelled' })
+      .eq('client_id', clientId)
+      .in('status', ['pending', 'accepted', 'scheduled'])
+  }
+
+  // When backtracking contract to locked/pending — reset so client can't see it
+  if (stepKey === 'step_contract' && ['locked', 'pending'].includes(value)) {
+    await admin.from('contracts')
+      .update({ status: 'pending', client_signature: null, client_signed_at: null })
+      .eq('client_id', clientId)
+      .neq('status', 'fully_paid')
+  }
+
+  // When backtracking deposit to locked/pending — reset deposit status
+  if (stepKey === 'step_deposit' && ['locked', 'pending'].includes(value)) {
+    await admin.from('contracts')
+      .update({ status: 'sent', deposit_paid_at: null })
+      .eq('client_id', clientId)
+      .eq('status', 'deposit_paid')
   }
 
   return NextResponse.json({ ok: true })

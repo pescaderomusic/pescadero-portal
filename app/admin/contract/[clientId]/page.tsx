@@ -85,8 +85,11 @@ export default function AdminContractPage() {
   const finalAmt  = totalDue - (Number(form.deposit_amount) || 0)
 
   useEffect(() => {
-    fetch(`/api/admin/client/${clientId}`)
-      .then(r => r.json())
+    fetch(`/api/admin/client/${clientId}`, { credentials: 'include' })
+      .then(r => {
+        if (!r.ok) throw new Error(`API error: ${r.status}`)
+        return r.json()
+      })
       .then(d => {
         setProfile(d.profile)
         setEmail(d.email || '')
@@ -150,6 +153,7 @@ export default function AdminContractPage() {
         }
         setLoading(false)
       })
+      .catch(e => { console.error('Contract load error:', e); setLoading(false); setMsg('❌ Failed to load client data — check console') })
   }, [clientId])
 
   const buildPayload = () => ({

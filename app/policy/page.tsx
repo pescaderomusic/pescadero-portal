@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import PrintDownloadButton from '@/components/PrintDownloadButton'
 
 const NAVY  = '#0D1B2A'
 const BLUE  = '#44BEC7'
@@ -65,7 +66,10 @@ export default function PolicyPage() {
           <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 20, fontWeight: 700, color: RED }}>Pescadero</span>
           <span style={{ fontFamily: 'monospace', fontSize: 9, fontWeight: 700, letterSpacing: '4px', color: BLUE, textTransform: 'uppercase' }}>MUSIC</span>
         </div>
-        <Link href="/" style={{ fontSize: 11, color: 'rgba(232,224,213,0.4)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>← Home</Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <PrintDownloadButton label="🖨 Print / Save PDF" />
+          <Link href="/" style={{ fontSize: 11, color: 'rgba(232,224,213,0.4)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>← Home</Link>
+        </div>
       </nav>
 
       {/* Hero */}
