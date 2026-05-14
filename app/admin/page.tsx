@@ -117,6 +117,8 @@ export default async function AdminPage() {
           <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE }}>PESCADERO ADMIN</span>
           <Link href="/admin/availability" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📅 Availability</Link>
           <Link href="/admin/schedule" style={{ fontSize: 11, color: consultPending > 0 ? '#F5A623' : 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: consultPending > 0 ? 700 : 400 }}>📞 Schedule{consultPending > 0 ? ` (${consultPending})` : ''}</Link>
+          <Link href="/admin/analytics" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📊 Analytics</Link>
+          <Link href="/admin/reviews" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>⭐ Reviews</Link>
         </div>
         <Link href="/dashboard?client=true" style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '5px 12px' }}>
           Switch to Client View →
