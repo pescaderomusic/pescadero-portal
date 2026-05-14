@@ -175,7 +175,6 @@ export default function AdminContractPage() {
 
   const buildPayload = () => ({
     ...form,
-    additional_charges: additionalCharges.filter(c => c.description || c.amount),
     final_payment_amount: finalAmt.toFixed(2),
   })
 
@@ -280,11 +279,7 @@ export default function AdminContractPage() {
             <Field label="Start Time"><input style={inputStyle} type="time" value={form.event_start_time} onChange={set('event_start_time')} disabled={isSent} /></Field>
             <Field label="End Time"><input style={inputStyle} type="time" value={form.event_end_time} onChange={set('event_end_time')} disabled={isSent} /></Field>
             <Field label="Expected Attendance"><input style={inputStyle} value={form.expected_attendance} onChange={set('expected_attendance')} disabled={isSent} /></Field>
-            <Field label="Contracted Hours">
-              <select style={inputStyle} value={form.contracted_hours} onChange={set('contracted_hours')} disabled={isSent}>
-                {['2','3','4','5','6','7','8'].map(h => <option key={h} value={h}>{h} hours</option>)}
-              </select>
-            </Field>
+
             <Field label="Indoor / Outdoor">
               <select style={inputStyle} value={form.indoor_outdoor} onChange={set('indoor_outdoor')} disabled={isSent}>
                 <option value="">Select…</option><option>Indoor</option><option>Outdoor</option><option>Both</option>
@@ -304,24 +299,19 @@ export default function AdminContractPage() {
         </Section>
 
         {/* Package + travel */}
-        <Section title="Package & Travel">
+        <Section title="Investment & Travel">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
-            <Field label="Package">
-              <select style={inputStyle} value={form.package} onChange={set('package')} disabled={isSent}>
-                <option>Basic DJ Package</option><option>Premium DJ Package</option><option>Custom</option>
-              </select>
-            </Field>
-            <Field label="Package Price ($)"><input style={inputStyle} type="number" value={form.package_price} onChange={set('package_price')} disabled={isSent} /></Field>
+  
+            <Field label="Investment ($) — Sat: $1,500 · Fri/Thu: $1,400 · Mon–Wed: $1,200"><input style={inputStyle} type="number" value={form.package_price} onChange={set('package_price')} disabled={isSent} /></Field>
             <Field label="Venue Distance from Provo">
               <select style={inputStyle} value={form.venue_distance} onChange={e => { set('venue_distance')(e); const v = e.target.value; setForm(f => ({ ...f, venue_distance: v, travel_fee: v === '0-30' ? '0' : v === '31-60' ? '75' : f.travel_fee })) }} disabled={isSent}>
-                <option value="">Select distance…</option>
-                <option value="0-30">Within 30 miles (Free)</option>
-                <option value="31-60">31–60 miles ($75)</option>
-                <option value="61+">61+ miles (custom)</option>
+                <option value="">Select distance from Provo…</option>
+                <option value="0-60">Within 60 miles (Free)</option>
+                <option value="61+">61+ miles (consult — enter fee below)</option>
               </select>
             </Field>
             <Field label="Travel Fee ($)"><input style={inputStyle} type="number" value={form.travel_fee} onChange={set('travel_fee')} disabled={isSent} /></Field>
-            <Field label="Overtime Rate ($/hr)"><input style={inputStyle} type="number" value={form.overtime_rate} onChange={set('overtime_rate')} disabled={isSent} /></Field>
+
           </div>
         </Section>
 
@@ -335,32 +325,13 @@ export default function AdminContractPage() {
           </div>
         </Section>
 
-        {/* Additional charges */}
-        <Section title="Additional Charges (if any)">
-          <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
-            {['Description of Charge', 'Amount ($)', 'Approved By'].map(h => (
-              <p key={h} style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>{h}</p>
-            ))}
-          </div>
-          {additionalCharges.map((c, i) => (
-            <div key={i} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
-              <input style={inputStyle} placeholder={`Charge ${i + 1} description…`} value={c.description} onChange={e => setCharge(i, 'description', e.target.value)} disabled={isSent} />
-              <input style={inputStyle} type="number" placeholder="0" value={c.amount} onChange={e => setCharge(i, 'amount', e.target.value)} disabled={isSent} />
-              <input style={inputStyle} placeholder="Garrett E." value={c.approved_by} onChange={e => setCharge(i, 'approved_by', e.target.value)} disabled={isSent} />
-            </div>
-          ))}
-          {!isSent && (
-            <button onClick={() => setAdditionalCharges(cs => [...cs, emptyCharge()])} style={{ background: 'none', border: '1px dashed rgba(255,255,255,0.2)', borderRadius: 6, color: 'rgba(255,255,255,0.4)', fontSize: 11, padding: '6px 14px', cursor: 'pointer', marginTop: 4 }}>
-              + Add Row
-            </button>
-          )}
-        </Section>
+
 
         {/* Total summary */}
         <div style={{ background: 'rgba(68,190,199,0.06)', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 12, padding: '18px 22px', marginBottom: 16 }}>
           <p style={{ margin: '0 0 12px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontFamily: 'Poppins, sans-serif' }}>Payment Summary</p>
           {[
-            ['Package', `$${pkg.toFixed(2)}`],
+            ['Investment', `$${pkg.toFixed(2)}`],
             ...(travel > 0 ? [['Travel Fee', `$${travel.toFixed(2)}`]] : []),
             ...(addlTotal > 0 ? [['Additional Charges', `$${addlTotal.toFixed(2)}`]] : []),
             ...(taxAmt > 0 ? [`Sales Tax (${taxRate}%)`, `$${taxAmt.toFixed(2)}`].map(x => [x]) : []),
