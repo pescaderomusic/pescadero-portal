@@ -22,6 +22,8 @@ interface Booking {
 }
 
 interface Props {
+  justPaid?: boolean
+  paymentType?: string
   booking: Booking | null
   clientName: string
 }
