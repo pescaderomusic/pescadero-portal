@@ -241,7 +241,6 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                 background: '#0D1B2A',
                 boxShadow: eventDone ? `0 0 28px ${GREEN}35, inset 0 0 0 200px ${GREEN}18` : `0 0 28px ${RED}35, inset 0 0 0 200px ${RED}12`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: `0 0 28px ${eventDone ? GREEN : RED}35`,
                 flexShrink: 0,
               }}>
                 {eventDone
