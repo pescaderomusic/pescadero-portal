@@ -211,11 +211,12 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                     height: isActive ? 48 : 44,
                     borderRadius: '50%',
                     border: `2px solid ${isComplete ? GREEN : isActive ? BLUE : 'rgba(255,255,255,0.1)'}`,
-                    background: isComplete ? `${GREEN}18` : isActive ? `${BLUE}18` : 'rgba(255,255,255,0.03)',
+                    background: isComplete ? `#0D1B2A` : isActive ? `#0D1B2A` : '#0D1B2A',
+                    boxShadow: isActive ? `0 0 18px ${BLUE}40, inset 0 0 0 200px ${BLUE}18` : isComplete ? `inset 0 0 0 200px ${GREEN}18` : 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: isActive ? `0 0 18px ${BLUE}40` : 'none',
                     transition: 'all 0.3s',
                     flexShrink: 0,
+                    position: 'relative' as const,
                   }}>
                     {isComplete
                       ? <span style={{ fontSize: 17, color: GREEN }}>✓</span>
@@ -237,7 +238,8 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
               <div style={{
                 width: 68, height: 68, borderRadius: '50%',
                 border: `3px solid ${eventDone ? GREEN : RED}`,
-                background: eventDone ? `${GREEN}18` : `${RED}12`,
+                background: '#0D1B2A',
+                boxShadow: eventDone ? `0 0 28px ${GREEN}35, inset 0 0 0 200px ${GREEN}18` : `0 0 28px ${RED}35, inset 0 0 0 200px ${RED}12`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: `0 0 28px ${eventDone ? GREEN : RED}35`,
                 flexShrink: 0,
@@ -261,7 +263,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
               <div style={{
                 width: 44, height: 44, borderRadius: '50%',
                 border: `2px solid ${eventDone ? GOLD : 'rgba(255,255,255,0.08)'}`,
-                background: eventDone ? `${GOLD}15` : 'rgba(255,255,255,0.02)',
+                background: '#0D1B2A',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
                 <span style={{ fontSize: 18, filter: eventDone ? 'none' : 'grayscale(1) opacity(0.25)' }}>⭐</span>
@@ -274,21 +276,44 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         </div>
 
         {/* Active step card */}
-        {activeStep && (
-          <div style={{ background: `rgba(68,190,199,0.07)`, border: `1px solid rgba(68,190,199,0.2)`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-            <div>
-              <p style={{ margin: '0 0 3px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>
-                Next — {activeStep.label}
-              </p>
-              <p style={{ margin: 0, fontSize: 14, color: 'white', fontWeight: 600 }}>{activeStep.desc}</p>
+        {/* Next step card */}
+        {(() => {
+          // Special message when inquiry done, waiting on consultation
+          const inquiryDone = !noBooking && booking!.step_inquiry === 'complete'
+          const consultPending = !noBooking && booking!.step_consultation === 'pending'
+          const consultScheduled = !noBooking && booking!.step_consultation === 'scheduled'
+
+          if (inquiryDone && consultPending) return (
+            <div style={{ background: 'rgba(68,190,199,0.07)', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 12, padding: '20px 24px', marginBottom: 20 }}>
+              <p style={{ margin: '0 0 6px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>✓ Inquiry Received</p>
+              <p style={{ margin: '0 0 4px', fontSize: 14, color: 'white', fontWeight: 600 }}>We've got your inquiry — thank you!</p>
+              <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>Garrett will reach out within 24–48 hours to schedule your consultation call. Keep an eye on your email and phone.</p>
             </div>
-            {activeStep.action && (
-              <Link href={activeStep.action.href} style={{ padding: '11px 26px', borderRadius: 9, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 4px 18px rgba(214,40,40,0.35)', flexShrink: 0 }}>
-                {activeStep.action.label}
-              </Link>
-            )}
-          </div>
-        )}
+          )
+
+          if (consultScheduled) return (
+            <div style={{ background: 'rgba(68,190,199,0.07)', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 12, padding: '20px 24px', marginBottom: 20 }}>
+              <p style={{ margin: '0 0 6px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>📅 Consultation Scheduled</p>
+              <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>Your call is confirmed — Garrett will be reaching out directly at the scheduled time.</p>
+            </div>
+          )
+
+          if (!activeStep) return null
+
+          return (
+            <div style={{ background: 'rgba(68,190,199,0.07)', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 12, padding: '20px 24px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+              <div>
+                <p style={{ margin: '0 0 3px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>Next — {activeStep.label}</p>
+                <p style={{ margin: 0, fontSize: 14, color: 'white', fontWeight: 600 }}>{activeStep.desc}</p>
+              </div>
+              {activeStep.action && (
+                <Link href={activeStep.action.href} style={{ padding: '11px 26px', borderRadius: 9, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 4px 18px rgba(214,40,40,0.35)', flexShrink: 0 }}>
+                  {activeStep.action.label}
+                </Link>
+              )}
+            </div>
+          )
+        })()}
 
         {/* Review CTA */}
         {eventDone && (
