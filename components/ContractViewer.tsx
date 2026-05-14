@@ -85,8 +85,15 @@ export default function ContractViewer({ contract }: Props) {
       status: 'client_signed',
     }).eq('id', contract.id)
 
+    // Update booking step
+    await supabase.from('bookings')
+      .update({ step_contract: 'signed', step_deposit: 'pending' })
+      .eq('client_id', contract.client_id)
+
     setSigned(true)
     setSigning(false)
+    // Redirect to deposit payment — combined flow
+    window.location.href = '/contract/payment'
   }
 
   const inputStyle = {

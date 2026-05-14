@@ -72,26 +72,32 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       actionLabel: noBooking ? 'Submit Inquiry →' : 'View Inquiry',
     },
     {
-      id: 'consultation', num: '02', title: 'Initial Consultation', subtitle: 'Quick call before your contract',
-      description: 'Garrett will reach out to schedule a brief call to walk through your event, answer any questions, and make sure everything is a perfect fit before sending your contract.',
+      id: 'consultation', num: '02', title: 'Initial Consultation', subtitle: 'Garrett will be in touch',
+      description: booking?.step_consultation === 'complete'
+        ? 'Your consultation call is done. Your service agreement is next.'
+        : booking?.step_consultation === 'scheduled'
+        ? 'Your call is scheduled — Garrett will reach out to you directly at the confirmed time.'
+        : 'After your inquiry is reviewed, Garrett will reach out directly to schedule a brief call before sending your contract. No action needed on your end.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_consultation),
-      href: '/consultation',
-      actionLabel: 'Request a Call →',
+      href: null,
+      actionLabel: null,
     },
     {
-      id: 'contract', num: '03', title: 'Service Agreement', subtitle: 'Review & sign your contract',
+      id: 'contract', num: '03', title: 'Service Agreement', subtitle: 'Review, sign & pay deposit',
       description: !noBooking && booking.step_contract === 'sent'
-        ? 'Your contract is ready to review and sign. Click below to open it.'
-        : 'Your contract will appear here once Garrett confirms your booking after the consultation.',
+        ? 'Your contract is ready. Review, sign, and pay your deposit in one step to officially secure your date.'
+        : !noBooking && booking.step_contract === 'signed'
+        ? 'Your contract is signed and deposit is paid. Your date is officially secured!'
+        : 'Your service agreement will be ready once Garrett finalizes it after your consultation.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_contract),
-      href: '/contract', actionLabel: 'Open Contract →',
+      href: '/contract', actionLabel: 'Review & Sign →',
     },
     {
-      id: 'deposit', num: '04', title: 'Deposit', subtitle: '$100 to secure your date',
-      description: 'Secure your date with a $100 non-refundable deposit. Your date is not officially locked until payment is received.',
+      id: 'deposit', num: '04', title: 'Deposit', subtitle: 'Paid with contract signing',
+      description: 'Your $100 non-refundable deposit is collected at the time of contract signing to officially secure your date.',
       status: noBooking ? 'locked' as const : getStepStatus(booking.step_deposit),
-      href: '/contract/payment',
-      actionLabel: 'Make Deposit →',
+      href: null,
+      actionLabel: null,
     },
     {
       id: 'planning', num: '05', title: 'Planning & Music', subtitle: 'Timeline, details & playlist',
