@@ -14,8 +14,7 @@ const STEP_CONFIG: Record<string, {
   step_inquiry: {
     num: '01', label: 'Inquiry',
     statuses: [
-      { value: 'locked',   label: 'Not Started',   color: 'rgba(255,255,255,0.2)', description: 'Awaiting inquiry submission' },
-      { value: 'complete', label: 'Received ✓',    color: GREEN,                  description: 'Inquiry submitted and received' },
+      { value: 'complete', label: 'Received ✓', color: GREEN, description: 'Inquiry submitted and received' },
     ],
   },
   step_consultation: {
