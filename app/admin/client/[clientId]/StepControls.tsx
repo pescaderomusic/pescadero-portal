@@ -250,6 +250,11 @@ export default function StepControls({ clientId, booking, email, firstName, cons
               <a href={`mailto:${email}`} style={{ display: 'block', padding: '9px 14px', borderRadius: 8, border: '1px solid rgba(68,190,199,0.2)', background: 'rgba(68,190,199,0.07)', color: BLUE, fontSize: 12, fontWeight: 700, textDecoration: 'none', textAlign: 'center' as const, fontFamily: 'Poppins, sans-serif' }}>
                 ✉️ Email {firstName}
               </a>
+              {(['scheduled','pending'].includes(local.step_consultation || '')) && (
+                <a href={`/admin/reschedule/${clientId}`} style={{ display: 'block', padding: '9px 14px', borderRadius: 8, border: '1px solid rgba(245,166,35,0.25)', background: 'rgba(245,166,35,0.07)', color: '#F5A623', fontSize: 12, fontWeight: 700, textDecoration: 'none', textAlign: 'center' as const, fontFamily: 'Poppins, sans-serif' }}>
+                  📅 Reschedule Consultation
+                </a>
+              )}
               <button onClick={resetAll} disabled={saving === 'all'} style={{ padding: '9px 14px', borderRadius: 8, border: '1px solid rgba(214,40,40,0.2)', background: 'rgba(214,40,40,0.05)', color: RED, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Poppins, sans-serif' }}>
                 🔄 Reset All Steps
               </button>
