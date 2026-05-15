@@ -27,14 +27,11 @@ export default function InquiryPage() {
 
 const STYLES = `
   :root {
-    --navy: #0D1B2A; --navy-80: rgba(13,27,42,0.80);
-    --cream: #F5EFE0; --cream-dark: #EAE0CC; --cream-mid: #DDD3BC;
-    --red: #D62828; --red-dark: #B52020;
-    --blue: #44BEC7; --blue-dark: #37A8B0;
+    --navy: #0D1B2A; --cream: #F5EFE0; --cream-dark: #EAE0CC; --cream-mid: #DDD3BC;
+    --red: #D62828; --red-dark: #B52020; --blue: #44BEC7; --blue-dark: #37A8B0;
     --text-dark: #1A2D3F; --text-mid: #4A5E6E; --text-light: #8A9EAA;
     --font: 'Plus Jakarta Sans', system-ui, sans-serif;
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --panel-w: 480px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1); --panel-w: 480px;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   #inquiry-root { font-family: var(--font); font-size: 15px; background: var(--navy); color: var(--text-dark); display: flex; height: calc(100vh - 44px); overflow: hidden; }
@@ -54,8 +51,8 @@ const STYLES = `
   .panel-header-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .panel-header-title { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
   .panel-header-sub { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); line-height: 1; }
-  .panel-header-main { font-size: 0.88rem; font-weight: 700; color: var(--cream); line-height: 1; letter-spacing: -0.1px; }
-  .progress-bar { flex-shrink: 0; background: #fff; border-bottom: 1px solid var(--cream-mid); padding: 0 28px; display: flex; gap: 0; }
+  .panel-header-main { font-size: 0.88rem; font-weight: 700; color: var(--cream); line-height: 1; }
+  .progress-bar { flex-shrink: 0; background: #fff; border-bottom: 1px solid var(--cream-mid); padding: 0 28px; display: flex; }
   .step-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 4px 10px; background: none; border: none; cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; transition: background 0.15s; }
   .step-btn:hover { background: rgba(13,27,42,0.03); }
   .step-btn::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px; background: transparent; transition: background 0.35s var(--ease); }
@@ -83,6 +80,7 @@ const STYLES = `
   input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="time"], select, textarea { width: 100%; background: #fff; border: 1.5px solid var(--cream-mid); border-radius: 8px; color: var(--text-dark); font-family: var(--font); font-size: 0.88rem; font-weight: 500; padding: 10px 13px; outline: none; -webkit-appearance: none; transition: border-color 0.2s, box-shadow 0.2s; }
   input::placeholder, textarea::placeholder { color: var(--text-light); font-weight: 400; }
   input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(68,190,199,0.13); }
+  input.error, select.error, textarea.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(214,40,40,0.1); }
   textarea { resize: none; min-height: 88px; line-height: 1.55; }
   .choice-group { display: flex; flex-direction: column; gap: 7px; }
   .choice-group.inline { flex-direction: row; flex-wrap: wrap; gap: 7px; }
@@ -90,11 +88,14 @@ const STYLES = `
   .choice-item:hover { border-color: var(--blue); background: rgba(68,190,199,0.04); color: var(--text-dark); }
   .choice-item:has(input:checked) { border-color: var(--blue); background: rgba(68,190,199,0.09); color: var(--navy); font-weight: 600; }
   .choice-item input[type="radio"], .choice-item input[type="checkbox"] { width: 16px; height: 16px; min-width: 16px; accent-color: var(--blue); cursor: pointer; }
+  .choice-group.error .choice-item { border-color: rgba(214,40,40,0.4); }
+  .form-error { background: rgba(214,40,40,0.08); border: 1px solid rgba(214,40,40,0.25); border-radius: 8px; padding: 10px 14px; font-size: 0.78rem; color: var(--red); margin-bottom: 4px; flex-shrink: 0; display: none; }
+  .form-error.visible { display: block; }
   .review-list { display: flex; flex-direction: column; gap: 0; flex: 1; }
   .review-row { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--cream-dark); font-size: 0.84rem; }
   .review-key { min-width: 120px; flex-shrink: 0; font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-light); padding-top: 2px; }
   .review-val { color: var(--text-dark); font-weight: 500; }
-  .slide-footer { flex-shrink: 0; padding-top: 18px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .slide-footer { flex-shrink: 0; padding-top: 18px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
   .btn { font-family: var(--font); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 11px 24px; border: none; border-radius: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all 0.2s var(--ease); }
   .btn-back { background: transparent; color: var(--text-light); border: 1.5px solid var(--cream-mid); }
   .btn-back:hover { border-color: var(--text-light); color: var(--text-dark); }
@@ -102,12 +103,12 @@ const STYLES = `
   .btn-next:hover { background: var(--red-dark); transform: translateY(-1px); box-shadow: 0 7px 20px rgba(214,40,40,0.38); }
   .btn-submit { background: var(--red); color: #fff; padding: 12px 36px; font-size: 0.84rem; box-shadow: 0 4px 16px rgba(214,40,40,0.32); }
   .btn-submit:hover { background: var(--red-dark); transform: translateY(-1px); }
-  .step-counter { font-size: 0.72rem; font-weight: 600; color: var(--text-light); letter-spacing: 0.04em; }
+  .slide-footer-split { justify-content: space-between; }
   .success-slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 28px; text-align: center; opacity: 0; pointer-events: none; visibility: hidden; transform: translateY(20px); transition: opacity 0.55s var(--ease), transform 0.55s var(--ease), visibility 0s 0.55s; }
   .success-slide.visible { opacity: 1; pointer-events: auto; visibility: visible; transform: translateY(0); transition: opacity 0.55s var(--ease), transform 0.55s var(--ease), visibility 0s 0s; }
   .success-ring { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--blue-dark)); display: flex; align-items: center; justify-content: center; margin-bottom: 22px; box-shadow: 0 8px 30px rgba(68,190,199,0.35); animation: popIn 0.5s var(--ease) both; }
   @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .success-slide h2 { font-size: 1.5rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; letter-spacing: -0.3px; }
+  .success-slide h2 { font-size: 1.5rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
   .success-slide p { font-size: 0.85rem; color: var(--text-mid); line-height: 1.65; max-width: 320px; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
   @media (max-width: 700px) {
@@ -132,9 +133,7 @@ const BODY = `<div id="inquiry-root">
 
 <div class="form-panel">
   <div class="panel-header">
-    <div class="panel-header-logo">
-      <img src="https://inquiries.pescaderomusic.com/images/logo.png" alt="Pescadero Music" />
-    </div>
+    <div class="panel-header-logo"><img src="https://inquiries.pescaderomusic.com/images/logo.png" alt="Pescadero Music" /></div>
     <div class="panel-header-title">
       <span class="panel-header-sub">Pescadero Music</span>
       <span class="panel-header-main">Wedding Sound Inquiry</span>
@@ -156,31 +155,20 @@ const BODY = `<div id="inquiry-root">
       <div class="slide-head">
         <div class="slide-eyebrow">Welcome to Pescadero Music</div>
         <div class="slide-title">Let\u2019s Get You Booked</div>
-        <div class="slide-sub">This takes about 3 minutes. Here\u2019s what to expect.</div>
+        <div class="slide-sub">This takes about 3 minutes.</div>
       </div>
-      <div class="fields" style="gap:10px;">
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:flex-start;gap:14px;background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
-            <div style="width:36px;height:36px;border-radius:50%;background:rgba(68,190,199,0.12);border:1.5px solid rgba(68,190,199,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">\u270f\ufe0f</div>
-            <div><div style="font-size:0.86rem;font-weight:700;color:#0D1B2A;margin-bottom:3px;">1 \u2014 Submit Your Inquiry</div><div style="font-size:0.81rem;color:#6A7E8E;line-height:1.55;">Tell us about your event \u2014 your contact info, date, venue, and any questions. Takes about 3 minutes.</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:14px;background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
-            <div style="width:36px;height:36px;border-radius:50%;background:rgba(68,190,199,0.12);border:1.5px solid rgba(68,190,199,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">\ud83d\udcde</div>
-            <div><div style="font-size:0.86rem;font-weight:700;color:#0D1B2A;margin-bottom:3px;">2 \u2014 Garrett Reaches Out</div><div style="font-size:0.81rem;color:#6A7E8E;line-height:1.55;">Within 24\u201348 hours, Garrett will contact you directly to talk through your vision and confirm availability.</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:14px;background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
-            <div style="width:36px;height:36px;border-radius:50%;background:rgba(68,190,199,0.12);border:1.5px solid rgba(68,190,199,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">\ud83d\udcdd</div>
-            <div><div style="font-size:0.86rem;font-weight:700;color:#0D1B2A;margin-bottom:3px;">3 \u2014 Sign &amp; Secure Your Date</div><div style="font-size:0.81rem;color:#6A7E8E;line-height:1.55;">Once everything looks good, you\u2019ll receive a contract and pay your deposit \u2014 all online, in one step.</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:14px;background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
-            <div style="width:36px;height:36px;border-radius:50%;background:rgba(214,40,40,0.08);border:1.5px solid rgba(214,40,40,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">\ud83c\udfa7</div>
-            <div><div style="font-size:0.86rem;font-weight:700;color:#0D1B2A;margin-bottom:3px;">4 \u2014 Enjoy Your Wedding Day</div><div style="font-size:0.81rem;color:#6A7E8E;line-height:1.55;">Garrett handles everything from sound to MC. You just show up and celebrate.</div></div>
-          </div>
+      <div class="fields" style="gap:12px;">
+        <div style="display:flex;align-items:flex-start;gap:14px;background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:16px 18px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(68,190,199,0.12);border:1.5px solid rgba(68,190,199,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">\u270f\ufe0f</div>
+          <div><div style="font-size:0.9rem;font-weight:700;color:#0D1B2A;margin-bottom:4px;">1 \u2014 Submit Your Inquiry</div><div style="font-size:0.83rem;color:#6A7E8E;line-height:1.6;">Tell us about your event \u2014 your contact info, date, venue, and any questions.</div></div>
         </div>
-        <div style="background:rgba(68,190,199,0.06);border:1px solid rgba(68,190,199,0.18);border-radius:8px;padding:11px 14px;font-size:0.78rem;color:#4A5E6E;line-height:1.55;flex-shrink:0;">\ud83d\udd12 Your information is only shared with Garrett \u2014 never sold or shared with third parties.</div>
+        <div style="display:flex;align-items:flex-start;gap:14px;background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:16px 18px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(68,190,199,0.12);border:1.5px solid rgba(68,190,199,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">\ud83d\udcde</div>
+          <div><div style="font-size:0.9rem;font-weight:700;color:#0D1B2A;margin-bottom:4px;">2 \u2014 Garrett Reaches Out</div><div style="font-size:0.83rem;color:#6A7E8E;line-height:1.6;">Within 24\u201348 hours, Garrett will contact you directly to talk through your vision, answer questions, and confirm availability.</div></div>
+        </div>
+        <div style="background:rgba(68,190,199,0.06);border:1px solid rgba(68,190,199,0.18);border-radius:8px;padding:12px 15px;font-size:0.78rem;color:#4A5E6E;line-height:1.55;">\ud83d\udd12 Your information is only shared with Garrett \u2014 never sold or shared with third parties.</div>
       </div>
       <div class="slide-footer">
-        <span class="step-counter">Let\u2019s go \u2192</span>
         <button class="btn btn-next" onclick="goTo(2,'forward')">Get Started \u2192</button>
       </div>
     </div>
@@ -192,6 +180,7 @@ const BODY = `<div id="inquiry-root">
         <div class="slide-title">Contact Information</div>
         <div class="slide-sub">Tell us how to reach you.</div>
       </div>
+      <div id="error-2" class="form-error"></div>
       <div class="fields">
         <div class="field-row">
           <div class="field-group"><div class="field-label">First Name <span class="req">*</span></div><input type="text" id="firstName" placeholder="First" /></div>
@@ -201,7 +190,7 @@ const BODY = `<div id="inquiry-root">
         <div class="field-group"><div class="field-label">Phone Number <span class="req">*</span></div><input type="tel" id="phone" placeholder="(801) 555-5555" /></div>
         <div class="field-group">
           <div class="field-label">Preferred Contact Method <span class="req">*</span></div>
-          <div class="choice-group inline">
+          <div class="choice-group inline" id="contactGroup">
             <label class="choice-item"><input type="radio" name="entry.1289776342" value="Call" /> Call</label>
             <label class="choice-item"><input type="radio" name="entry.1289776342" value="Email" /> Email</label>
             <label class="choice-item"><input type="radio" name="entry.1289776342" value="Text" /> Text</label>
@@ -209,7 +198,7 @@ const BODY = `<div id="inquiry-root">
         </div>
         <div class="field-group"><div class="field-label">Name of Bride &amp; Groom <span class="req">*</span></div><input type="text" id="coupleNames" placeholder="e.g. Emily &amp; James" /></div>
       </div>
-      <div class="slide-footer">
+      <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(1,'back')">\u2190 Back</button>
         <button class="btn btn-next" onclick="goTo(3,'forward')">Next \u2192</button>
       </div>
@@ -222,6 +211,7 @@ const BODY = `<div id="inquiry-root">
         <div class="slide-title">Event Details</div>
         <div class="slide-sub">Tell us about your wedding day.</div>
       </div>
+      <div id="error-3" class="form-error"></div>
       <div class="fields">
         <div class="field-group"><div class="field-label">Event Name / Description <span class="req">*</span></div><input type="text" id="eventName" placeholder="e.g. Smith Wedding Reception" /></div>
         <div class="field-group"><div class="field-label">Event Date <span class="req">*</span></div><input type="date" id="eventDate" name="entry.1402594235" /></div>
@@ -233,7 +223,7 @@ const BODY = `<div id="inquiry-root">
         <div class="field-group"><div class="field-label">Venue Address <span class="req">*</span></div><input type="text" id="venueAddress" placeholder="Street, City, State, ZIP" /></div>
         <div class="field-group">
           <div class="field-label">Indoor or Outdoor? <span class="req">*</span></div>
-          <div class="choice-group inline">
+          <div class="choice-group inline" id="settingGroup">
             <label class="choice-item"><input type="radio" name="entry.1884292728" value="Indoor" /> Indoor</label>
             <label class="choice-item"><input type="radio" name="entry.1884292728" value="Outdoor" /> Outdoor</label>
             <label class="choice-item"><input type="radio" name="entry.1884292728" value="Both" /> Both</label>
@@ -241,7 +231,7 @@ const BODY = `<div id="inquiry-root">
         </div>
         <div class="field-group"><div class="field-label">Estimated Attendance <span class="req">*</span></div><input type="text" id="attendance" placeholder="e.g. 150" /></div>
       </div>
-      <div class="slide-footer">
+      <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(2,'back')">\u2190 Back</button>
         <button class="btn btn-next" onclick="goTo(4,'forward')">Next \u2192</button>
       </div>
@@ -252,7 +242,7 @@ const BODY = `<div id="inquiry-root">
       <div class="slide-head">
         <div class="slide-eyebrow">Step 3 of 4</div>
         <div class="slide-title">What\u2019s Included</div>
-        <div class="slide-sub">Every booking includes the full premium experience. We\u2019ll tailor the details during your consultation.</div>
+        <div class="slide-sub">Every booking includes the full premium experience.</div>
       </div>
       <div class="fields" style="gap:10px;">
         <div style="background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
@@ -275,14 +265,14 @@ const BODY = `<div id="inquiry-root">
           </div>
         </div>
         <div style="background:rgba(68,190,199,0.06);border:1px solid rgba(68,190,199,0.2);border-radius:8px;padding:12px 15px;font-size:0.8rem;color:#4A5E6E;line-height:1.6;flex-shrink:0;">
-          <strong style="color:#0D1B2A;">No selections needed.</strong> All services are included at a flat rate. During our consultation we will discuss your preferences and make sure everything fits your day perfectly.
+          <strong style="color:#0D1B2A;">No selections needed.</strong> All services are included. We\u2019ll tailor the details during your consultation.
         </div>
         <div class="field-group">
           <div class="field-label">Additional Details &amp; Questions</div>
           <textarea id="additionalDetails" placeholder="Share any additional details, questions, or special requests\u2026"></textarea>
         </div>
       </div>
-      <div class="slide-footer">
+      <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(3,'back')">\u2190 Back</button>
         <button class="btn btn-next" onclick="goTo(5,'forward')">Review \u2192</button>
       </div>
@@ -310,7 +300,7 @@ const BODY = `<div id="inquiry-root">
         <input type="hidden" id="h_indoorOutdoor" name="entry.1884292728" />
         <input type="hidden" id="h_attendance" name="entry.1801133532" />
         <input type="hidden" id="h_additionalDetails" name="entry.1670641103" />
-        <div class="slide-footer">
+        <div class="slide-footer slide-footer-split">
           <button type="button" class="btn btn-back" onclick="goTo(4,'back')">\u2190 Edit</button>
           <button type="submit" class="btn btn-submit">Submit Inquiry \u2192</button>
         </div>
@@ -323,7 +313,7 @@ const BODY = `<div id="inquiry-root">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <h2>Inquiry Received!</h2>
-      <p style="margin:0 0 8px;">We\u2019ve received your inquiry and will reach out within <strong>24\u201348 hours</strong> to schedule your consultation call.</p>
+      <p style="margin:0 0 8px;">We\u2019ve received your inquiry and will reach out within <strong>24\u201348 hours</strong>.</p>
       <p style="font-size:13px;color:#888;margin:0 0 20px;">Questions? <a href="mailto:garrett@pescaderomusic.com" style="color:#44BEC7;">garrett@pescaderomusic.com</a></p>
       <a href="/dashboard" style="display:inline-block;padding:12px 28px;background:#D62828;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;">Back to Dashboard \u2192</a>
     </div>
@@ -336,31 +326,65 @@ const BODY = `<div id="inquiry-root">
   let current = 1, animating = false;
 
   function showBg(step) {
-    document.querySelectorAll('.bg-layer').forEach(el => {
+    document.querySelectorAll('.bg-layer').forEach(function(el) {
       el.classList.toggle('visible', parseInt(el.dataset.section) === step);
     });
   }
 
+  function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function r(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
+
+  function showError(slideNum, msg) {
+    var err = document.getElementById('error-' + slideNum);
+    if (!err) return;
+    err.textContent = msg;
+    err.classList.add('visible');
+    setTimeout(function() { err.classList.remove('visible'); }, 4000);
+  }
+
+  function validate(slide) {
+    if (slide === 2) {
+      if (!v('firstName')) { showError(2, 'First name is required.'); return false; }
+      if (!v('lastName'))  { showError(2, 'Last name is required.'); return false; }
+      if (!v('email'))     { showError(2, 'Email address is required.'); return false; }
+      if (!v('phone'))     { showError(2, 'Phone number is required.'); return false; }
+      if (!r('entry.1289776342')) { showError(2, 'Please select a preferred contact method.'); return false; }
+      if (!v('coupleNames')) { showError(2, 'Please enter the names of the bride & groom.'); return false; }
+    }
+    if (slide === 3) {
+      if (!v('eventName'))    { showError(3, 'Event name is required.'); return false; }
+      if (!v('eventDate'))    { showError(3, 'Event date is required.'); return false; }
+      if (!v('startTime'))    { showError(3, 'Start time is required.'); return false; }
+      if (!v('endTime'))      { showError(3, 'End time is required.'); return false; }
+      if (!v('venue'))        { showError(3, 'Venue name is required.'); return false; }
+      if (!v('venueAddress')) { showError(3, 'Venue address is required.'); return false; }
+      if (!r('entry.1884292728')) { showError(3, 'Please select indoor or outdoor.'); return false; }
+      if (!v('attendance'))   { showError(3, 'Estimated attendance is required.'); return false; }
+    }
+    return true;
+  }
+
   function goTo(next, dir) {
     if (animating || next === current) return;
+    if (dir === 'forward' && !validate(current)) return;
     if (next === 5) buildReview();
     animating = true;
-    const out = document.getElementById('slide-' + current);
-    const inn = document.getElementById('slide-' + next);
-    const outTo = dir === 'forward' ? '-48px' : '48px';
-    const inFrom = dir === 'forward' ? '48px' : '-48px';
+    var out = document.getElementById('slide-' + current);
+    var inn = document.getElementById('slide-' + next);
+    var outTo = dir === 'forward' ? '-48px' : '48px';
+    var inFrom = dir === 'forward' ? '48px' : '-48px';
     out.style.pointerEvents = 'none'; out.style.visibility = 'visible'; out.style.zIndex = '1';
     inn.style.transition = 'none'; inn.style.visibility = 'visible'; inn.style.opacity = '0';
     inn.style.transform = 'translateX(' + inFrom + ')'; inn.style.pointerEvents = 'none'; inn.style.zIndex = '2';
     void inn.offsetHeight;
-    const T = 'opacity ' + DUR + 'ms cubic-bezier(0.22,1,0.36,1), transform ' + DUR + 'ms cubic-bezier(0.22,1,0.36,1)';
+    var T = 'opacity ' + DUR + 'ms cubic-bezier(0.22,1,0.36,1), transform ' + DUR + 'ms cubic-bezier(0.22,1,0.36,1)';
     out.style.transition = T; out.style.opacity = '0'; out.style.transform = 'translateX(' + outTo + ')';
     inn.style.transition = T; inn.style.opacity = '1'; inn.style.transform = 'translateX(0)';
     showBg(next);
-    setTimeout(() => {
+    setTimeout(function() {
       inn.classList.add('is-active'); inn.style.cssText = '';
       out.classList.remove('is-active'); out.style.cssText = '';
-      document.querySelectorAll('#sectionsWrap .slide').forEach(s => {
+      document.querySelectorAll('#sectionsWrap .slide').forEach(function(s) {
         if (s.id !== 'slide-' + next) { s.classList.remove('is-active'); s.style.cssText = ''; }
       });
       current = next; updateProgress(next); animating = false;
@@ -370,22 +394,19 @@ const BODY = `<div id="inquiry-root">
   function tabNav(step) { if (step !== current) goTo(step, step > current ? 'forward' : 'back'); }
 
   function updateProgress(step) {
-    document.querySelectorAll('.step-btn').forEach(btn => {
-      const s = parseInt(btn.dataset.step);
+    document.querySelectorAll('.step-btn').forEach(function(btn) {
+      var s = parseInt(btn.dataset.step);
       btn.classList.toggle('active', s === step);
       btn.classList.toggle('done', s < step);
     });
   }
 
-  const v = id => (document.getElementById(id) || {}).value || '';
-  const r = name => { const el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : '\u2014'; };
-
   function buildReview() {
-    const rows = [
+    var rows = [
       ['Name', v('firstName') + ' ' + v('lastName')],
       ['Email', v('email')],
       ['Phone', v('phone')],
-      ['Contact Via', r('entry.1289776342')],
+      ['Contact Via', r('entry.1289776342') || '\u2014'],
       ['Bride & Groom', v('coupleNames')],
       ['Event', v('eventName')],
       ['Date', v('eventDate')],
@@ -393,13 +414,13 @@ const BODY = `<div id="inquiry-root">
       ['End', v('endTime')],
       ['Venue', v('venue')],
       ['Address', v('venueAddress')],
-      ['Setting', r('entry.1884292728')],
+      ['Setting', r('entry.1884292728') || '\u2014'],
       ['Attendance', v('attendance')],
       ['Notes', v('additionalDetails') || '\u2014'],
     ];
-    document.getElementById('reviewList').innerHTML = rows.map(([k, val]) =>
-      '<div class="review-row"><span class="review-key">' + k + '</span><span class="review-val">' + (val || '\u2014') + '</span></div>'
-    ).join('');
+    document.getElementById('reviewList').innerHTML = rows.map(function(row) {
+      return '<div class="review-row"><span class="review-key">' + row[0] + '</span><span class="review-val">' + (row[1] || '\u2014') + '</span></div>';
+    }).join('');
     document.getElementById('h_firstName').value = v('firstName');
     document.getElementById('h_lastName').value = v('lastName');
     document.getElementById('h_email').value = v('email');
@@ -431,11 +452,11 @@ const BODY = `<div id="inquiry-root">
 
   function restoreProgress() {
     try {
-      const saved = localStorage.getItem('pescadero_inquiry');
+      var saved = localStorage.getItem('pescadero_inquiry');
       if (!saved) return;
-      const d = JSON.parse(saved);
-      const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
-      const setR = (name, val) => { if (!val || val === '\u2014') return; const el = document.querySelector('input[name="' + name + '"][value="' + val + '"]'); if (el) el.checked = true; };
+      var d = JSON.parse(saved);
+      var set = function(id, val) { var el = document.getElementById(id); if (el && val) el.value = val; };
+      var setR = function(name, val) { if (!val) return; var el = document.querySelector('input[name="' + name + '"][value="' + val + '"]'); if (el) el.checked = true; };
       set('firstName', d.firstName); set('lastName', d.lastName);
       set('email', d.email); set('phone', d.phone);
       setR('entry.1289776342', d.contactMethod);
@@ -448,7 +469,7 @@ const BODY = `<div id="inquiry-root">
   }
 
   function handleSubmit(e) {
-    const formData = {
+    var formData = {
       firstName: v('firstName'), lastName: v('lastName'),
       email: v('email'), phone: v('phone'),
       contactMethod: r('entry.1289776342'),
@@ -461,11 +482,11 @@ const BODY = `<div id="inquiry-root">
     fetch('/api/inquiry/submit', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       credentials: 'include', body: JSON.stringify(formData),
-    }).catch(err => console.error('Save error:', err));
-    setTimeout(() => {
+    }).catch(function(err) { console.error('Save error:', err); });
+    setTimeout(function() {
       try { localStorage.removeItem('pescadero_inquiry'); } catch(e) {}
       document.getElementById('progressBar').style.display = 'none';
-      document.querySelectorAll('.slide').forEach(s => { s.classList.remove('is-active'); s.style.display = 'none'; });
+      document.querySelectorAll('.slide').forEach(function(s) { s.classList.remove('is-active'); s.style.display = 'none'; });
       document.getElementById('successSlide').classList.add('visible');
       showBg(1);
     }, 600);
