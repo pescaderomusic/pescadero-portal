@@ -2,36 +2,36 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
+const NAVY  = '#0D1B2A'
 const BLUE  = '#44BEC7'
 const RED   = '#D62828'
-const NAVY  = '#0D1B2A'
-const GOLD  = '#F5A623'
 const GREEN = '#4CAF50'
+const GOLD  = '#F5A623'
 
 interface Booking {
-  id: string
-  event_date: string | null
-  venue_name: string | null
-  venue_address: string | null
-  package: string
-  step_inquiry: string
-  step_contract: string
-  step_deposit: string
-  step_planning: string
-  step_consultation: string
+  id:                  string
+  event_date:          string | null
+  venue_name:          string | null
+  venue_address:       string | null
+  package:             string
+  step_inquiry:        string
+  step_consultation:   string
+  step_contract:       string
+  step_deposit:        string
+  step_planning:       string
   step_final_payment?: string
-  step_event: string
-  couple_names?: string
-  event_name?: string
-  event_type?: string
-  final_payment_due?: string
+  step_event:          string
+  couple_names?:       string
+  event_name?:         string
+  event_type?:         string
+  final_payment_due?:  string
 }
 
 interface Props {
-  justPaid?: boolean
+  booking:     Booking | null
+  clientName:  string
+  justPaid?:   boolean
   paymentType?: string
-  booking: Booking | null
-  clientName: string
 }
 
 function useCountdown(date: string | null) {
@@ -46,75 +46,177 @@ function useCountdown(date: string | null) {
   return days
 }
 
-function status(val: string | undefined): 'complete' | 'active' | 'locked' {
-  if (!val) return 'locked'
+function stepStatus(val: string | undefined): 'complete' | 'active' | 'locked' {
+  if (!val || val === 'locked') return 'locked'
   if (['complete','signed','client_signed','paid','submitted'].includes(val)) return 'complete'
   if (['pending','sent','scheduled'].includes(val)) return 'active'
   return 'locked'
 }
 
 export default function StepTracker({ booking, clientName, justPaid, paymentType }: Props) {
-  const noBooking  = !booking
-  const firstName  = clientName?.split(' ')[0] || 'there'
-  const eventDate  = booking?.event_date || null
-  const daysUntil  = useCountdown(eventDate)
-  const eventDone  = booking?.step_event === 'complete'
-  const fmtDate    = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+  const b         = booking
+  const noBooking = !b
+  const firstName = clientName?.split(' ')[0] || 'there'
+  const daysUntil = useCountdown(b?.event_date || null)
+  const eventDone = b?.step_event === 'complete'
 
-  // Inquiry: never locked for client
-  const inquiryStatus = (noBooking || !booking?.step_inquiry || booking.step_inquiry === 'locked')
+  const fmtDate = (d: string) =>
+    new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+
+  // ── Steps ────────────────────────────────────────────────────────
+  const inquiryStatus = (noBooking || !b.step_inquiry || b.step_inquiry === 'locked')
     ? 'active' as const
-    : status(booking.step_inquiry)
+    : stepStatus(b.step_inquiry)
 
   const steps = [
     {
-      id: 'inquiry', num: 1, label: 'Inquiry',
+      num: 1, label: 'Inquiry',
       s: inquiryStatus,
       desc: inquiryStatus === 'complete' ? 'Submitted ✓' : 'Tell us about your event',
       action: inquiryStatus !== 'complete' ? { label: 'Get Started →', href: '/inquiry' } : null,
       doc: inquiryStatus === 'complete' ? { label: 'View Inquiry', href: '/inquiry/view' } : null,
     },
     {
-      id: 'consultation', num: 2, label: 'Consultation',
-      s: noBooking ? 'locked' as const : status(booking!.step_consultation),
-      desc: booking?.step_consultation === 'complete' ? 'Call complete ✓'
-        : booking?.step_consultation === 'scheduled' ? 'Call scheduled — Garrett will reach out'
-        : 'Garrett will be in touch',
+      num: 2, label: 'Consultation',
+      s: noBooking ? 'locked' as const : stepStatus(b.step_consultation),
+      desc: b?.step_consultation === 'complete' ? 'Call complete ✓'
+          : b?.step_consultation === 'scheduled' ? 'Call scheduled'
+          : 'Garrett will be in touch',
       action: null,
       doc: null,
     },
     {
-      id: 'contract', num: 3, label: 'Sign & Pay',
-      s: noBooking ? 'locked' as const : status(booking!.step_contract),
-      desc: ['signed','client_signed'].includes(booking?.step_contract || '') ? 'Signed & deposit paid ✓'
-        : booking?.step_contract === 'sent' ? 'Ready to sign'
-        : 'Sent after consultation',
-      action: booking?.step_contract === 'sent' ? { label: 'Sign & Pay Deposit →', href: '/contract' } : null,
-      doc: ['signed','client_signed'].includes(booking?.step_contract || '') ? { label: 'View Contract', href: '/contract' } : null,
+      num: 3, label: 'Sign & Pay',
+      s: noBooking ? 'locked' as const : stepStatus(b.step_contract),
+      desc: ['signed','client_signed'].includes(b?.step_contract || '') ? 'Signed & deposit paid ✓'
+          : b?.step_contract === 'sent' ? 'Ready to review & sign'
+          : 'Contract sent after consultation',
+      action: b?.step_contract === 'sent' ? { label: 'Sign & Pay Deposit →', href: '/contract' } : null,
+      doc: ['signed','client_signed'].includes(b?.step_contract || '') ? { label: 'View Contract', href: '/contract' } : null,
     },
     {
-      id: 'planning', num: 4, label: 'Planning',
-      s: noBooking ? 'locked' as const : status(booking!.step_planning),
-      desc: booking?.step_planning === 'submitted' ? 'Submitted ✓' : 'Music, timeline & details',
-      action: ['pending','submitted'].includes(booking?.step_planning || '')
-        ? { label: booking?.step_planning === 'submitted' ? 'Edit Form' : 'Open Form →', href: '/planning' }
+      num: 4, label: 'Planning',
+      s: noBooking ? 'locked' as const : stepStatus(b.step_planning),
+      desc: b?.step_planning === 'submitted' ? 'Submitted ✓'
+          : b?.step_planning === 'pending' ? 'Ready to fill out'
+          : 'Garrett will send this next',
+      action: b?.step_planning === 'pending'
+        ? { label: 'Open Planning Form →', href: '/planning' }
+        : b?.step_planning === 'submitted'
+        ? { label: 'View Submission', href: '/planning' }
         : null,
       doc: null,
     },
     {
-      id: 'final', num: 5, label: 'Final Payment',
-      s: noBooking ? 'locked' as const : status(booking!.step_final_payment || 'locked'),
-      desc: booking?.step_final_payment === 'paid' ? 'Paid in full ✓'
-        : booking?.final_payment_due ? `Due ${new Date(booking.final_payment_due + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-        : 'Balance due before event',
-      action: booking?.step_final_payment === 'pending' ? { label: 'Pay Balance →', href: '/contract/final-payment' } : null,
-      doc: booking?.step_final_payment === 'paid' ? { label: 'View Receipt', href: '/receipt' } : null,
+      num: 5, label: 'Final Payment',
+      s: noBooking ? 'locked' as const : stepStatus(b.step_final_payment || 'locked'),
+      desc: b?.step_final_payment === 'paid' ? 'Paid in full ✓'
+          : b?.step_final_payment === 'pending' ? 'Balance due now'
+          : 'Opens after planning is submitted',
+      action: b?.step_final_payment === 'pending' ? { label: 'Pay Final Balance →', href: '/contract/final-payment' } : null,
+      doc: b?.step_final_payment === 'paid' ? { label: 'View Receipt', href: '/receipt' } : null,
     },
   ]
 
-  const activeStep    = steps.find(s => s.s === 'active')
   const completedCount = steps.filter(s => s.s === 'complete').length
-  const allDocs       = steps.filter(s => s.doc).map(s => s.doc!)
+  const allDocs        = steps.filter(s => s.doc).map(s => s.doc!)
+
+  // ── Next box state machine ────────────────────────────────────────
+  type Card = { eyebrow: string; title: string; body: string; action?: { label: string; href: string } | null; color: string }
+
+  const getCard = (): Card | null => {
+    if (!b || inquiryStatus !== 'complete') return {
+      eyebrow: 'Start Here',
+      title: 'Tell us about your event',
+      body: 'Fill out a quick inquiry so we can check availability and get the conversation started.',
+      action: { label: 'Submit Inquiry →', href: '/inquiry' },
+      color: BLUE,
+    }
+
+    if (['locked','pending'].includes(b.step_consultation || 'locked') && b.step_inquiry === 'complete') return {
+      eyebrow: '✓ Inquiry Received',
+      title: 'Garrett will be in contact with you shortly.',
+      body: 'We\'ve received your inquiry and will reach out within 24–48 hours to schedule your consultation call. Keep an eye on your phone and email.',
+      action: null,
+      color: BLUE,
+    }
+
+    if (b.step_consultation === 'scheduled') return {
+      eyebrow: '📅 Consultation Scheduled',
+      title: 'Your call is confirmed.',
+      body: 'Garrett will reach out to you directly at the scheduled time. No action needed — just be available!',
+      action: null,
+      color: BLUE,
+    }
+
+    if (b.step_consultation === 'complete' && ['locked','pending'].includes(b.step_contract || 'locked')) return {
+      eyebrow: 'Consultation Complete ✓',
+      title: 'Your contract is being prepared.',
+      body: 'Great call! Garrett is now putting together your service agreement. You\'ll receive an email when it\'s ready to review and sign.',
+      action: null,
+      color: BLUE,
+    }
+
+    if (b.step_contract === 'sent') return {
+      eyebrow: 'Action Required',
+      title: 'Your contract is ready to sign.',
+      body: 'Review your personalized service agreement, sign digitally, and pay your deposit — all in one step — to officially secure your date.',
+      action: { label: 'Sign & Pay Deposit →', href: '/contract' },
+      color: RED,
+    }
+
+    if (['signed','client_signed'].includes(b.step_contract || '') && b.step_planning === 'locked') return {
+      eyebrow: '🎉 You\'re Officially Booked!',
+      title: 'Your date is secured.',
+      body: 'Your deposit is paid and your date is locked in. Garrett will send your planning form when it\'s time to start mapping out the details.',
+      action: null,
+      color: GREEN,
+    }
+
+    if (b.step_planning === 'pending') return {
+      eyebrow: 'Action Required',
+      title: 'Your planning form is ready.',
+      body: 'Fill out your event timeline, day-of contact, key songs, and anything else Garrett needs to make your day run perfectly.',
+      action: { label: 'Open Planning Form →', href: '/planning' },
+      color: RED,
+    }
+
+    if (b.step_planning === 'submitted' && ['locked'].includes(b.step_final_payment || 'locked')) return {
+      eyebrow: 'Planning Submitted ✓',
+      title: 'Garrett has everything he needs.',
+      body: 'Your planning form is in. Your final payment window will open soon — you\'ll receive a notification when it\'s ready.',
+      action: null,
+      color: BLUE,
+    }
+
+    if (b.step_final_payment === 'pending') return {
+      eyebrow: 'Action Required',
+      title: 'Final payment is due.',
+      body: 'Your remaining balance is due before your event. Pay now to fully confirm your booking.',
+      action: { label: 'Pay Final Balance →', href: '/contract/final-payment' },
+      color: RED,
+    }
+
+    if (b.step_final_payment === 'paid' && !eventDone) return {
+      eyebrow: '✓ Fully Paid',
+      title: 'See you on event day! 🎵',
+      body: 'You\'re completely confirmed. Garrett will arrive 1.5 hours before your event. All you have to do is show up and enjoy.',
+      action: null,
+      color: GREEN,
+    }
+
+    if (eventDone) return {
+      eyebrow: 'Event Complete',
+      title: 'We hope your day was perfect.',
+      body: 'It was an honor being part of your celebration. We\'d love to hear your feedback!',
+      action: { label: 'Leave a Review ⭐', href: '/review' },
+      color: GOLD,
+    }
+
+    return null
+  }
+
+  const card = getCard()
 
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
@@ -131,7 +233,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         </div>
       </nav>
 
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '36px 24px 80px' }}>
 
         {/* Just paid banner */}
         {justPaid && (
@@ -148,29 +250,27 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
 
         {/* Event card */}
         {!noBooking && (
-          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '20px 24px', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '20px 24px', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
             <div>
               <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Your Event</p>
               <p style={{ margin: '0 0 4px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: 'white', fontWeight: 700 }}>
-                {booking?.couple_names || booking?.event_name || booking?.event_type || `${firstName}'s Event`}
+                {b?.couple_names || b?.event_name || b?.event_type || `${firstName}'s Event`}
               </p>
-              {eventDate && (
-                <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
-                  {fmtDate(eventDate)}{booking?.venue_name ? ` · ${booking.venue_name}` : ''}
+              {b?.event_date && (
+                <p style={{ margin: '2px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
+                  {fmtDate(b.event_date)}{b.venue_name ? ` · ${b.venue_name}` : ''}
                 </p>
               )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexShrink: 0 }}>
-              {daysUntil !== null && daysUntil > 0 && (
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ margin: 0, fontSize: 36, fontWeight: 700, color: RED, lineHeight: 1 }}>{daysUntil}</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 10, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>days away</p>
-                </div>
-              )}
-              {daysUntil !== null && daysUntil <= 0 && (
-                <p style={{ fontSize: 18, fontWeight: 700, color: GREEN, margin: 0 }}>Today! 🎉</p>
-              )}
-            </div>
+            {daysUntil !== null && daysUntil > 0 && (
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <p style={{ margin: 0, fontSize: 38, fontWeight: 700, color: RED, lineHeight: 1 }}>{daysUntil}</p>
+                <p style={{ margin: '2px 0 0', fontSize: 10, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>days away</p>
+              </div>
+            )}
+            {daysUntil !== null && daysUntil <= 0 && (
+              <p style={{ fontSize: 18, fontWeight: 700, color: GREEN, margin: 0 }}>Today! 🎉</p>
+            )}
           </div>
         )}
 
@@ -183,89 +283,81 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           </div>
         )}
 
-        {/* ── Horizontal Timeline ─────────────────────────────────────────── */}
-        <div style={{ marginBottom: 36 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
+        {/* ── Horizontal Timeline ──────────────────────────────── */}
+        <div style={{ marginBottom: 32, position: 'relative' }}>
 
-            {/* Background line */}
-            <div style={{ position: 'absolute', top: 22, left: 22, right: 36, height: 2, background: 'rgba(255,255,255,0.07)', zIndex: 0 }} />
+          {/* Background line */}
+          <div style={{ position: 'absolute', top: 24, left: '4%', right: '4%', height: 2, background: 'rgba(255,255,255,0.06)', zIndex: 0 }} />
+          {/* Progress line */}
+          <div style={{
+            position: 'absolute', top: 24, left: '4%', height: 2, zIndex: 1,
+            background: `linear-gradient(90deg, ${GREEN}, ${BLUE})`,
+            width: completedCount === 0 ? '0%' : `${Math.min((completedCount / (steps.length + 0.8)) * 92, 88)}%`,
+            transition: 'width 0.8s ease',
+          }} />
 
-            {/* Progress line */}
-            <div style={{
-              position: 'absolute', top: 22, left: 22, height: 2, zIndex: 1,
-              background: `linear-gradient(90deg, ${GREEN}, ${BLUE})`,
-              width: `calc(${completedCount === 0 ? 0 : Math.min(completedCount / (steps.length + 1), 1) * 100}% - 44px)`,
-              transition: 'width 0.8s ease',
-              borderRadius: 2,
-            }} />
+          <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative', zIndex: 2 }}>
 
-            {/* Step dots */}
-            {steps.map((step, i) => {
+            {/* Steps */}
+            {steps.map(step => {
               const isComplete = step.s === 'complete'
               const isActive   = step.s === 'active'
               const isLocked   = step.s === 'locked'
               return (
-                <div key={step.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, position: 'relative', zIndex: 2 }}>
+                <div key={step.num} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                   <div style={{
-                    width: isActive ? 48 : 44,
-                    height: isActive ? 48 : 44,
+                    width: isActive ? 50 : 44, height: isActive ? 50 : 44,
                     borderRadius: '50%',
                     border: `2px solid ${isComplete ? GREEN : isActive ? BLUE : 'rgba(255,255,255,0.1)'}`,
-                    background: isComplete ? `#0D1B2A` : isActive ? `#0D1B2A` : '#0D1B2A',
-                    boxShadow: isActive ? `0 0 18px ${BLUE}40, inset 0 0 0 200px ${BLUE}18` : isComplete ? `inset 0 0 0 200px ${GREEN}18` : 'none',
+                    background: NAVY,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.3s',
-                    flexShrink: 0,
-                    position: 'relative' as const,
+                    boxShadow: isActive ? `0 0 20px ${BLUE}40` : 'none',
+                    transition: 'all 0.3s', flexShrink: 0,
                   }}>
                     {isComplete
-                      ? <span style={{ fontSize: 17, color: GREEN }}>✓</span>
+                      ? <span style={{ fontSize: 18, color: GREEN }}>✓</span>
                       : <span style={{ fontSize: 12, fontWeight: 700, color: isActive ? BLUE : 'rgba(255,255,255,0.2)' }}>{step.num}</span>
                     }
                   </div>
-                  <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: isLocked ? 'rgba(255,255,255,0.2)' : 'white', textAlign: 'center', letterSpacing: '0.3px' }}>
-                    {step.label}
-                  </p>
-                  <p style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', lineHeight: 1.4, maxWidth: 70 }}>
-                    {step.desc}
-                  </p>
+                  <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: isLocked ? 'rgba(255,255,255,0.2)' : 'white', textAlign: 'center' }}>{step.label}</p>
+                  <p style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', lineHeight: 1.4, maxWidth: 72 }}>{step.desc}</p>
                 </div>
               )
             })}
 
-            {/* Event Day — big focal dot */}
-            <div style={{ flex: 1.4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, position: 'relative', zIndex: 2 }}>
+            {/* Event Day */}
+            <div style={{ flex: 1.3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <div style={{
-                width: 68, height: 68, borderRadius: '50%',
+                width: 64, height: 64, borderRadius: '50%',
                 border: `3px solid ${eventDone ? GREEN : RED}`,
-                background: '#0D1B2A',
-                boxShadow: eventDone ? `0 0 28px ${GREEN}35, inset 0 0 0 200px ${GREEN}18` : `0 0 28px ${RED}35, inset 0 0 0 200px ${RED}12`,
+                background: NAVY,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: `0 0 28px ${eventDone ? GREEN : RED}35`,
                 flexShrink: 0,
               }}>
                 {eventDone
-                  ? <span style={{ fontSize: 26, color: GREEN }}>✓</span>
-                  : <span style={{ fontSize: 24 }}>🎵</span>
+                  ? <span style={{ fontSize: 24, color: GREEN }}>✓</span>
+                  : <span style={{ fontSize: 22 }}>🎵</span>
                 }
               </div>
               <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: eventDone ? GREEN : RED, textAlign: 'center' }}>Event Day</p>
               {daysUntil !== null && daysUntil > 0 && (
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1 }}>{daysUntil}d</p>
+                  <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: 'white', lineHeight: 1 }}>{daysUntil}d</p>
                   <p style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>to go</p>
                 </div>
               )}
             </div>
 
             {/* Review */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, position: 'relative', zIndex: 2 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <div style={{
                 width: 44, height: 44, borderRadius: '50%',
                 border: `2px solid ${eventDone ? GOLD : 'rgba(255,255,255,0.08)'}`,
-                background: '#0D1B2A',
+                background: NAVY,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <span style={{ fontSize: 18, filter: eventDone ? 'none' : 'grayscale(1) opacity(0.25)' }}>⭐</span>
+                <span style={{ fontSize: 18, filter: eventDone ? 'none' : 'grayscale(1) opacity(0.2)' }}>⭐</span>
               </div>
               <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: eventDone ? GOLD : 'rgba(255,255,255,0.2)', textAlign: 'center' }}>Review</p>
               <p style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.2)', textAlign: 'center', maxWidth: 60 }}>After your event</p>
@@ -274,67 +366,45 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           </div>
         </div>
 
-        {/* Active step card */}
-        {/* Next step card */}
-        {(() => {
-          // Special message when inquiry done, waiting on consultation
-          const inquiryDone = !noBooking && booking!.step_inquiry === 'complete'
-          const consultPending = !noBooking && booking!.step_consultation === 'pending'
-          const consultScheduled = !noBooking && booking!.step_consultation === 'scheduled'
-
-          if (inquiryDone && consultPending) return (
-            <div style={{ background: 'rgba(68,190,199,0.07)', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 12, padding: '20px 24px', marginBottom: 20 }}>
-              <p style={{ margin: '0 0 6px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>✓ Inquiry Received</p>
-              <p style={{ margin: '0 0 4px', fontSize: 14, color: 'white', fontWeight: 600 }}>We've got your inquiry — thank you!</p>
-              <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>Garrett will reach out within 24–48 hours to schedule your consultation call. Keep an eye on your email and phone.</p>
-            </div>
-          )
-
-          if (consultScheduled) return (
-            <div style={{ background: 'rgba(68,190,199,0.07)', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 12, padding: '20px 24px', marginBottom: 20 }}>
-              <p style={{ margin: '0 0 6px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>📅 Consultation Scheduled</p>
-              <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>Your call is confirmed — Garrett will be reaching out directly at the scheduled time.</p>
-            </div>
-          )
-
-          if (!activeStep) return null
-
+        {/* ── Next Box ─────────────────────────────────────────── */}
+        {card && (() => {
+          const borderCol = card.color === GREEN ? 'rgba(76,175,80,0.25)'
+            : card.color === RED  ? 'rgba(214,40,40,0.2)'
+            : card.color === GOLD ? 'rgba(245,166,35,0.25)'
+            : 'rgba(68,190,199,0.2)'
+          const bgCol = card.color === GREEN ? 'rgba(76,175,80,0.07)'
+            : card.color === RED  ? 'rgba(214,40,40,0.05)'
+            : card.color === GOLD ? 'rgba(245,166,35,0.07)'
+            : 'rgba(68,190,199,0.07)'
           return (
-            <div style={{ background: 'rgba(68,190,199,0.07)', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 12, padding: '20px 24px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-              <div>
-                <p style={{ margin: '0 0 3px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>Next — {activeStep.label}</p>
-                <p style={{ margin: 0, fontSize: 14, color: 'white', fontWeight: 600 }}>{activeStep.desc}</p>
+            <div style={{ background: bgCol, border: `1px solid ${borderCol}`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: card.color, fontWeight: 700 }}>{card.eyebrow}</p>
+                <p style={{ margin: '0 0 4px', fontSize: 14, color: 'white', fontWeight: 600 }}>{card.title}</p>
+                <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{card.body}</p>
               </div>
-              {activeStep.action && (
-                <Link href={activeStep.action.href} style={{ padding: '11px 26px', borderRadius: 9, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 4px 18px rgba(214,40,40,0.35)', flexShrink: 0 }}>
-                  {activeStep.action.label}
+              {card.action && (
+                <Link href={card.action.href} style={{ padding: '11px 26px', borderRadius: 9, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 4px 18px rgba(214,40,40,0.3)', flexShrink: 0 }}>
+                  {card.action.label}
                 </Link>
               )}
             </div>
           )
         })()}
 
-        {/* Review CTA */}
-        {eventDone && (
-          <div style={{ background: `rgba(245,166,35,0.07)`, border: `1px solid rgba(245,166,35,0.2)`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-            <div>
-              <p style={{ margin: '0 0 3px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: GOLD, fontWeight: 700 }}>Post-Event</p>
-              <p style={{ margin: 0, fontSize: 14, color: 'white', fontWeight: 600 }}>How did we do? We'd love your feedback.</p>
-            </div>
-            <Link href="/review" style={{ padding: '11px 26px', borderRadius: 9, background: GOLD, color: NAVY, textDecoration: 'none', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0 }}>
-              Leave a Review ⭐
-            </Link>
-          </div>
-        )}
-
         {/* Document access */}
         {allDocs.length > 0 && (
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {allDocs.map(doc => (
-              <Link key={doc.href} href={doc.href} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(232,224,213,0.55)', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
+              <Link key={doc.href} href={doc.href} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(232,224,213,0.5)', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
                 {doc.label}
               </Link>
             ))}
+            {eventDone && (
+              <Link href="/review" style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid rgba(245,166,35,0.3)`, background: `rgba(245,166,35,0.08)`, color: GOLD, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
+                Leave a Review ⭐
+              </Link>
+            )}
             <Link href="/policy" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.06)', background: 'transparent', color: 'rgba(255,255,255,0.25)', fontSize: 12, textDecoration: 'none' }}>
               Service Policy
             </Link>
@@ -344,7 +414,6 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         <p style={{ textAlign: 'center', marginTop: 48, fontSize: 12, color: 'rgba(255,255,255,0.18)' }}>
           Questions? <a href="mailto:garrett@pescaderomusic.com" style={{ color: BLUE, textDecoration: 'none' }}>garrett@pescaderomusic.com</a> · (210) 727-9328
         </p>
-
       </div>
     </div>
   )
