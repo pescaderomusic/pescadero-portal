@@ -24,7 +24,7 @@ export default function HomePage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <a href="#services" style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 600 }}>Services</a>
           <a href="#pricing" style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 600 }}>Pricing</a>
-          <Link href="/auth/signup" style={{ padding: '8px 20px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.5px' }}>Book Now</Link>
+          <Link href="/get-started" style={{ padding: '8px 20px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.5px' }}>Book Now</Link>
         </div>
       </nav>
 
@@ -44,7 +44,7 @@ export default function HomePage() {
             A single, all-encompassing premium service — no tiers, no guesswork. If it's needed to make your wedding perfect, it's already included.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/auth/signup" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.35)', letterSpacing: '0.3px' }}>
+            <Link href="/get-started" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.35)', letterSpacing: '0.3px' }}>
               Get Started →
             </Link>
             <a href="#services" style={{ padding: '14px 32px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>
@@ -181,7 +181,7 @@ export default function HomePage() {
           </div>
 
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/auth/signup" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.3)' }}>
+            <Link href="/get-started" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.3)' }}>
               Book Your Date →
             </Link>
             <Link href="/policy" style={{ padding: '14px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: 14 }}>
