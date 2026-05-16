@@ -261,7 +261,7 @@ const BODY = `<div id="inquiry-root">
             <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Design Consultations \u2014 Custom lighting &amp; music planning</span></div>
             <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Two Independent Sound Systems \u2014 Ceremony + dance floor</span></div>
             <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Dual-Channel Professional Microphones \u2014 Handheld or lapel</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Professional MC &amp; Performance</span></div>
+            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Professional MC Service</span></div>
             <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Bespoke Visuals \u2014 Handcrafted furniture + dance floor lighting</span></div>
           </div>
         </div>
