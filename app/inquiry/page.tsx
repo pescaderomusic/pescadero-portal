@@ -7,7 +7,16 @@ export default function InquiryPage() {
     style.id = 'inquiry-styles'
     style.textContent = STYLES
     document.head.appendChild(style)
-    return () => { document.getElementById('inquiry-styles')?.remove() }
+
+    const script = document.createElement('script')
+    script.id = 'inquiry-script'
+    script.textContent = SCRIPT
+    document.body.appendChild(script)
+
+    return () => {
+      document.getElementById('inquiry-styles')?.remove()
+      document.getElementById('inquiry-script')?.remove()
+    }
   }, [])
 
   return (
@@ -321,7 +330,9 @@ const BODY = `<div id="inquiry-root">
   </div>
 </div>
 
-<script>
+
+</div>`
+const SCRIPT = `
   const DUR = 400;
   let current = 1, animating = false;
 
@@ -494,5 +505,5 @@ const BODY = `<div id="inquiry-root">
 
   showBg(1);
   restoreProgress();
-</script>
-</div>`
+`
+
