@@ -97,7 +97,7 @@ export default function ContractViewer() {
     // Redirect to deposit payment
     const res = await fetch('/api/stripe/create-checkout', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clientId: user.id, type: 'deposit', amount: contract.deposit_amount }),
+      body: JSON.stringify({ contractId: contract.id, type: 'deposit' }),
     })
 
     const { url, error: stripeErr } = await res.json()
