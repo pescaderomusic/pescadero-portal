@@ -45,7 +45,7 @@ export default function HomePage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <a href="#services" style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 600 }}>Services</a>
           <a href="#pricing" style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 600 }}>Pricing</a>
-          <Link href="#" onClick={(e) => { e.preventDefault(); setShowModal(true) }} style={{ padding: '8px 20px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.5px' }}>Book Now</Link>
+          <button onClick={() => setShowModal(true)} style={{ padding: '8px 18px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', marginRight: 8 }}>Sign In</button><Link href="#account" style={{ padding: '8px 20px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.5px' }}>Book Now</Link>
         </div>
       </nav>
 
@@ -65,7 +65,7 @@ export default function HomePage() {
             A single, all-encompassing premium sound service—no tiers, no guesswork. We offer one top-tier wedding celebration experience, premium features already included.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="#" onClick={(e) => { e.preventDefault(); setShowModal(true) }} style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.35)', letterSpacing: '0.3px' }}>
+            <Link href="#account" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.35)', letterSpacing: '0.3px' }}>
               Get Started →
             </Link>
             <a href="#services" style={{ padding: '14px 32px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>
@@ -202,12 +202,40 @@ export default function HomePage() {
           </div>
 
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="#" onClick={(e) => { e.preventDefault(); setShowModal(true) }} style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.3)' }}>
+            <Link href="#account" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.3)' }}>
               Book Your Date →
             </Link>
             <Link href="/policy" style={{ padding: '14px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: 14 }}>
               Service Policy
             </Link>
+          </div>
+        </div>
+      </section>
+
+
+      {/* ── ACCOUNT SECTION ─────────────────────────────────── */}
+      <section id="account" style={{ padding: '80px 24px', scrollMarginTop: 64, background: 'rgba(0,0,0,0.15)' }}>
+        <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ margin: '0 0 10px', fontSize: 10, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>Your Booking Portal</p>
+          <h2 style={{ margin: '0 0 16px', fontFamily: 'Georgia, serif', fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 700, color: 'white', lineHeight: 1.2 }}>
+            Everything in One Place
+          </h2>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.5)', lineHeight: 1.75, maxWidth: 480, margin: '0 auto 36px' }}>
+            Create a free account to manage your entire booking from start to finish — submit your inquiry, sign your contract, fill out your planning form, make payments, and track every step of the process in real time.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setShowModal(true)}
+              style={{ padding: '13px 32px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              Sign In
+            </button>
+            <a
+              href="/auth/signup"
+              style={{ padding: '13px 32px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 4px 20px rgba(214,40,40,0.3)' }}
+            >
+              Create Account →
+            </a>
           </div>
         </div>
       </section>
