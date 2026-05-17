@@ -241,14 +241,10 @@ export default function HomePage() {
             {/* Header */}
             <p style={{ margin: '0 0 2px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 20, fontWeight: 700, color: 'white' }}>Pescadero Music</p>
             <p style={{ margin: '0 0 24px', fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#44BEC7' }}>
-              {isSignUp ? 'Create Account' : 'Welcome Back'}
+              Welcome Back
             </p>
 
-            {/* Toggle */}
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: 8, padding: 3, marginBottom: 20 }}>
-              <button onClick={() => setIsSignUp(false)} style={{ flex: 1, padding: '8px', borderRadius: 6, border: 'none', background: !isSignUp ? 'rgba(255,255,255,0.1)' : 'transparent', color: !isSignUp ? 'white' : 'rgba(255,255,255,0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}>Sign In</button>
-              <button onClick={() => { setIsSignUp(true); window.location.href = '/auth/signup' }} style={{ flex: 1, padding: '8px', borderRadius: 6, border: 'none', background: isSignUp ? 'rgba(255,255,255,0.1)' : 'transparent', color: isSignUp ? 'white' : 'rgba(255,255,255,0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}>Create Account</button>
-            </div>
+
 
             {/* Fields */}
             <div style={{ marginBottom: 12 }}>
@@ -277,7 +273,11 @@ export default function HomePage() {
               {loading ? 'Signing in…' : 'Sign In →'}
             </button>
 
-            <p style={{ margin: '16px 0 0', textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>
+            <p style={{ margin: '16px 0 0', textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>
+              New here?{' '}
+              <a href="/auth/signup" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'underline', textUnderlineOffset: 3 }}>Create an account</a>
+            </p>
+            <p style={{ margin: '10px 0 0', textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>
               Questions? <a href="mailto:garrett@pescaderomusic.com" style={{ color: '#44BEC7', textDecoration: 'none' }}>garrett@pescaderomusic.com</a>
             </p>
           </div>
