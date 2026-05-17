@@ -1,5 +1,7 @@
 'use client'
 import Link from 'next/link'
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { useEffect } from 'react'
 
 const NAVY  = '#0D1B2A'
@@ -8,6 +10,25 @@ const RED   = '#D62828'
 const CREAM = '#F5EFE0'
 
 export default function HomePage() {
+  const [showModal, setShowModal] = useState(false)
+  const [isSignUp, setIsSignUp]   = useState(false)
+  const [email, setEmail]         = useState('')
+  const [password, setPassword]   = useState('')
+  const [authError, setAuthError] = useState('')
+  const [loading, setLoading]     = useState(false)
+
+  const handleAuth = async () => {
+    setLoading(true); setAuthError('')
+    const supabase = createClient()
+    const { error } = isSignUp
+      ? await supabase.auth.signUp({ email, password })
+      : await supabase.auth.signInWithPassword({ email, password })
+    if (error) { setAuthError(error.message); setLoading(false); return }
+    if (isSignUp) { window.location.href = '/auth/signup' }
+    else          { window.location.href = '/dashboard' }
+  }
+
+
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth'
   }, [])
@@ -24,7 +45,7 @@ export default function HomePage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <a href="#services" style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 600 }}>Services</a>
           <a href="#pricing" style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 600 }}>Pricing</a>
-          <Link href="/get-started" style={{ padding: '8px 20px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.5px' }}>Book Now</Link>
+          <Link href="#" onClick={(e) => { e.preventDefault(); setShowModal(true) }} style={{ padding: '8px 20px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.5px' }}>Book Now</Link>
         </div>
       </nav>
 
@@ -44,7 +65,7 @@ export default function HomePage() {
             A single, all-encompassing premium sound service—no tiers, no guesswork. We offer one top-tier wedding celebration experience, premium features already included.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/get-started" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.35)', letterSpacing: '0.3px' }}>
+            <Link href="#" onClick={(e) => { e.preventDefault(); setShowModal(true) }} style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.35)', letterSpacing: '0.3px' }}>
               Get Started →
             </Link>
             <a href="#services" style={{ padding: '14px 32px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>
@@ -181,7 +202,7 @@ export default function HomePage() {
           </div>
 
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/get-started" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.3)' }}>
+            <Link href="#" onClick={(e) => { e.preventDefault(); setShowModal(true) }} style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.3)' }}>
               Book Your Date →
             </Link>
             <Link href="/policy" style={{ padding: '14px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: 14 }}>
@@ -202,5 +223,67 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+      {/* ── Auth Modal ─────────────────────────────────────── */}
+      {showModal && (
+        <div
+          onClick={() => setShowModal(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 24 }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: '#0D1B2A', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 16, padding: '36px 32px', width: '100%', maxWidth: 400, position: 'relative' }}
+          >
+            {/* X button */}
+            <button
+              onClick={() => setShowModal(false)}
+              style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}
+            >×</button>
+
+            {/* Header */}
+            <p style={{ margin: '0 0 2px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 20, fontWeight: 700, color: 'white' }}>Pescadero Music</p>
+            <p style={{ margin: '0 0 24px', fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#44BEC7' }}>
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
+            </p>
+
+            {/* Toggle */}
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: 8, padding: 3, marginBottom: 20 }}>
+              <button onClick={() => setIsSignUp(false)} style={{ flex: 1, padding: '8px', borderRadius: 6, border: 'none', background: !isSignUp ? 'rgba(255,255,255,0.1)' : 'transparent', color: !isSignUp ? 'white' : 'rgba(255,255,255,0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}>Sign In</button>
+              <button onClick={() => { setIsSignUp(true); window.location.href = '/auth/signup' }} style={{ flex: 1, padding: '8px', borderRadius: 6, border: 'none', background: isSignUp ? 'rgba(255,255,255,0.1)' : 'transparent', color: isSignUp ? 'white' : 'rgba(255,255,255,0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}>Create Account</button>
+            </div>
+
+            {/* Fields */}
+            <div style={{ marginBottom: 12 }}>
+              <input
+                type="email" placeholder="Email address" value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleAuth()}
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 8, border: '1.5px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' as const }}
+              />
+            </div>
+            <div style={{ marginBottom: authError ? 12 : 20 }}>
+              <input
+                type="password" placeholder="Password" value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleAuth()}
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 8, border: '1.5px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' as const }}
+              />
+            </div>
+
+            {authError && <p style={{ margin: '0 0 12px', fontSize: 12, color: '#ff6b6b' }}>{authError}</p>}
+
+            <button
+              onClick={handleAuth} disabled={loading}
+              style={{ width: '100%', padding: '13px', borderRadius: 10, border: 'none', background: loading ? 'rgba(214,40,40,0.5)' : '#D62828', color: 'white', fontSize: 14, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', boxShadow: loading ? 'none' : '0 4px 20px rgba(214,40,40,0.3)' }}
+            >
+              {loading ? 'Signing in…' : 'Sign In →'}
+            </button>
+
+            <p style={{ margin: '16px 0 0', textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>
+              Questions? <a href="mailto:garrett@pescaderomusic.com" style={{ color: '#44BEC7', textDecoration: 'none' }}>garrett@pescaderomusic.com</a>
+            </p>
+          </div>
+        </div>
+      )}
+
   )
 }
