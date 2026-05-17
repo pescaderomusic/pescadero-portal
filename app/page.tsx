@@ -222,7 +222,6 @@ export default function HomePage() {
           <a href="tel:2107279328" style={{ fontSize: 12, color: BLUE, textDecoration: 'none' }}>(210) 727-9328</a>
         </div>
       </footer>
-    </div>
       {/* ── Auth Modal ─────────────────────────────────────── */}
       {showModal && (
         <div
@@ -284,6 +283,6 @@ export default function HomePage() {
           </div>
         </div>
       )}
-
+    </div>
   )
 }
