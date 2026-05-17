@@ -257,12 +257,12 @@ const BODY = `<div id="inquiry-root">
         <div style="background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
           <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#4A5E6E;margin-bottom:10px;">Full Premium Experience \u2014 Included in Every Booking</div>
           <div style="display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Full Day Coverage \u2014 Sound for ceremony, dinner, speeches, toasts, dance, and send-off</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Design Consultations \u2014 Custom lighting &amp; music planning</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Two Independent Sound Systems \u2014 Ceremony + dance floor</span></div>
+            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Full Day Coverage \u2014 Sound for ceremony and or reception needs such as dinner, speeches, toasts, dance, and send-off</span></div>
+            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Design Consultations \u2014 Customizable lighting &amp; music planning</span></div>
+            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Two Independent Sound Systems \u2014 Ceremony/reception + dance floor</span></div>
             <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Dual-Channel Professional Microphones \u2014 Handheld or lapel</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Professional MC Service \u2014 Entrances, Announcements, Event Flow</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Bespoke Visuals \u2014 Handcrafted furniture + dance floor lighting</span></div>
+            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Professional MC Service \u2014 Entrances, announcements, event flow, etc.</span></div>
+            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Seamless Aesthetic \u2014 Ultra-clean, handcrafted wood and white setups that look like a natural extension of your reception space</span></div>
           </div>
         </div>
         <div style="background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
