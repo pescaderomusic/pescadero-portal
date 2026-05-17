@@ -41,7 +41,7 @@ export default function HomePage() {
             <span style={{ color: BLUE }}>As It Looks</span>
           </h1>
           <p style={{ margin: '0 0 36px', fontSize: 'clamp(15px, 2vw, 18px)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
-            A single, all-encompassing premium service — no tiers, no guesswork. If it's needed to make your wedding perfect, it's already included.
+            A single, all-encompassing premium sound service—no tiers, no guesswork. We offer one top-tier wedding celebration experience, premium features already included.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/get-started" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 28px rgba(214,40,40,0.35)', letterSpacing: '0.3px' }}>
@@ -59,7 +59,7 @@ export default function HomePage() {
         <p style={{ margin: '0 0 12px', fontSize: 10, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>Our Philosophy</p>
         <h2 style={{ margin: '0 0 20px', fontFamily: 'Georgia, serif', fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 700, color: 'white', lineHeight: 1.2 }}>The All-Inclusive Premium Experience</h2>
         <p style={{ margin: 0, fontSize: 16, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8 }}>
-          We provide a single, all-encompassing service designed to eliminate the stress of traditional "tiered" packages. We offer our highest level of professional audio, bespoke furniture, and lighting design regardless of the venue or guest count. If it is required to make the wedding perfect, it is already included.
+          We provide a single, all-encompassing service designed to eliminate the stress of traditional "tiered" packages. We deliver a high-end production experience—complete with premium audio, a clean white-and-wood presentation tailored to Utah venues, and professional lighting—streamlined into one definitive offering. Everything essential for a flawless, beautifully integrated celebration is already included, giving you a luxury-tier service without the artificial premium.
         </p>
       </section>
 
@@ -77,7 +77,7 @@ export default function HomePage() {
               <div style={{ height: 200, backgroundImage: `url('https://inquiries.pescaderomusic.com/images/bg2.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center 25%' }} />
               <div style={{ padding: '28px 28px 32px' }}>
                 <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>Part I</p>
-                <h3 style={{ margin: '0 0 16px', fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: 'white' }}>Ceremony & Dinner Excellence</h3>
+                <h3 style={{ margin: '0 0 16px', fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: 'white' }}>The Curated Ceremony/Reception Atmosphere</h3>
                 <p style={{ margin: '0 0 20px', fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>We prioritize clarity, reliability, and an invisible technical presence for the most intimate and formal moments of your day.</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div style={{ borderLeft: `2px solid ${BLUE}`, paddingLeft: 14 }}>
@@ -97,7 +97,7 @@ export default function HomePage() {
               <div style={{ height: 200, backgroundImage: `url('https://inquiries.pescaderomusic.com/images/bg3.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center 20%' }} />
               <div style={{ padding: '28px 28px 32px' }}>
                 <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: RED, fontWeight: 700 }}>Part II</p>
-                <h3 style={{ margin: '0 0 16px', fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: 'white' }}>The High-Energy Reception</h3>
+                <h3 style={{ margin: '0 0 16px', fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: 'white' }}>The High-Energy Celebration</h3>
                 <p style={{ margin: '0 0 20px', fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>When the celebration begins, we transition to a dedicated environment built specifically for the energy of the dance floor.</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div style={{ borderLeft: `2px solid ${RED}`, paddingLeft: 14 }}>
@@ -165,12 +165,12 @@ export default function HomePage() {
             <p style={{ margin: '0 0 16px', fontSize: 11, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>What's Included in Every Booking</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px 24px' }}>
               {[
-                'Full Event Coverage: Ceremony, Cocktail Hour, Dinner & Reception',
-                'Design Consultations: Custom lighting and music planning',
-                'Two Independent Sound Systems: Dedicated ceremony + dance floor',
-                'Dual-Channel Professional Microphones: Handheld or lapel',
-                'Professional MC & Performance: Expert event flow management',
-                'Bespoke Visuals: Handcrafted furniture + dance floor lighting',
+                'Full Event Coverage — Seamless audio for your ceremony, dinner, speeches, and high-energy celebration',
+                'Design Consultations: Personalized planning for custom event music and tailored lighting',
+                'Dual Sound Systems: Two independent, professional audio setups to seamlessly cover multiple spaces',
+                'Professional Microphones: Dual-channel wireless systems featuring clean, high-performance handheld mics.',
+                'Professional MC Service: Polished, engaging management of entrances, announcements, and timeline flow.',
+                'Seamless Aesthetic: Clean, handcrafted wood-and-white setups designed to look like an extension of your venue.',
               ].map(item => (
                 <div key={item} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <span style={{ color: BLUE, fontWeight: 700, flexShrink: 0, marginTop: 2, fontSize: 13 }}>✓</span>
