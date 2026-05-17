@@ -59,7 +59,7 @@ export default function HomePage() {
         <p style={{ margin: '0 0 12px', fontSize: 10, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontWeight: 700 }}>Our Philosophy</p>
         <h2 style={{ margin: '0 0 20px', fontFamily: 'Georgia, serif', fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 700, color: 'white', lineHeight: 1.2 }}>The All-Inclusive Premium Experience</h2>
         <p style={{ margin: 0, fontSize: 16, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8 }}>
-          We provide a single, all-encompassing service designed to eliminate the stress of traditional "tiered" packages. We deliver a high-end production experience—complete with premium audio, a clean white-and-wood presentation tailored to Utah venues, and professional lighting—streamlined into one definitive offering. Everything essential for a flawless, beautifully integrated celebration is already included, giving you a luxury-tier service without the artificial premium.
+          We believe elite wedding entertainment shouldn't be hidden behind arbitrary silver and gold package tiers. Instead, we deliver a high-end production experience—complete with premium audio, professional lighting, and a polished presentation tailored to Utah venues—streamlined into one definitive offering. Everything essential for a flawless, beautifully integrated celebration is already included, giving you a luxury-tier service without the artificial premium.
         </p>
       </section>
 
