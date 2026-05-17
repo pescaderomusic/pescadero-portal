@@ -165,10 +165,10 @@ export default function HomePage() {
             <p style={{ margin: '0 0 16px', fontSize: 11, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>What's Included in Every Booking</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px 24px' }}>
               {[
-                'Full Event Coverage — Seamless audio for your ceremony, dinner, speeches, and high-energy celebration',
+                'Full Event Coverage — Professional audio for your ceremony, dinner, speeches, and high-energy celebration',
                 'Design Consultations: Personalized planning for custom event music and tailored lighting',
-                'Dual Sound Systems: Two independent, professional audio setups to seamlessly cover multiple spaces',
-                'Professional Microphones: Dual-channel wireless systems featuring clean, high-performance handheld mics.',
+                'Dual Sound Systems: Two independent, high-fidelity audio setups to seamlessly cover multiple spaces',
+                'Professional Microphones: Dual-channel wireless systems featuring robust, high-performance handheld mics.',
                 'Professional MC Service: Polished, engaging management of entrances, announcements, and timeline flow.',
                 'Seamless Aesthetic: Clean, handcrafted wood-and-white setups designed to look like an extension of your venue.',
               ].map(item => (
