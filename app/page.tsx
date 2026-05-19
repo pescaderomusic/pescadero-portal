@@ -161,7 +161,7 @@ export default function HomePage() {
             </p>
 
             {/* Hero headline */}
-            <h1 style={{ margin: '0 0 24px', fontFamily: DISPLAY, fontSize: 'clamp(52px, 6.5vw, 82px)', fontWeight: 300, lineHeight: 1.05, letterSpacing: '-0.5px' }}>
+            <h1 style={{ margin: '0 0 24px', fontFamily: DISPLAY, fontSize: 'clamp(56px, 7vw, 90px)', fontWeight: 200, lineHeight: 1.05, letterSpacing: '-1px' }}>
               <span style={{ display: 'block', color: CREAM }}>Your Day.</span>
               <span style={{ display: 'block', color: BLUE }}>Your Music.</span>
               <span style={{ display: 'block', color: CREAM }}>Our Sound.</span>
