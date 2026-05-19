@@ -222,7 +222,18 @@ const BODY = `<div id="inquiry-root">
       </div>
       <div id="error-3" class="form-error"></div>
       <div class="fields">
-        <div class="field-group"><div class="field-label">Event Name / Description <span class="req">*</span></div><input type="text" id="eventName" placeholder="e.g. Smith Wedding Reception" /></div>
+        <div class="field-group"><div class="field-label">Event Name <span class="req">*</span></div><input type="text" id="eventName" placeholder="e.g. Smith Wedding" /></div>
+        <div class="field-group">
+          <div class="field-label">Event Type <span style="font-size:11px;color:#8A9EAA;font-weight:400;">(select all that apply)</span></div>
+          <div class="choice-group" id="eventTypeGroup" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+            <label class="choice-item"><input type="checkbox" name="eventType" value="Ceremony" /> Ceremony</label>
+            <label class="choice-item"><input type="checkbox" name="eventType" value="Cocktail Hour" /> Cocktail Hour</label>
+            <label class="choice-item"><input type="checkbox" name="eventType" value="Reception" /> Reception</label>
+            <label class="choice-item"><input type="checkbox" name="eventType" value="Dinner" /> Dinner</label>
+            <label class="choice-item"><input type="checkbox" name="eventType" value="Dancing" /> Dancing</label>
+            <label class="choice-item"><input type="checkbox" name="eventType" value="Open House" /> Open House</label>
+          </div>
+        </div>
         <div class="field-group"><div class="field-label">Event Date <span class="req">*</span></div><input type="date" id="eventDate" name="entry.1402594235" /></div>
         <div class="field-row">
           <div class="field-group"><div class="field-label">Start Time <span class="req">*</span></div><input type="time" id="startTime" name="entry.1145643384" /></div>
@@ -452,7 +463,7 @@ const SCRIPT = `
         firstName: v('firstName'), lastName: v('lastName'),
         email: v('email'), phone: v('phone'),
         contactMethod: r('entry.1289776342'),
-        coupleNames: v('coupleNames'), eventName: v('eventName'),
+        coupleNames: v('coupleNames'), eventName: v('eventName'), eventTypes: Array.from(document.querySelectorAll('input[name="eventType"]:checked')).map(function(cb){return cb.value;}),
         eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
         venue: v('venue'), venueAddress: v('venueAddress'),
         indoorOutdoor: r('entry.1884292728'),
@@ -501,7 +512,7 @@ const SCRIPT = `
       set('firstName', d.firstName); set('lastName', d.lastName);
       set('email', d.email); set('phone', d.phone);
       setR('entry.1289776342', d.contactMethod);
-      set('coupleNames', d.coupleNames); set('eventName', d.eventName);
+      set('coupleNames', d.coupleNames); set('eventName', d.eventName); if(d.eventTypes){d.eventTypes.forEach(function(v){var cb=document.querySelector('input[name="eventType"][value="'+v+'"]');if(cb)cb.checked=true;});}
       set('eventDate', d.eventDate); set('startTime', d.startTime); set('endTime', d.endTime);
       set('venue', d.venue); set('venueAddress', d.venueAddress);
       setR('entry.1884292728', d.indoorOutdoor);
@@ -514,7 +525,7 @@ const SCRIPT = `
       firstName: v('firstName'), lastName: v('lastName'),
       email: v('email'), phone: v('phone'),
       contactMethod: r('entry.1289776342'),
-      coupleNames: v('coupleNames'), eventName: v('eventName'),
+      coupleNames: v('coupleNames'), eventName: v('eventName'), eventTypes: Array.from(document.querySelectorAll('input[name="eventType"]:checked')).map(function(cb){return cb.value;}),
       eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
       venue: v('venue'), venueAddress: v('venueAddress'),
       indoorOutdoor: r('entry.1884292728'), attendance: v('attendance'),
