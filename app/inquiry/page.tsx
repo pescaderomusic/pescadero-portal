@@ -463,6 +463,36 @@ const SCRIPT = `
 
   function restoreProgress() {
     try {
+
+      // ── Auto-fill from account ─────────────────────────────
+      (function() {
+        try {
+          // Supabase stores session in localStorage as sb-*-auth-token
+          var keys = Object.keys(localStorage);
+          var sessionKey = keys.find(function(k) { return k.includes('auth-token') || k.includes('supabase'); });
+          if (!sessionKey) return;
+          var session = JSON.parse(localStorage.getItem(sessionKey));
+          var user = session && (session.user || (session[0] && session[0].user));
+          if (!user) return;
+
+          // Fill email
+          var emailEl = document.getElementById('email');
+          if (emailEl && !emailEl.value) emailEl.value = user.email || '';
+
+          // Fill name from user_metadata
+          var meta = user.user_metadata || {};
+          var fullName = meta.full_name || meta.name || '';
+          if (fullName) {
+            var parts = fullName.trim().split(' ');
+            var firstEl = document.getElementById('firstName');
+            var lastEl  = document.getElementById('lastName');
+            if (firstEl && !firstEl.value) firstEl.value = parts[0] || '';
+            if (lastEl  && !lastEl.value)  lastEl.value  = parts.slice(1).join(' ') || '';
+          }
+        } catch(e) {}
+      })();
+      // ─────────────────────────────────────────────────────────
+
       var saved = localStorage.getItem('pescadero_inquiry');
       if (!saved) return;
       var d = JSON.parse(saved);
