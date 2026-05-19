@@ -1,12 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600;700&display=swap');
+/* Adobe Fonts loaded via <link> in layout.tsx */
+/* Inter, Cormorant Garamond via Adobe Fonts (qmr3yfz) */
 
 :root {
-  --navy:       #0F1F35;
-  --navy-light: #1E3050;
-  --teal:       #4FB9AF;
-  --teal-dim:   #3A8F97;
-  --red:        #D63031;
-  --cream:      #F5F0E4;
+  --navy:       #07111A;
+  --navy-light: #0D1E2B;
+  --teal:       #44BEC7;
+  --teal-dim:   rgba(68,190,199,0.15);
+  --red:        #C8202A;
+  --cream:      #F5EFE0;
   --gold:       #C8A96E;
   --charcoal:   #2D3436;
   --mid-gray:   #636E72;
@@ -19,16 +20,18 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Poppins', system-ui, sans-serif;
+  font-family: 'inter', system-ui, sans-serif;
   background: var(--navy);
-  color: #E8E0D5;
+  color: #F5EFE0;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ── Utility classes ─────────────────────────────────── */
-.font-display { font-family: 'Lora', Georgia, serif; }
-.font-body    { font-family: 'Poppins', system-ui, sans-serif; }
+.font-display { font-family: 'freight-display-pro', Georgia, serif; }
+.font-ui      { font-family: 'futura-pt-condensed', 'Barlow Condensed', sans-serif; }
+.font-body    { font-family: 'inter', system-ui, sans-serif; }
+.font-accent  { font-family: 'cormorant-garamond', Georgia, serif; font-style: italic; }
 
 /* ── Form inputs ─────────────────────────────────────── */
 .pm-input {
@@ -37,24 +40,25 @@ body {
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 8px;
   padding: 12px 14px;
-  color: #E8E0D5;
-  font-family: 'Poppins', sans-serif;
+  color: #F5EFE0;
+  font-family: 'inter', sans-serif;
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
 }
 .pm-input:focus {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(79,185,175,0.12);
+  box-shadow: 0 0 0 3px rgba(68,190,199,0.12);
 }
-.pm-input::placeholder { color: rgba(232,224,213,0.3); }
+.pm-input::placeholder { color: rgba(245,239,224,0.3); }
 
 .pm-label {
   display: block;
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
+  font-weight: 500;
+  letter-spacing: 2px;
   text-transform: uppercase;
+  font-family: 'futura-pt-condensed', sans-serif;
   color: var(--teal);
   margin-bottom: 6px;
 }
@@ -70,18 +74,20 @@ body {
   border: none;
   border-radius: 8px;
   padding: 12px 24px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
+  font-family: 'futura-pt-condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 16px rgba(214,48,49,0.3);
+  box-shadow: 0 4px 16px rgba(200,32,42,0.35);
   text-decoration: none;
 }
 .btn-primary:hover {
   opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(214,48,49,0.4);
+  box-shadow: 0 6px 20px rgba(200,32,42,0.45);
 }
 .btn-primary:disabled {
   opacity: 0.5;
@@ -95,18 +101,20 @@ body {
   gap: 8px;
   background: transparent;
   color: var(--teal);
-  border: 1px solid rgba(79,185,175,0.3);
+  border: 1px solid rgba(68,190,199,0.35);
   border-radius: 8px;
   padding: 10px 20px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-family: 'futura-pt-condensed', sans-serif;
+  font-size: 14px;
   font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
 }
 .btn-ghost:hover {
-  background: rgba(79,185,175,0.08);
+  background: rgba(68,190,199,0.08);
   border-color: var(--teal);
 }
 
@@ -120,16 +128,16 @@ body {
 
 /* ── Error / success ─────────────────────────────────── */
 .pm-error {
-  background: rgba(214,48,49,0.1);
-  border: 1px solid rgba(214,48,49,0.3);
+  background: rgba(200,32,42,0.1);
+  border: 1px solid rgba(200,32,42,0.3);
   border-radius: 8px;
   padding: 12px 16px;
   font-size: 13px;
   color: #ff8585;
 }
 .pm-success {
-  background: rgba(79,185,175,0.1);
-  border: 1px solid rgba(79,185,175,0.3);
+  background: rgba(68,190,199,0.1);
+  border: 1px solid rgba(68,190,199,0.3);
   border-radius: 8px;
   padding: 12px 16px;
   font-size: 13px;
