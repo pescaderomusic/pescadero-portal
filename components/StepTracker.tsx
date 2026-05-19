@@ -36,7 +36,7 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     active: {
       title: 'Start Here',
       body: "Start here. Tell us about your date, venue, and vision\u2014we're invested in the details. (Takes about 3 minutes).",
-      action: { label: 'Submit Inquiry \u2192', href: '/inquiry' },
+      action: { label: 'Submit Inquiry →', href: '/inquiry' },
     },
     complete: {
       title: 'Inquiry Received',
@@ -69,10 +69,10 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     sent: {
       title: 'Agreement Ready',
       body: 'Your agreement is ready. Review it, sign, and pay your deposit via Stripe to officially lock in your date.',
-      action: { label: 'Sign & Pay Deposit \u2192', href: '/contract' },
+      action: { label: 'Sign & Pay Deposit →', href: '/contract' },
     },
     complete: {
-      title: 'Signed & Deposited \U0001f389',
+      title: 'Signed & Deposited 🎉',
       body: 'Signed and deposited. Your day is locked in!',
     },
   },
@@ -84,7 +84,7 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     pending: {
       title: 'Planning Form Ready',
       body: 'Your planning form is ready. Fill it out so Garrett has everything he needs to prep for your day.',
-      action: { label: 'Open Planning Form \u2192', href: '/planning' },
+      action: { label: 'Open Planning Form →', href: '/planning' },
     },
     complete: {
       title: 'Planning Submitted',
@@ -99,10 +99,10 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     pending: {
       title: 'Final Payment Due',
       body: 'Your final balance is due. Complete this secure Stripe payment and your entire sound experience is fully secured.',
-      action: { label: 'Pay Final Balance \u2192', href: '/contract/final-payment' },
+      action: { label: 'Pay Final Balance →', href: '/contract/final-payment' },
     },
     complete: {
-      title: 'Paid in Full \U0001f3b5',
+      title: 'Paid in Full 🎵',
       body: "Paid in full. We are completely cleared for launch\u2014we can\u2019t wait for your celebration!",
     },
   },
@@ -120,7 +120,7 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     active: {
       title: 'Leave a Review',
       body: 'How did we do? Your feedback means everything to us, and it directly helps us continue providing this same premium, unforgettable service for more couples.',
-      action: { label: 'Leave a Review \u2b50', href: '/review' },
+      action: { label: 'Leave a Review ⭐', href: '/review' },
     },
     locked: {
       title: 'Leave a Review',
@@ -218,10 +218,10 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
     if (!b || inquiryStatus !== 'complete') return {
       eyebrow: 'Start Here', title: 'Tell Us About Your Day',
       body: "Start here. Tell us about your date, venue, and vision\u2014we're invested in the details. (Takes about 3 minutes).",
-      action: { label: 'Submit Inquiry \u2192', href: '/inquiry' }, color: BLUE,
+      action: { label: 'Submit Inquiry →', href: '/inquiry' }, color: BLUE,
     }
     if (['locked','pending'].includes(b.step_consultation || 'locked') && b.step_inquiry === 'complete') return {
-      eyebrow: '\u2713 Inquiry Received', title: 'Garrett Will Be in Touch',
+      eyebrow: '✓ Inquiry Received', title: 'Garrett Will Be in Touch',
       body: 'Inquiry received. Garrett will be in touch within 24\u201348 hours.',
       action: null, color: BLUE,
     }
@@ -231,43 +231,43 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       action: null, color: BLUE,
     }
     if (b.step_consultation === 'complete' && ['locked','pending'].includes(b.step_contract || 'locked')) return {
-      eyebrow: 'Consultation Complete \u2713', title: 'Agreement Coming Your Way',
+      eyebrow: 'Consultation Complete ✓', title: 'Agreement Coming Your Way',
       body: 'Consultation done. Sit back and relax\u2014Garrett is crafting your personalized service agreement.',
       action: null, color: BLUE,
     }
     if (b.step_contract === 'sent') return {
       eyebrow: 'Action Required', title: 'Agreement Ready',
       body: 'Your agreement is ready. Review it, sign, and pay your deposit via Stripe to officially lock in your date.',
-      action: { label: 'Sign & Pay Deposit \u2192', href: '/contract' }, color: RED,
+      action: { label: 'Sign & Pay Deposit →', href: '/contract' }, color: RED,
     }
     if (['signed','client_signed'].includes(b.step_contract || '') && b.step_planning === 'locked') return {
-      eyebrow: '\U0001f389 Signed & Deposited', title: 'Your Day Is Locked In!',
+      eyebrow: '🎉 Signed & Deposited', title: 'Your Day Is Locked In!',
       body: 'Signed and deposited. Your day is locked in!', action: null, color: GREEN,
     }
     if (b.step_planning === 'pending') return {
       eyebrow: 'Action Required', title: 'Planning Form Ready',
       body: 'Your planning form is ready. Fill it out so Garrett has everything he needs to prep for your day.',
-      action: { label: 'Open Planning Form \u2192', href: '/planning' }, color: RED,
+      action: { label: 'Open Planning Form →', href: '/planning' }, color: RED,
     }
     if (b.step_planning === 'submitted' && ['locked'].includes(b.step_final_payment || 'locked')) return {
-      eyebrow: 'Planning Submitted \u2713', title: 'Garrett Is On It',
+      eyebrow: 'Planning Submitted ✓', title: 'Garrett Is On It',
       body: 'Planning submitted. Garrett is diving into your details and actively preparing for your celebration.',
       action: null, color: BLUE,
     }
     if (b.step_final_payment === 'pending') return {
       eyebrow: 'Action Required', title: 'Final Payment Due',
       body: 'Your final balance is due. Complete this secure Stripe payment and your entire sound experience is fully secured.',
-      action: { label: 'Pay Final Balance \u2192', href: '/contract/final-payment' }, color: RED,
+      action: { label: 'Pay Final Balance →', href: '/contract/final-payment' }, color: RED,
     }
     if (b.step_final_payment === 'paid' && !eventDone) return {
-      eyebrow: '\u2713 Fully Confirmed', title: 'Cleared for Launch \U0001f3b5',
+      eyebrow: '✓ Fully Confirmed', title: 'Cleared for Launch 🎵',
       body: "Paid in full. We are completely cleared for launch\u2014we can\u2019t wait for your celebration!",
       action: null, color: GREEN,
     }
     if (eventDone) return {
       eyebrow: 'Event Complete', title: 'Thank You',
       body: "What an incredible celebration. Thank you so much for trusting us with your wedding day\u2014we hope it\u2019s a night you\u2019ll never forget.",
-      action: { label: 'Leave a Review \u2b50', href: '/review' }, color: GOLD,
+      action: { label: 'Leave a Review ⭐', href: '/review' }, color: GOLD,
     }
     return null
   }
@@ -303,7 +303,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
             <div>
               <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Your Event</p>
               <p style={{ margin: '0 0 4px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: 'white', fontWeight: 700 }}>{b?.couple_names || b?.event_name || b?.event_type || `${firstName}'s Event`}</p>
-              {b?.event_date && <p style={{ margin: '2px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>{fmtDate(b.event_date)}{b.venue_name ? ` \u00b7 ${b.venue_name}` : ''}</p>}
+              {b?.event_date && <p style={{ margin: '2px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>{fmtDate(b.event_date)}{b.venue_name ? ` · ${b.venue_name}` : ''}</p>}
             </div>
             {daysUntil !== null && daysUntil > 0 && (
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -382,7 +382,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                 <p style={{ margin: 0, fontSize: 13, color: isLocked ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.55)', lineHeight: 1.7 }}>{card.body}</p>
                 {selectedStep && (
                   <button onClick={() => setSelectedStep(null)} style={{ marginTop: 12, background: 'none', border: 'none', color: 'rgba(255,255,255,0.25)', fontSize: 11, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
-                    \u2190 Back to your next step
+                    ← Back to your next step
                   </button>
                 )}
               </div>
@@ -403,12 +403,12 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
             <Link href="/inquiry/view" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(232,224,213,0.5)', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>View Inquiry</Link>
           )}
           {eventDone && (
-            <Link href="/review" style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid rgba(245,166,35,0.3)`, background: `rgba(245,166,35,0.08)`, color: GOLD, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>Leave a Review \u2b50</Link>
+            <Link href="/review" style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid rgba(245,166,35,0.3)`, background: `rgba(245,166,35,0.08)`, color: GOLD, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>Leave a Review ⭐</Link>
           )}
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 48, fontSize: 12, color: 'rgba(255,255,255,0.18)' }}>
-          Questions? <a href="mailto:garrett@pescaderomusic.com" style={{ color: BLUE, textDecoration: 'none' }}>garrett@pescaderomusic.com</a> \u00b7 (210) 727-9328
+          Questions? <a href="mailto:garrett@pescaderomusic.com" style={{ color: BLUE, textDecoration: 'none' }}>garrett@pescaderomusic.com</a> · (210) 727-9328
         </p>
       </div>
     </div>
