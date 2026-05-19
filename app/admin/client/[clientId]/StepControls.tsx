@@ -302,24 +302,79 @@ export default function StepControls({ clientId, booking, email, firstName, cons
           {/* Planning form */}
           {planning ? (
             <div style={{ ...card, padding: '18px 20px' }}>
-              <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontFamily: 'Poppins, sans-serif' }}>Planning & Music Form</p>
+              <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontFamily: 'Poppins, sans-serif' }}>Planning Form</p>
+
+              {/* Day-of Contact */}
+              <p style={{ margin: '0 0 8px', fontSize: 10, fontWeight: 700, color: BLUE, textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>Day-of Contact</p>
               {[
-                ['First Dance', planning.first_dance_song], ['Father/Daughter', planning.father_daughter_song],
-                ['Mother/Son', planning.mother_son_song], ['Cake Cutting', planning.cake_cutting_song],
-                ['Last Dance', planning.last_dance_song], ['Genres', planning.genres],
-                ['Must Play', planning.must_play], ['Do Not Play', planning.do_not_play],
-                ['Vibe', planning.vibe], ['MC Needed', planning.mc_needed], ['MC Notes', planning.mc_notes],
-                ['Photographer', planning.photographer], ['Videographer', planning.videographer],
-                ['Coordinator', planning.coordinator], ['Catering', planning.catering],
-                ['Special Moments', planning.special_moments], ['Notes', planning.additional_notes],
-                ['Grand Entrance', planning.grand_entrance_time], ['First Dance Time', planning.first_dance_time],
-                ['Ceremony', planning.ceremony_time], ['Reception', planning.reception_start],
+                ['Name', planning.day_of_contact_name],
+                ['Phone', planning.day_of_contact_phone],
+                ['Role', planning.day_of_contact_role],
               ].filter(([, v]) => v).map(([k, v]) => (
-                <div key={k} style={{ marginBottom: 10 }}>
+                <div key={k as string} style={{ marginBottom: 8 }}>
                   <p style={{ margin: '0 0 2px', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>{k}</p>
-                  <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.8)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5, whiteSpace: 'pre-wrap' as const }}>{v}</p>
+                  <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.8)', fontFamily: 'Poppins, sans-serif' }}>{v}</p>
                 </div>
               ))}
+
+              {/* Venue & Setup */}
+              {planning.venue_setup_notes && (
+                <div style={{ marginTop: 14, marginBottom: 8 }}>
+                  <p style={{ margin: '0 0 4px', fontSize: 10, fontWeight: 700, color: BLUE, textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>Venue & Setup</p>
+                  <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.8)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.6, whiteSpace: 'pre-wrap' as const }}>{planning.venue_setup_notes}</p>
+                </div>
+              )}
+
+              {/* MC Expectations */}
+              {planning.garrett_expectations && (
+                <div style={{ marginTop: 14, marginBottom: 8 }}>
+                  <p style={{ margin: '0 0 4px', fontSize: 10, fontWeight: 700, color: BLUE, textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>MC Notes & Expectations</p>
+                  <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.8)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.6, whiteSpace: 'pre-wrap' as const }}>{planning.garrett_expectations}</p>
+                </div>
+              )}
+
+              {/* Itinerary */}
+              {planning.itinerary && Array.isArray(planning.itinerary) && planning.itinerary.length > 0 && (
+                <div style={{ marginTop: 14, marginBottom: 8 }}>
+                  <p style={{ margin: '0 0 8px', fontSize: 10, fontWeight: 700, color: BLUE, textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>Itinerary</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '0 12px' }}>
+                    <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif', marginBottom: 6 }}>Time</span>
+                    <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif', marginBottom: 6 }}>Cue / Description</span>
+                    {planning.itinerary.filter((r: any) => r.time || r.description).map((row: any, i: number) => (
+                      <>
+                        <p key={`t${i}`} style={{ margin: '0 0 6px', fontSize: 12, color: BLUE, fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>{row.time || '—'}</p>
+                        <p key={`d${i}`} style={{ margin: '0 0 6px', fontSize: 12, color: 'rgba(232,224,213,0.8)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.5 }}>{row.description || '—'}</p>
+                      </>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Key Songs */}
+              <div style={{ marginTop: 14 }}>
+                <p style={{ margin: '0 0 8px', fontSize: 10, fontWeight: 700, color: BLUE, textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>Key Songs</p>
+                {[
+                  ['First Dance',       planning.first_dance_song,       planning.first_dance_artist],
+                  ['Father-Daughter',   planning.father_daughter_song,   planning.father_daughter_artist],
+                  ['Mother-Son',        planning.mother_son_song,        planning.mother_son_artist],
+                ].filter(([, song]) => song).map(([label, song, artist]) => (
+                  <div key={label as string} style={{ marginBottom: 8 }}>
+                    <p style={{ margin: '0 0 2px', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>{label}</p>
+                    <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.8)', fontFamily: 'Poppins, sans-serif' }}>
+                      {song}{artist ? ` — ${artist}` : ''}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Special Requests */}
+              {planning.special_requests && (
+                <div style={{ marginTop: 14 }}>
+                  <p style={{ margin: '0 0 4px', fontSize: 10, fontWeight: 700, color: BLUE, textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Poppins, sans-serif' }}>Special Requests</p>
+                  <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,224,213,0.8)', fontFamily: 'Poppins, sans-serif', lineHeight: 1.6, whiteSpace: 'pre-wrap' as const }}>{planning.special_requests}</p>
+                </div>
+              )}
+
             </div>
           ) : (
             <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13, fontFamily: 'Poppins, sans-serif', fontStyle: 'italic' }}>Planning form not yet submitted.</p>
