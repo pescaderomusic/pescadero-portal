@@ -243,11 +243,11 @@ export default function HomePage() {
                 <p style={{ margin: '0 0 20px', fontSize: 14, color: 'rgba(245,239,224,0.5)', lineHeight: 1.7 }}>We prioritize clarity, reliability, and an invisible technical presence for the most intimate and formal moments of your day.</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div style={{ borderLeft: `2px solid ${BLUE}`, paddingLeft: 14 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: CREAM }}>The "Anywhere" Ceremony System</p>
+                    <p style={{ margin: '0 0 4px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>The "Anywhere" Ceremony System</p>
                     <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)', lineHeight: 1.6 }}>Our ceremony and dinner setup is completely battery-powered, allowing for high-fidelity audio in any location — from remote mountain overlooks to open meadows — without noisy generators or unsightly extension cords.</p>
                   </div>
                   <div style={{ borderLeft: `2px solid ${BLUE}`, paddingLeft: 14 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: CREAM }}>Professional Wireless Microphones</p>
+                    <p style={{ margin: '0 0 4px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>Professional Wireless Microphones</p>
                     <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)', lineHeight: 1.6 }}>We utilize world-class wireless systems with two dedicated channels for any combination of handheld or discreet lapel microphones. Our professional-grade signal remains rock-solid and interference-free, even in crowded environments.</p>
                   </div>
                 </div>
@@ -262,11 +262,11 @@ export default function HomePage() {
                 <p style={{ margin: '0 0 20px', fontSize: 14, color: 'rgba(245,239,224,0.5)', lineHeight: 1.7 }}>When the celebration begins, we transition to a dedicated environment built specifically for the energy of the dance floor.</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div style={{ borderLeft: `2px solid ${RED}`, paddingLeft: 14 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: CREAM }}>The Pro-Grade Dance Floor System</p>
+                    <p style={{ margin: '0 0 4px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>The Pro-Grade Dance Floor System</p>
                     <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)', lineHeight: 1.6 }}>Our reception setup features a high-output sound system hardwired directly into a professional mixing console for 100% reliability — rich, punchy, and crystal-clear all night long.</p>
                   </div>
                   <div style={{ borderLeft: `2px solid ${RED}`, paddingLeft: 14 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: CREAM }}>Tailored Dance Floor Lighting</p>
+                    <p style={{ margin: '0 0 4px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>Tailored Dance Floor Lighting</p>
                     <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)', lineHeight: 1.6 }}>We treat lighting as an essential part of the party experience. During our consultation, we collaborate to choose the perfect look — from a soft candle-lit glow for your first dance to vibrant custom colors that match your wedding palette.</p>
                   </div>
                 </div>
@@ -283,11 +283,11 @@ export default function HomePage() {
                 <p style={{ margin: '0 0 20px', fontSize: 14, color: 'rgba(245,239,224,0.5)', lineHeight: 1.7 }}>Our equipment is designed to complement the modern-organic aesthetic of Utah's premier venues.</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   <div>
-                    <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: CREAM }}>Handcrafted DJ Furniture</p>
+                    <p style={{ margin: '0 0 3px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>Handcrafted DJ Furniture</p>
                     <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)' }}>A custom-built white DJ table topped with a light-brown hardwood counter — designed to match a clean, organic wedding aesthetic.</p>
                   </div>
                   <div>
-                    <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: CREAM }}>The "Slick" Look</p>
+                    <p style={{ margin: '0 0 3px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>The "Slick" Look</p>
                     <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)' }}>A minimalist footprint with meticulous cable management. All wiring is hidden, ensuring your photos stay focused on your celebration — not the gear.</p>
                   </div>
                 </div>
@@ -315,7 +315,7 @@ export default function HomePage() {
               { day: 'Monday – Wednesday',      price: '$1,200', highlight: false },
             ].map(({ day, price, highlight }, i) => (
               <div key={day} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '16px 24px', background: highlight ? 'rgba(68,190,199,0.05)' : 'transparent', borderBottom: i < 2 ? '1px solid rgba(245,239,224,0.05)' : 'none' }}>
-                <span style={{ fontSize: 15, color: 'rgba(245,239,224,0.75)', textAlign: 'left', fontWeight: highlight ? 600 : 400 }}>{day}</span>
+                <span style={{ fontSize: 15, fontFamily: DISPLAY, color: 'rgba(245,239,224,0.75)', textAlign: 'left', fontWeight: highlight ? 600 : 400 }}>{day}</span>
                 <span style={{ fontSize: 20, fontFamily: DISPLAY, fontWeight: 300, color: highlight ? BLUE : CREAM, textAlign: 'right' }}>{price}</span>
               </div>
             ))}
