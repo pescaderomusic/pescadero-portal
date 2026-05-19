@@ -84,7 +84,7 @@ export default function HomePage() {
       }}>
         {/* Left: logo + wordmark */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/images/logo.png" alt="Pescadero Music" style={{ height: 38, width: 38, objectFit: 'contain' }} />
+          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 38, width: 38, objectFit: 'contain' }} />
           <span style={{ fontFamily: WORDMARK, fontSize: 17, letterSpacing: '4px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
         </div>
 
@@ -145,7 +145,7 @@ export default function HomePage() {
       <section style={{ position: 'relative', height: '100vh', minHeight: 640, overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
 
         {/* Full bleed photo */}
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('/images/hero.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center 30%' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/hero.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center 30%' }} />
 
         {/* Gradient overlays — left darker for text, overall darkening */}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(7,17,26,0.82) 0%, rgba(7,17,26,0.55) 45%, rgba(7,17,26,0.15) 100%)' }} />
