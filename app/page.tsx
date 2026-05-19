@@ -23,7 +23,14 @@ export default function HomePage() {
     const { error } = isSignUp
       ? await supabase.auth.signUp({ email, password })
       : await supabase.auth.signInWithPassword({ email, password })
-    if (error) { setAuthError(error.message); setLoading(false); return }
+    if (error) {
+      if (error.message.toLowerCase().includes('email') && error.message.toLowerCase().includes('confirm')) {
+        setAuthError('Email not confirmed — please check your inbox and confirm your email before signing in.')
+      } else {
+        setAuthError(error.message)
+      }
+      setLoading(false); return
+    }
     if (isSignUp) { window.location.href = '/auth/signup' }
     else          { window.location.href = '/dashboard' }
   }

@@ -116,7 +116,7 @@ export default async function AdminPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE }}>PESCADERO ADMIN</span>
           <Link href="/admin/availability" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📅 Availability</Link>
-          <Link href="/admin/schedule" style={{ fontSize: 11, color: consultPending > 0 ? '#F5A623' : 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: consultPending > 0 ? 700 : 400 }}>📞 Schedule{consultPending > 0 ? ` (${consultPending})` : ''}</Link>
+          
           <Link href="/admin/analytics" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📊 Analytics</Link>
           <Link href="/admin/reviews" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>⭐ Reviews</Link>
         </div>
@@ -182,7 +182,7 @@ export default async function AdminPage() {
                       <Link
                         href={
                           b.step_consultation === 'pending'
-                            ? '/admin/schedule'
+                            ? `/admin/client/${b.client_id}`
                             : `/admin/client/${b.client_id}`
                         }
                         style={{ fontSize: 10, color: GOLD, textDecoration: 'none', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 5, padding: '3px 10px' }}
@@ -324,7 +324,7 @@ export default async function AdminPage() {
               {[
                 { href: 'mailto:garrett@pescaderomusic.com', label: '✉️ Compose Email' },
                 { href: '/admin/availability', label: '📅 Set Availability' },
-                { href: '/admin/schedule', label: '📞 View Schedule' },
+                
                 { href: 'https://dashboard.stripe.com', label: '💳 Stripe Dashboard', ext: true },
                 { href: 'https://resend.com', label: '📬 Resend Logs', ext: true },
               ].map(link => (

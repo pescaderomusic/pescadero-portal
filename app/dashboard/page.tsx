@@ -26,17 +26,24 @@ export default async function DashboardPage({
     .eq('id', user.id)
     .single()
 
-  const { data: booking } = await supabase
-    .from('bookings')
-    .select('*')
-    .eq('client_id', user.id)
-    .single()
+  const [{ data: booking }, { data: inquiry }] = await Promise.all([
+    supabase.from('bookings').select('*').eq('client_id', user.id).single(),
+    supabase.from('inquiry_submissions').select('couple_names, event_name, venue_name').eq('client_id', user.id).single(),
+  ])
+
+  // Merge inquiry fields into booking for display
+  const bookingWithNames = booking ? {
+    ...booking,
+    couple_names: booking.couple_names || inquiry?.couple_names,
+    event_name:   booking.event_name   || inquiry?.event_name,
+    venue_name:   booking.venue_name   || inquiry?.venue_name,
+  } : null
 
   const justPaid = !!searchParams.session_id
 
   return (
     <StepTracker
-      booking={booking || null}
+      booking={bookingWithNames}
       clientName={profile?.full_name || ''}
       justPaid={justPaid}
       paymentType={searchParams.type}

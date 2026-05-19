@@ -61,6 +61,26 @@ export default function PlanningPage() {
           setBooking(data)
           setLoading(false)
           if (data?.step_planning === 'submitted') setSubmitted(true)
+          // Restore saved draft
+          try {
+            const saved = localStorage.getItem('pescadero_planning')
+            if (saved && data?.step_planning !== 'submitted') {
+              const d = JSON.parse(saved)
+              if (d.contactName)        setContactName(d.contactName)
+              if (d.contactPhone)       setContactPhone(d.contactPhone)
+              if (d.contactRole)        setContactRole(d.contactRole)
+              if (d.setupNotes)         setSetupNotes(d.setupNotes)
+              if (d.expectations)       setExpectations(d.expectations)
+              if (d.itinerary?.length)  setItinerary(d.itinerary)
+              if (d.firstDanceSong)     setFirstDanceSong(d.firstDanceSong)
+              if (d.firstDanceArtist)   setFirstDanceArtist(d.firstDanceArtist)
+              if (d.fatherDaughterSong) setFatherDaughterSong(d.fatherDaughterSong)
+              if (d.fatherDaughterArtist) setFatherDaughterArtist(d.fatherDaughterArtist)
+              if (d.motherSonSong)      setMotherSonSong(d.motherSonSong)
+              if (d.motherSonArtist)    setMotherSonArtist(d.motherSonArtist)
+              if (d.specialRequests)    setSpecialRequests(d.specialRequests)
+            }
+          } catch(e) {}
         })
     })
   }, [router])
@@ -68,6 +88,16 @@ export default function PlanningPage() {
   const addRow = () => setItinerary(r => [...r, { time: '', description: '' }])
   const updateRow = (i: number, key: keyof ItineraryRow, val: string) =>
     setItinerary(r => r.map((row, idx) => idx === i ? { ...row, [key]: val } : row))
+
+  const saveToLocal = () => {
+    try {
+      localStorage.setItem('pescadero_planning', JSON.stringify({
+        contactName, contactPhone, contactRole, setupNotes, expectations,
+        itinerary, firstDanceSong, firstDanceArtist, fatherDaughterSong,
+        fatherDaughterArtist, motherSonSong, motherSonArtist, specialRequests,
+      }))
+    } catch(e) {}
+  }
 
   const handleSubmit = async () => {
     if (!contactName || !contactPhone) {
@@ -112,6 +142,7 @@ export default function PlanningPage() {
       body: JSON.stringify({ clientId: user.id }),
     }).catch(() => {})
 
+    try { localStorage.removeItem('pescadero_planning') } catch(e) {}
     setSubmitted(true)
     setSaving(false)
   }
@@ -137,7 +168,8 @@ export default function PlanningPage() {
     </div>
   )
 
-  if (!booking || booking.step_planning === 'locked') return (
+  const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
+  if (!booking || (booking.step_planning === 'locked' && booking.client_id !== GARRETT_ID)) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Poppins, sans-serif' }}>
       <div style={{ textAlign: 'center', padding: 40 }}>
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Your planning form isn't available yet. Garrett will send it after your deposit is confirmed.</p>
@@ -153,7 +185,7 @@ export default function PlanningPage() {
 
       {/* Print nav */}
       <div className="no-print" style={{ background: NAVY, padding: '0 24px', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => router.push('/dashboard')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>← Dashboard</button>
+        <button onClick={() => { saveToLocal(); router.push('/dashboard') }} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>← Save & Exit</button>
         <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 16, color: 'white' }}>Pescadero Music</span>
         <button onClick={() => window.print()} style={{ background: 'none', border: '1px solid rgba(68,190,199,0.4)', borderRadius: 6, color: BLUE, fontSize: 11, fontWeight: 700, padding: '5px 14px', cursor: 'pointer', fontFamily: 'inherit' }}>🖨 Print</button>
       </div>
