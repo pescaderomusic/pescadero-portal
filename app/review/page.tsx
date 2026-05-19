@@ -119,7 +119,7 @@ export default function ReviewPage() {
           <p style={{ margin: '0 0 8px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Post-Event</p>
           <h1 style={{ margin: '0 0 10px', fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 28, color: 'white' }}>How did we do, {firstName}?</h1>
           <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
-            We hope {eventName} was everything you dreamed of. Take a moment to share your experience — it means the world.
+            We hope {eventName} was everything you dreamed of. Take a moment to share your experience — your feedback means everything to us.
           </p>
         </div>
 
@@ -149,7 +149,7 @@ export default function ReviewPage() {
             <textarea
               value={form.testimonial}
               onChange={e => set('testimonial', e.target.value)}
-              placeholder="Garrett was incredible — the music was perfect all night and he kept the energy exactly where we wanted it…"
+              placeholder="Share what your experience was like — what worked, what stood out, and anything you'd want others to know."
               style={{ ...inputStyle, height: 110, resize: 'vertical' }}
             />
           </div>
