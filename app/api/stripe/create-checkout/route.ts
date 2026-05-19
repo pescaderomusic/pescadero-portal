@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         payment_type: type,
       },
       customer_email: user.email,
-      success_url: `${origin}/contract/payment/success?session_id={CHECKOUT_SESSION_ID}&type=${type}`,
+      success_url: `${origin}/contract/payment/success?session_id={CHECKOUT_SESSION_ID}&type=${type}&contract=${contractId}`,
       cancel_url: `${origin}/contract/payment?cancelled=true`,
     })
 

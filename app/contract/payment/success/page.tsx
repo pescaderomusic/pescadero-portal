@@ -40,7 +40,7 @@ export default async function PaymentSuccessPage({ searchParams }: { searchParam
         </h1>
         <p style={{ fontSize: 13, color: 'rgba(232,224,213,0.6)', lineHeight: 1.7, marginBottom: 8 }}>
           {isDeposit
-            ? 'Your deposit has been received and your date is officially locked in. Garrett will be in touch soon!'
+            ? 'Your deposit has been received and your date is officially locked in. Sit back and relax — next up is your planning form, which Garrett will send your way when the time is right.'
             : 'Your final payment has been received. Your booking is fully confirmed. See you on event day!'
           }
         </p>
