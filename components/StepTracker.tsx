@@ -2,11 +2,16 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const NAVY  = '#0D1B2A'
-const BLUE  = '#44BEC7'
-const RED   = '#D62828'
-const GREEN = '#4CAF50'
-const GOLD  = '#F5A623'
+const NAVY     = '#07111A'
+const BLUE     = '#44BEC7'
+const RED      = '#C8202A'
+const GREEN    = '#4CAF50'
+const GOLD     = '#F5A623'
+const CREAM    = '#F5EFE0'
+const DISPLAY  = "'freight-display-pro', Georgia, serif"
+const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
+const BODY     = "'inter', system-ui, sans-serif"
+const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
 
 interface Booking {
   id: string
@@ -36,7 +41,7 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     active: {
       title: 'Start Here',
       body: "Start here. Tell us about your date, venue, and vision\u2014we're invested in the details. (Takes about 3 minutes).",
-      action: { label: 'Submit Inquiry →', href: '/inquiry' },
+      action: { label: 'Submit Inquiry \u2192', href: '/inquiry' },
     },
     complete: {
       title: 'Inquiry Received',
@@ -69,10 +74,10 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     sent: {
       title: 'Agreement Ready',
       body: 'Your agreement is ready. Review it, sign, and pay your deposit via Stripe to officially lock in your date.',
-      action: { label: 'Sign & Pay Deposit →', href: '/contract' },
+      action: { label: 'Sign & Pay Deposit \u2192', href: '/contract' },
     },
     complete: {
-      title: 'Signed & Deposited 🎉',
+      title: 'Signed & Deposited \ud83c\udf89',
       body: 'Signed and deposited. Your day is locked in!',
     },
   },
@@ -84,7 +89,7 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     pending: {
       title: 'Planning Form Ready',
       body: 'Your planning form is ready. Fill it out so Garrett has everything he needs to prep for your day.',
-      action: { label: 'Open Planning Form →', href: '/planning' },
+      action: { label: 'Open Planning Form \u2192', href: '/planning' },
     },
     complete: {
       title: 'Planning Submitted',
@@ -99,10 +104,10 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     pending: {
       title: 'Final Payment Due',
       body: 'Your final balance is due. Complete this secure Stripe payment and your entire sound experience is fully secured.',
-      action: { label: 'Pay Final Balance →', href: '/contract/final-payment' },
+      action: { label: 'Pay Final Balance \u2192', href: '/contract/final-payment' },
     },
     complete: {
-      title: 'Paid in Full 🎵',
+      title: 'Paid in Full \ud83c\udfb5',
       body: "Paid in full. We are completely cleared for launch\u2014we can\u2019t wait for your celebration!",
     },
   },
@@ -120,7 +125,7 @@ const COPY: Record<string, Record<string, { title: string; body: string; action?
     active: {
       title: 'Leave a Review',
       body: 'How did we do? Your feedback means everything to us, and it directly helps us continue providing this same premium, unforgettable service for more couples.',
-      action: { label: 'Leave a Review ⭐', href: '/review' },
+      action: { label: 'Leave a Review \u2b50', href: '/review' },
     },
     locked: {
       title: 'Leave a Review',
@@ -211,63 +216,63 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         title: copy.title,
         body: copy.body,
         action: isLocked ? null : (copy as any).action || null,
-        color: isLocked ? 'rgba(255,255,255,0.3)' : copy.stepState === 'complete' ? GREEN : BLUE,
+        color: isLocked ? 'rgba(245,239,224,0.3)' : copy.stepState === 'complete' ? GREEN : BLUE,
         locked: isLocked,
       }
     }
     if (!b || inquiryStatus !== 'complete') return {
       eyebrow: 'Start Here', title: 'Tell Us About Your Day',
       body: "Start here. Tell us about your date, venue, and vision\u2014we're invested in the details. (Takes about 3 minutes).",
-      action: { label: 'Submit Inquiry →', href: '/inquiry' }, color: BLUE,
+      action: { label: 'Submit Inquiry \u2192', href: '/inquiry' }, color: BLUE,
     }
     if (['locked','pending'].includes(b.step_consultation || 'locked') && b.step_inquiry === 'complete') return {
-      eyebrow: '✓ Inquiry Received', title: 'Garrett Will Be in Touch',
+      eyebrow: '\u2713 Inquiry Received', title: 'Garrett Will Be in Touch',
       body: 'Inquiry received. Garrett will be in touch within 24\u201348 hours.',
       action: null, color: BLUE,
     }
     if (b.step_consultation === 'scheduled') return {
-      eyebrow: '\U0001f4c5 Consultation Locked In', title: 'Consultation Locked In',
+      eyebrow: '\ud83d\udcc5 Consultation Locked In', title: 'Consultation Locked In',
       body: "Your consultation is locked in. We\u2019re excited to connect, listen to your ideas, and talk through your celebration.",
       action: null, color: BLUE,
     }
     if (b.step_consultation === 'complete' && ['locked','pending'].includes(b.step_contract || 'locked')) return {
-      eyebrow: 'Consultation Complete ✓', title: 'Agreement Coming Your Way',
+      eyebrow: 'Consultation Complete \u2713', title: 'Agreement Coming Your Way',
       body: 'Consultation done. Sit back and relax\u2014Garrett is crafting your personalized service agreement.',
       action: null, color: BLUE,
     }
     if (b.step_contract === 'sent') return {
       eyebrow: 'Action Required', title: 'Agreement Ready',
       body: 'Your agreement is ready. Review it, sign, and pay your deposit via Stripe to officially lock in your date.',
-      action: { label: 'Sign & Pay Deposit →', href: '/contract' }, color: RED,
+      action: { label: 'Sign & Pay Deposit \u2192', href: '/contract' }, color: RED,
     }
     if (['signed','client_signed'].includes(b.step_contract || '') && b.step_planning === 'locked') return {
-      eyebrow: '🎉 Signed & Deposited', title: 'Your Day Is Locked In!',
+      eyebrow: '\ud83c\udf89 Signed & Deposited', title: 'Your Day Is Locked In!',
       body: 'Signed and deposited. Your day is locked in!', action: null, color: GREEN,
     }
     if (b.step_planning === 'pending') return {
       eyebrow: 'Action Required', title: 'Planning Form Ready',
       body: 'Your planning form is ready. Fill it out so Garrett has everything he needs to prep for your day.',
-      action: { label: 'Open Planning Form →', href: '/planning' }, color: RED,
+      action: { label: 'Open Planning Form \u2192', href: '/planning' }, color: RED,
     }
     if (b.step_planning === 'submitted' && ['locked'].includes(b.step_final_payment || 'locked')) return {
-      eyebrow: 'Planning Submitted ✓', title: 'Garrett Is On It',
+      eyebrow: 'Planning Submitted \u2713', title: 'Garrett Is On It',
       body: 'Planning submitted. Garrett is diving into your details and actively preparing for your celebration.',
       action: null, color: BLUE,
     }
     if (b.step_final_payment === 'pending') return {
       eyebrow: 'Action Required', title: 'Final Payment Due',
       body: 'Your final balance is due. Complete this secure Stripe payment and your entire sound experience is fully secured.',
-      action: { label: 'Pay Final Balance →', href: '/contract/final-payment' }, color: RED,
+      action: { label: 'Pay Final Balance \u2192', href: '/contract/final-payment' }, color: RED,
     }
     if (b.step_final_payment === 'paid' && !eventDone) return {
-      eyebrow: '✓ Fully Confirmed', title: 'Cleared for Launch 🎵',
+      eyebrow: '\u2713 Fully Confirmed', title: 'Cleared for Launch \ud83c\udfb5',
       body: "Paid in full. We are completely cleared for launch\u2014we can\u2019t wait for your celebration!",
       action: null, color: GREEN,
     }
     if (eventDone) return {
       eyebrow: 'Event Complete', title: 'Thank You',
       body: "What an incredible celebration. Thank you so much for trusting us with your wedding day\u2014we hope it\u2019s a night you\u2019ll never forget.",
-      action: { label: 'Leave a Review ⭐', href: '/review' }, color: GOLD,
+      action: { label: 'Leave a Review \u2b50', href: '/review' }, color: GOLD,
     }
     return null
   }
@@ -275,15 +280,15 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
   const card = getCard()
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.96)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(68,190,199,0.1)', padding: '0 28px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 17, fontWeight: 700, color: RED }}>Pescadero</span>
-          <span style={{ fontFamily: 'monospace', fontSize: 8, fontWeight: 700, letterSpacing: '4px', color: BLUE, textTransform: 'uppercase' }}>MUSIC</span>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #07111A 0%, #0D1E2B 100%)', fontFamily: BODY }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(7,17,26,0.96)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(68,190,199,0.1)', padding: '0 28px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 32, width: 32, objectFit: 'contain' }} />
+          <span style={{ fontFamily: WORDMARK, fontSize: 15, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>Hi, {firstName}</span>
-          <Link href="/auth/signout" style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', textDecoration: 'none' }}>Sign out</Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={{ fontSize: 12, color: 'rgba(245,239,224,0.4)', fontFamily: UI_FONT, letterSpacing: '1px' }}>Hi, {firstName}</span>
+          <Link href="/auth/signout" style={{ fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.25)', textDecoration: 'none' }}>Sign Out</Link>
         </div>
       </nav>
 
@@ -292,38 +297,38 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           <div style={{ background: 'rgba(76,175,80,0.1)', border: '1px solid rgba(76,175,80,0.2)', borderRadius: 10, padding: '14px 20px', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 22 }}>🎉</span>
             <div>
-              <p style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 700, color: GREEN }}>{paymentType === 'final' ? "Fully paid — you're all set!" : 'Deposit paid — your date is secured!'}</p>
-              <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Garrett has been notified.</p>
+              <p style={{ margin: '0 0 2px', fontSize: 14, fontFamily: DISPLAY, fontWeight: 300, color: GREEN }}>{paymentType === 'final' ? "Fully paid — you're all set!" : 'Deposit paid — your date is secured!'}</p>
+              <p style={{ margin: 0, fontSize: 12, fontFamily: BODY, color: 'rgba(245,239,224,0.4)' }}>Garrett has been notified.</p>
             </div>
           </div>
         )}
 
         {!noBooking && (
-          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '20px 24px', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 14, padding: '20px 24px', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
             <div>
-              <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Your Event</p>
-              <p style={{ margin: '0 0 4px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: 'white', fontWeight: 700 }}>{b?.couple_names || b?.event_name || b?.event_type || `${firstName}'s Event`}</p>
-              {b?.event_date && <p style={{ margin: '2px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>{fmtDate(b.event_date)}{b.venue_name ? ` · ${b.venue_name}` : ''}</p>}
+              <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)' }}>Your Event</p>
+              <p style={{ margin: '0 0 4px', fontFamily: DISPLAY, fontSize: 24, color: CREAM, fontWeight: 300 }}>{b?.couple_names || b?.event_name || b?.event_type || `${firstName}'s Event`}</p>
+              {b?.event_date && <p style={{ margin: '2px 0 0', fontSize: 13, fontFamily: BODY, color: 'rgba(245,239,224,0.4)' }}>{fmtDate(b.event_date)}{b.venue_name ? ` · ${b.venue_name}` : ''}</p>}
             </div>
             {daysUntil !== null && daysUntil > 0 && (
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <p style={{ margin: 0, fontSize: 38, fontWeight: 700, color: RED, lineHeight: 1 }}>{daysUntil}</p>
-                <p style={{ margin: '2px 0 0', fontSize: 10, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>days away</p>
+                <p style={{ margin: 0, fontSize: 38, fontFamily: DISPLAY, fontWeight: 300, color: RED, lineHeight: 1 }}>{daysUntil}</p>
+                <p style={{ margin: '2px 0 0', fontSize: 10, fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>days away</p>
               </div>
             )}
-            {daysUntil !== null && daysUntil <= 0 && <p style={{ fontSize: 18, fontWeight: 700, color: GREEN, margin: 0 }}>Today! 🎉</p>}
+            {daysUntil !== null && daysUntil <= 0 && <p style={{ fontSize: 18, fontFamily: DISPLAY, fontWeight: 300, color: GREEN, margin: 0 }}>Today! 🎉</p>}
           </div>
         )}
 
         {noBooking && (
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <h1 style={{ margin: '0 0 8px', fontFamily: 'Georgia, serif', fontSize: 30, color: 'white' }}>Let's Make Your Day Unforgettable</h1>
-            <p style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>Start by submitting your inquiry below.</p>
+            <h1 style={{ margin: '0 0 8px', fontFamily: DISPLAY, fontSize: 32, fontWeight: 300, color: CREAM }}>Let's Make Your Day Unforgettable</h1>
+            <p style={{ margin: 0, fontSize: 14, fontFamily: BODY, color: 'rgba(245,239,224,0.4)' }}>Start by submitting your inquiry below.</p>
           </div>
         )}
 
         <div style={{ marginBottom: 8, position: 'relative' }}>
-          <div style={{ position: 'absolute', top: 24, left: '4%', right: '4%', height: 2, background: 'rgba(255,255,255,0.06)', zIndex: 0 }} />
+          <div style={{ position: 'absolute', top: 24, left: '4%', right: '4%', height: 2, background: 'rgba(245,239,224,0.06)', zIndex: 0 }} />
           <div style={{ position: 'absolute', top: 24, left: '4%', height: 2, zIndex: 1, background: `linear-gradient(90deg, ${GREEN}, ${BLUE})`, width: completedCount === 0 ? '0%' : `${Math.min((completedCount / (steps.length + 0.8)) * 92, 88)}%`, transition: 'width 0.8s ease' }} />
           <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative', zIndex: 2 }}>
             {steps.map(step => {
@@ -333,61 +338,61 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
               const isSel      = selectedStep === step.key
               return (
                 <div key={step.key} onClick={() => handleStepClick(step.key)} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
-                  <div style={{ width: isSel ? 52 : isActive ? 48 : 44, height: isSel ? 52 : isActive ? 48 : 44, borderRadius: '50%', border: `2px solid ${isSel ? 'white' : isComplete ? GREEN : isActive ? BLUE : 'rgba(255,255,255,0.1)'}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: isSel ? '0 0 0 3px rgba(255,255,255,0.15)' : isActive ? `0 0 20px ${BLUE}40` : 'none', transition: 'all 0.2s', flexShrink: 0 }}>
-                    {isComplete ? <span style={{ fontSize: 18, color: GREEN }}>✓</span> : <span style={{ fontSize: 12, fontWeight: 700, color: isSel ? 'white' : isActive ? BLUE : 'rgba(255,255,255,0.2)' }}>{step.num}</span>}
+                  <div style={{ width: isSel ? 52 : isActive ? 48 : 44, height: isSel ? 52 : isActive ? 48 : 44, borderRadius: '50%', border: `2px solid ${isSel ? CREAM : isComplete ? GREEN : isActive ? BLUE : 'rgba(245,239,224,0.1)'}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: isSel ? `0 0 0 3px rgba(245,239,224,0.15)` : isActive ? `0 0 20px ${BLUE}40` : 'none', transition: 'all 0.2s', flexShrink: 0 }}>
+                    {isComplete ? <span style={{ fontSize: 18, color: GREEN }}>✓</span> : <span style={{ fontSize: 12, fontFamily: UI_FONT, fontWeight: 500, color: isSel ? CREAM : isActive ? BLUE : 'rgba(245,239,224,0.2)' }}>{step.num}</span>}
                   </div>
-                  <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: isSel ? 'white' : isLocked ? 'rgba(255,255,255,0.2)' : 'white', textAlign: 'center', transition: 'color 0.2s' }}>{step.label}</p>
+                  <p style={{ margin: 0, fontSize: 10, fontFamily: UI_FONT, letterSpacing: '1px', fontWeight: 500, color: isSel ? CREAM : isLocked ? 'rgba(245,239,224,0.2)' : CREAM, textAlign: 'center', transition: 'color 0.2s' }}>{step.label}</p>
                 </div>
               )
             })}
 
             <div onClick={() => handleStepClick('event')} style={{ flex: 1.3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
-              <div style={{ width: selectedStep === 'event' ? 68 : 64, height: selectedStep === 'event' ? 68 : 64, borderRadius: '50%', border: `3px solid ${selectedStep === 'event' ? 'white' : eventDone ? GREEN : RED}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: selectedStep === 'event' ? '0 0 0 3px rgba(255,255,255,0.15)' : `0 0 28px ${eventDone ? GREEN : RED}35`, transition: 'all 0.2s', flexShrink: 0 }}>
+              <div style={{ width: selectedStep === 'event' ? 68 : 64, height: selectedStep === 'event' ? 68 : 64, borderRadius: '50%', border: `3px solid ${selectedStep === 'event' ? CREAM : eventDone ? GREEN : RED}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: selectedStep === 'event' ? `0 0 0 3px rgba(245,239,224,0.15)` : `0 0 28px ${eventDone ? GREEN : RED}35`, transition: 'all 0.2s', flexShrink: 0 }}>
                 {eventDone ? <span style={{ fontSize: 24, color: GREEN }}>✓</span> : <span style={{ fontSize: 22 }}>🎵</span>}
               </div>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: selectedStep === 'event' ? 'white' : eventDone ? GREEN : RED, textAlign: 'center' }}>Event Day</p>
+              <p style={{ margin: 0, fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1px', fontWeight: 500, color: selectedStep === 'event' ? CREAM : eventDone ? GREEN : RED, textAlign: 'center' }}>Event Day</p>
               {daysUntil !== null && daysUntil > 0 && selectedStep !== 'event' && (
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: 'white', lineHeight: 1 }}>{daysUntil}d</p>
-                  <p style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>to go</p>
+                  <p style={{ margin: 0, fontSize: 17, fontFamily: DISPLAY, fontWeight: 300, color: CREAM, lineHeight: 1 }}>{daysUntil}d</p>
+                  <p style={{ margin: 0, fontSize: 9, fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)' }}>to go</p>
                 </div>
               )}
             </div>
 
             <div onClick={() => handleStepClick('review')} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
-              <div style={{ width: selectedStep === 'review' ? 48 : 44, height: selectedStep === 'review' ? 48 : 44, borderRadius: '50%', border: `2px solid ${selectedStep === 'review' ? 'white' : eventDone ? GOLD : 'rgba(255,255,255,0.08)'}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', flexShrink: 0, boxShadow: selectedStep === 'review' ? '0 0 0 3px rgba(255,255,255,0.15)' : 'none' }}>
+              <div style={{ width: selectedStep === 'review' ? 48 : 44, height: selectedStep === 'review' ? 48 : 44, borderRadius: '50%', border: `2px solid ${selectedStep === 'review' ? CREAM : eventDone ? GOLD : 'rgba(245,239,224,0.08)'}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', flexShrink: 0, boxShadow: selectedStep === 'review' ? `0 0 0 3px rgba(245,239,224,0.15)` : 'none' }}>
                 <span style={{ fontSize: 18, filter: eventDone ? 'none' : 'grayscale(1) opacity(0.2)' }}>⭐</span>
               </div>
-              <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: selectedStep === 'review' ? 'white' : eventDone ? GOLD : 'rgba(255,255,255,0.2)', textAlign: 'center' }}>Review</p>
+              <p style={{ margin: 0, fontSize: 10, fontFamily: UI_FONT, letterSpacing: '1px', fontWeight: 500, color: selectedStep === 'review' ? CREAM : eventDone ? GOLD : 'rgba(245,239,224,0.2)', textAlign: 'center' }}>Review</p>
             </div>
           </div>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.2)', margin: '8px 0 20px', letterSpacing: '0.5px' }}>
+        <p style={{ textAlign: 'center', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', color: 'rgba(245,239,224,0.2)', margin: '8px 0 20px' }}>
           {selectedStep ? 'Tap again to dismiss' : 'Tap any step to learn more'}
         </p>
 
         {card && (() => {
           const isLocked  = !!card.locked
-          const borderCol = isLocked ? 'rgba(255,255,255,0.08)' : card.color === GREEN ? 'rgba(76,175,80,0.25)' : card.color === RED ? 'rgba(214,40,40,0.2)' : card.color === GOLD ? 'rgba(245,166,35,0.25)' : 'rgba(68,190,199,0.2)'
-          const bgCol     = isLocked ? 'rgba(255,255,255,0.03)' : card.color === GREEN ? 'rgba(76,175,80,0.07)' : card.color === RED ? 'rgba(214,40,40,0.05)' : card.color === GOLD ? 'rgba(245,166,35,0.07)' : 'rgba(68,190,199,0.07)'
+          const borderCol = isLocked ? 'rgba(245,239,224,0.08)' : card.color === GREEN ? 'rgba(76,175,80,0.25)' : card.color === RED ? 'rgba(200,32,42,0.2)' : card.color === GOLD ? 'rgba(245,166,35,0.25)' : 'rgba(68,190,199,0.2)'
+          const bgCol     = isLocked ? 'rgba(245,239,224,0.03)' : card.color === GREEN ? 'rgba(76,175,80,0.07)' : card.color === RED ? 'rgba(200,32,42,0.05)' : card.color === GOLD ? 'rgba(245,166,35,0.07)' : 'rgba(68,190,199,0.07)'
           return (
             <div style={{ background: bgCol, border: `1px solid ${borderCol}`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <p style={{ margin: 0, fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: isLocked ? 'rgba(255,255,255,0.25)' : card.color, fontWeight: 700 }}>{card.eyebrow}</p>
-                  {isLocked && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>🔒 Locked</span>}
+                  <p style={{ margin: 0, fontSize: 10, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: isLocked ? 'rgba(245,239,224,0.25)' : card.color, fontWeight: 500 }}>{card.eyebrow}</p>
+                  {isLocked && <span style={{ fontSize: 11, color: 'rgba(245,239,224,0.2)' }}>🔒 Locked</span>}
                 </div>
-                <p style={{ margin: '0 0 6px', fontSize: 15, color: isLocked ? 'rgba(255,255,255,0.35)' : 'white', fontWeight: 600 }}>{card.title}</p>
-                <p style={{ margin: 0, fontSize: 13, color: isLocked ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.55)', lineHeight: 1.7 }}>{card.body}</p>
+                <p style={{ margin: '0 0 6px', fontSize: 17, fontFamily: DISPLAY, fontWeight: 300, color: isLocked ? 'rgba(245,239,224,0.35)' : CREAM }}>{card.title}</p>
+                <p style={{ margin: 0, fontSize: 13, fontFamily: BODY, color: isLocked ? 'rgba(245,239,224,0.25)' : 'rgba(245,239,224,0.6)', lineHeight: 1.7 }}>{card.body}</p>
                 {selectedStep && (
-                  <button onClick={() => setSelectedStep(null)} style={{ marginTop: 12, background: 'none', border: 'none', color: 'rgba(255,255,255,0.25)', fontSize: 11, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+                  <button onClick={() => setSelectedStep(null)} style={{ marginTop: 12, background: 'none', border: 'none', color: 'rgba(245,239,224,0.25)', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1px', cursor: 'pointer', padding: 0 }}>
                     ← Back to your next step
                   </button>
                 )}
               </div>
               {card.action && !isLocked && (
-                <Link href={card.action.href} style={{ padding: '11px 26px', borderRadius: 9, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 4px 18px rgba(214,40,40,0.3)', flexShrink: 0 }}>
+                <Link href={card.action.href} style={{ padding: '11px 26px', borderRadius: 9, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', whiteSpace: 'nowrap', boxShadow: '0 4px 18px rgba(200,32,42,0.35)', flexShrink: 0 }}>
                   {card.action.label}
                 </Link>
               )}
@@ -397,17 +402,17 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {b?.step_contract && ['signed','client_signed','complete'].includes(b.step_contract) && (
-            <Link href="/contract" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(232,224,213,0.5)', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>View Contract</Link>
+            <Link href="/contract" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>View Contract</Link>
           )}
           {b?.step_inquiry === 'complete' && (
-            <Link href="/inquiry/view" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(232,224,213,0.5)', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>View Inquiry</Link>
+            <Link href="/inquiry/view" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>View Inquiry</Link>
           )}
           {eventDone && (
-            <Link href="/review" style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid rgba(245,166,35,0.3)`, background: `rgba(245,166,35,0.08)`, color: GOLD, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>Leave a Review ⭐</Link>
+            <Link href="/review" style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid rgba(245,166,35,0.3)`, background: `rgba(245,166,35,0.08)`, color: GOLD, fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>Leave a Review ⭐</Link>
           )}
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: 48, fontSize: 12, color: 'rgba(255,255,255,0.18)' }}>
+        <p style={{ textAlign: 'center', marginTop: 48, fontSize: 12, fontFamily: BODY, color: 'rgba(245,239,224,0.18)' }}>
           Questions? <a href="mailto:garrett@pescaderomusic.com" style={{ color: BLUE, textDecoration: 'none' }}>garrett@pescaderomusic.com</a> · (210) 727-9328
         </p>
       </div>
