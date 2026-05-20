@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 const NAVY = '#07111A'
 const BLUE = '#44BEC7'
 const RED      = '#C8202A'
+const DISPLAY  = "'freight-display-pro', Georgia, serif"
 const CREAM    = '#F5EFE0'
 const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
 const BODY     = "'inter', system-ui, sans-serif"
