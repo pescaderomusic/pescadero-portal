@@ -392,11 +392,11 @@ export default function HomePage() {
             <p style={{ margin: '0 0 24px', fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontFamily: UI_FONT }}>Welcome Back</p>
             <div style={{ marginBottom: 12 }}>
               <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAuth()}
-                style={{ width: '100%', padding: '11px 14px', borderRadius: 8, border: '1.5px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.05)', color: CREAM, fontSize: 14, fontFamily: 'inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const }} />
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 8, border: '1.5px solid rgba(68,190,199,0.15)', background: 'rgba(245,239,224,0.05)', color: CREAM, fontSize: 14, fontFamily: 'inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const }} />
             </div>
             <div style={{ marginBottom: authError ? 12 : 20 }}>
               <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAuth()}
-                style={{ width: '100%', padding: '11px 14px', borderRadius: 8, border: '1.5px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.05)', color: CREAM, fontSize: 14, fontFamily: 'inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const }} />
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 8, border: '1.5px solid rgba(68,190,199,0.15)', background: 'rgba(245,239,224,0.05)', color: CREAM, fontSize: 14, fontFamily: 'inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const }} />
             </div>
             {authError && <p style={{ margin: '0 0 12px', fontSize: 12, color: '#ff6b6b' }}>{authError}</p>}
             <button onClick={handleAuth} disabled={loading} style={{ width: '100%', padding: '13px', borderRadius: 10, border: 'none', background: loading ? 'rgba(200,32,42,0.5)' : RED, color: 'white', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 20px rgba(200,32,42,0.35)' }}>
