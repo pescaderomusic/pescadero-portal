@@ -86,13 +86,7 @@ export default function ContractViewer() {
       status: 'client_signed',
     }).eq('client_id', user.id)
     await supabase.from('bookings').update({ step_contract: 'client_signed' }).eq('client_id', user.id)
-    const res = await fetch('/api/stripe/create-checkout', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contractId: contract.id, type: 'deposit' }),
-    })
-    const { url, error: stripeErr } = await res.json()
-    if (stripeErr || !url) { setError('Payment setup failed. Please contact Garrett.'); setSubmitting(false); return }
-    window.location.href = url
+    window.location.href = '/contract/payment'
   }
 
   if (loading) return (

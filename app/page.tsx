@@ -70,7 +70,7 @@ export default function HomePage() {
   const firstName = user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Account'
 
   return (
-    <div style={{ background: NAVY, minHeight: '100vh', fontFamily: BODY, color: CREAM }}>
+    <div style={{ background: 'linear-gradient(160deg, #07111A 0%, #0D1E2B 100%)', minHeight: '100vh', fontFamily: BODY, color: CREAM }}>
 
       {/* ── NAV ─────────────────────────────────────────────────── */}
       <nav style={{
