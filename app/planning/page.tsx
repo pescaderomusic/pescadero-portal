@@ -3,9 +3,13 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-const NAVY = '#0D1B2A'
+const NAVY = '#07111A'
 const BLUE = '#44BEC7'
-const RED  = '#D62828'
+const RED      = '#C8202A'
+const CREAM    = '#F5EFE0'
+const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
+const BODY     = "'inter', system-ui, sans-serif"
+const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 13px', borderRadius: 8,
@@ -149,19 +153,19 @@ export default function PlanningPage() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Poppins, sans-serif' }}>Loading…</p>
+      <p style={{ color: 'rgba(245,239,224,0.4)', fontFamily: BODY }}>Loading…</p>
     </div>
   )
 
   if (submitted) return (
-    <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY }}>
       <div style={{ textAlign: 'center', padding: 40 }}>
         <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, #44BEC7, #37A8B0)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 8px 30px rgba(68,190,199,0.35)' }}>
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <h2 style={{ margin: '0 0 12px', fontFamily: 'Georgia, serif', fontSize: 26, color: 'white' }}>Planning Form Submitted!</h2>
+        <h2 style={{ margin: '0 0 12px', fontFamily: DISPLAY, fontSize: 28, fontWeight: 300, color: CREAM }}>Planning Form Submitted!</h2>
         <p style={{ margin: '0 0 24px', fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>Garrett has everything he needs. Your final payment window will open soon.</p>
-        <button onClick={() => router.push('/dashboard')} style={{ padding: '12px 28px', borderRadius: 9, background: RED, color: 'white', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+        <button onClick={() => router.push('/dashboard')} style={{ padding: '12px 28px', borderRadius: 9, background: RED, color: 'white', border: 'none', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: 'pointer' }}>
           Back to Dashboard →
         </button>
       </div>
@@ -170,10 +174,10 @@ export default function PlanningPage() {
 
   const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
   if (!booking || (booking.step_planning === 'locked' && booking.client_id !== GARRETT_ID)) return (
-    <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY }}>
       <div style={{ textAlign: 'center', padding: 40 }}>
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Your planning form isn't available yet. Garrett will send it after your deposit is confirmed.</p>
-        <button onClick={() => router.push('/dashboard')} style={{ padding: '10px 24px', borderRadius: 8, background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)', border: 'none', fontSize: 13, cursor: 'pointer' }}>← Back to Dashboard</button>
+        <button onClick={() => router.push('/dashboard')} style={{ padding: '10px 24px', borderRadius: 8, background: 'rgba(245,239,224,0.06)', color: 'rgba(245,239,224,0.45)', border: 'none', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>← Back to Dashboard</button>
       </div>
     </div>
   )
@@ -181,13 +185,13 @@ export default function PlanningPage() {
   const eventDate = booking.event_date ? new Date(booking.event_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : ''
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f0ea', fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#f5f0ea', fontFamily: BODY }}>
 
       {/* Print nav */}
       <div className="no-print" style={{ background: NAVY, padding: '0 24px', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => { saveToLocal(); router.push('/dashboard') }} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>← Save & Exit</button>
-        <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 16, color: 'white' }}>Pescadero Music</span>
-        <button onClick={() => window.print()} style={{ background: 'none', border: '1px solid rgba(68,190,199,0.4)', borderRadius: 6, color: BLUE, fontSize: 11, fontWeight: 700, padding: '5px 14px', cursor: 'pointer', fontFamily: 'inherit' }}>🖨 Print</button>
+        <button onClick={() => { saveToLocal(); router.push('/dashboard') }} style={{ background: 'none', border: 'none', color: 'rgba(245,239,224,0.4)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>← Save & Exit</button>
+        <span style={{ fontFamily: WORDMARK, fontSize: 14, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</span>
+        <button onClick={() => window.print()} style={{ background: 'none', border: '1px solid rgba(68,190,199,0.4)', borderRadius: 6, color: BLUE, fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', padding: '5px 14px', cursor: 'pointer' }}>🖨 Print</button>
       </div>
 
       {/* Form document */}
@@ -198,7 +202,7 @@ export default function PlanningPage() {
           <div style={{ background: NAVY, padding: '28px 36px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <p style={{ margin: '0 0 2px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 20, fontWeight: 700, color: 'white' }}>Pescadero Music</p>
+                <p style={{ margin: '0 0 2px', fontFamily: WORDMARK, fontSize: 17, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
                 <p style={{ margin: 0, fontSize: 12, color: BLUE }}>Event Planning Form</p>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -211,7 +215,7 @@ export default function PlanningPage() {
 
           <div style={{ padding: '32px 36px' }}>
 
-            {error && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(214,40,40,0.08)', border: '1px solid rgba(214,40,40,0.2)', color: RED, fontSize: 13, marginBottom: 24 }}>{error}</div>}
+            {error && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(200,32,42,0.08)', border: '1px solid rgba(200,32,42,0.2)', color: RED, fontSize: 13, marginBottom: 24 }}>{error}</div>}
 
             {/* Day-of Contact */}
             <Section title="Day-of Contact" subtitle="Who should Garrett coordinate with on the day of the event?">
@@ -269,7 +273,7 @@ export default function PlanningPage() {
                   />
                 </div>
               ))}
-              <button className="no-print" onClick={addRow} style={{ background: 'none', border: '1px dashed #DDD3BC', borderRadius: 7, color: '#8A9EAA', fontSize: 12, padding: '7px 16px', cursor: 'pointer', marginTop: 4, fontFamily: 'inherit' }}>
+              <button className="no-print" onClick={addRow} style={{ background: 'none', border: '1px dashed #DDD3BC', borderRadius: 7, color: '#8A9EAA', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '7px 16px', cursor: 'pointer', marginTop: 4 }}>
                 + Add Row
               </button>
             </Section>
@@ -282,7 +286,7 @@ export default function PlanningPage() {
                 { label: 'Mother-Son Dance', song: motherSonSong, setSong: setMotherSonSong, artist: motherSonArtist, setArtist: setMotherSonArtist },
               ].map(({ label, song, setSong, artist, setArtist }) => (
                 <div key={label} style={{ marginBottom: 20 }}>
-                  <p style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700, color: '#1A2D3F' }}>{label}</p>
+                  <p style={{ margin: '0 0 8px', fontFamily: UI_FONT, fontSize: 13, fontWeight: 500, letterSpacing: '1px', color: '#1A2D3F' }}>{label}</p>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
                     <div>
                       <label style={labelStyle}>Song Title</label>
@@ -304,7 +308,7 @@ export default function PlanningPage() {
 
             {/* Submit */}
             <div className="no-print" style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid #EAE0CC', display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={handleSubmit} disabled={saving} style={{ padding: '13px 36px', borderRadius: 10, background: saving ? 'rgba(214,40,40,0.5)' : RED, color: 'white', border: 'none', fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', boxShadow: saving ? 'none' : '0 4px 20px rgba(214,40,40,0.3)' }}>
+              <button onClick={handleSubmit} disabled={saving} style={{ padding: '13px 36px', borderRadius: 10, background: saving ? 'rgba(200,32,42,0.5)' : RED, color: 'white', border: 'none', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : '0 4px 20px rgba(200,32,42,0.3)' }}>
                 {saving ? 'Submitting…' : 'Submit Planning Form →'}
               </button>
             </div>
@@ -328,7 +332,7 @@ function Section({ title, subtitle, children }: { title: string; subtitle: strin
   return (
     <div style={{ marginBottom: 36 }}>
       <div style={{ marginBottom: 14, paddingBottom: 8, borderBottom: '2px solid #EAE0CC' }}>
-        <h3 style={{ margin: '0 0 3px', fontSize: 16, fontWeight: 700, color: '#0D1B2A' }}>{title}</h3>
+        <h3 style={{ margin: '0 0 3px', fontFamily: UI_FONT, fontSize: 15, fontWeight: 500, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#07111A' }}>{title}</h3>
         <p style={{ margin: 0, fontSize: 12, color: '#8A9EAA', lineHeight: 1.5 }}>{subtitle}</p>
       </div>
       {children}
