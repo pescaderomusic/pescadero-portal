@@ -4,7 +4,12 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 
-const LOGO_B64 = "" // will be filled
+const BLUE     = '#44BEC7'
+const RED      = '#C8202A'
+const CREAM    = '#F5EFE0'
+const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
+const BODY     = "'inter', system-ui, sans-serif"
+const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
 
 interface Props {
   userName: string
@@ -34,32 +39,30 @@ export default function DashboardNav({ userName, userInitials }: Props) {
   return (
     <header style={{
       position: 'sticky', top: 0, zIndex: 100,
-      background: 'rgba(10,24,40,0.92)',
-      backdropFilter: 'blur(16px)',
-      borderBottom: '1px solid rgba(79,185,175,0.12)',
+      background: 'rgba(7,17,26,0.96)',
+      backdropFilter: 'blur(20px)',
+      borderBottom: '1px solid rgba(68,190,199,0.1)',
       padding: '0 24px',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       height: 64,
     }}>
-      {/* Logo + home link */}
+      {/* Logo + wordmark + home link */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-        <div style={{ lineHeight: 1 }}>
-          <div style={{
-            fontFamily: 'Georgia, serif', fontStyle: 'italic',
-            fontSize: 18, fontWeight: 700, color: '#D63031',
-            textShadow: '0 0 10px rgba(214,48,49,0.4)',
-          }}>Pescadero</div>
-          <div style={{
-            fontFamily: 'monospace', fontSize: 8, fontWeight: 700,
-            letterSpacing: '4px', color: '#4FB9AF',
-            textTransform: 'uppercase',
-          }}>CLIENT PORTAL</div>
-        </div>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <img
+            src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png"
+            alt="Pescadero Music"
+            style={{ height: 32, width: 32, objectFit: 'contain' }}
+          />
+          <span style={{ fontFamily: WORDMARK, fontSize: 15, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>
+            Pescadero Music
+          </span>
+        </Link>
         <Link href="/" style={{
-          fontSize: 11, color: 'rgba(232,224,213,0.35)',
-          textDecoration: 'none', letterSpacing: '1px',
-          textTransform: 'uppercase', fontFamily: 'Poppins, sans-serif',
-          borderLeft: '1px solid rgba(255,255,255,0.08)',
+          fontSize: 11, color: 'rgba(245,239,224,0.3)',
+          textDecoration: 'none', letterSpacing: '1.5px',
+          textTransform: 'uppercase', fontFamily: UI_FONT,
+          borderLeft: '1px solid rgba(245,239,224,0.08)',
           paddingLeft: 20,
         }}>
           ← Home
@@ -75,16 +78,14 @@ export default function DashboardNav({ userName, userInitials }: Props) {
             onClick={() => router.push(onAdmin ? '/dashboard' : '/admin')}
             style={{
               display: 'flex', alignItems: 'center', gap: 7,
-              background: onAdmin ? 'rgba(79,185,175,0.12)' : 'rgba(255,255,255,0.05)',
-              border: `1px solid ${onAdmin ? 'rgba(79,185,175,0.35)' : 'rgba(255,255,255,0.1)'}`,
+              background: onAdmin ? 'rgba(68,190,199,0.1)' : 'rgba(245,239,224,0.04)',
+              border: `1px solid ${onAdmin ? 'rgba(68,190,199,0.35)' : 'rgba(245,239,224,0.1)'}`,
               borderRadius: 8, padding: '6px 14px',
-              fontSize: 11, fontWeight: 600,
-              color: onAdmin ? '#4FB9AF' : 'rgba(232,224,213,0.5)',
-              cursor: 'pointer', fontFamily: 'Poppins, sans-serif',
-              letterSpacing: '0.5px', transition: 'all 0.2s',
+              fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase',
+              color: onAdmin ? BLUE : 'rgba(245,239,224,0.5)',
+              cursor: 'pointer', transition: 'all 0.2s',
             }}
           >
-            <span style={{ fontSize: 13 }}>{onAdmin ? '👤' : '⚙️'}</span>
             {onAdmin ? 'Client View' : 'Admin View'}
           </button>
         )}
@@ -92,11 +93,11 @@ export default function DashboardNav({ userName, userInitials }: Props) {
         {/* Avatar */}
         <div style={{
           width: 34, height: 34, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #4FB9AF, #0F1F35)',
-          border: '2px solid #4FB9AF',
+          background: `linear-gradient(135deg, ${BLUE}, #07111A)`,
+          border: `2px solid ${BLUE}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 12, fontWeight: 700, color: 'white',
-          fontFamily: 'Poppins, sans-serif',
+          fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px',
+          fontWeight: 500, color: CREAM,
         }}>
           {userInitials}
         </div>
@@ -106,14 +107,15 @@ export default function DashboardNav({ userName, userInitials }: Props) {
           onClick={handleSignOut}
           style={{
             background: 'transparent',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 6, padding: '5px 12px',
-            fontSize: 11, color: 'rgba(232,224,213,0.45)',
-            cursor: 'pointer', fontFamily: 'Poppins, sans-serif',
-            transition: 'all 0.2s',
+            border: '1px solid rgba(245,239,224,0.12)',
+            borderRadius: 6, padding: '5px 14px',
+            fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            color: 'rgba(245,239,224,0.4)',
+            cursor: 'pointer', transition: 'all 0.2s',
           }}
         >
-          Sign out
+          Sign Out
         </button>
       </div>
     </header>

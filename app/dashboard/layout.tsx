@@ -16,7 +16,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(160deg, #0F1F35 0%, #162840 60%, #0A1828 100%)',
+      background: 'linear-gradient(160deg, #07111A 0%, #0D1E2B 100%)',
     }}>
       <DashboardNav
         userName={profile?.full_name || user.email || ''}
