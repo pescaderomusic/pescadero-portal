@@ -1,3 +1,5 @@
+export const dynamic = 'force-static'
+
 import Link from 'next/link'
 
 const NAVY  = '#07111A'
