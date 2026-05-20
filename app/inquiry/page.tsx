@@ -513,7 +513,7 @@ const SCRIPT = `
         eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
         venue: v('venue'), venueAddress: v('venueAddress'),
         indoorOutdoor: r('entry.1884292728'),
-        attendance: v('attendance'), additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), vendorType: v('vendorType'), otherHear: v('otherHear'),
+        attendance: v('attendance'), additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), otherHear: v('otherHear'),
       }));
     } catch(e) {}
   }
