@@ -5,9 +5,14 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { LOGO_SRC, BRAND_NAME, BRAND_TAGLINE, BRAND_EMAIL } from '@/lib/brand'
 
-const NAVY  = '#0D1B2A'
-const RED   = '#D62828'
-const BLUE  = '#44BEC7'
+const NAVY  = '#07111A'
+const RED   = '#C8202A'
+const BLUE     = '#44BEC7'
+const CREAM    = '#F5EFE0'
+const DISPLAY  = "'freight-display-pro', Georgia, serif"
+const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
+const BODY     = "'inter', system-ui, sans-serif"
+const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
 
 export default function ReceiptPage() {
   const router = useRouter()
@@ -35,7 +40,7 @@ export default function ReceiptPage() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'Poppins, sans-serif' }}>Loading…</p>
+      <p style={{ color: 'rgba(245,239,224,0.5)', fontFamily: BODY }}>Loading…</p>
     </div>
   )
 
@@ -59,9 +64,9 @@ export default function ReceiptPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`,
+      background: `linear-gradient(160deg, ${NAVY} 0%, #0D1E2B 100%)`,
       padding: '40px 24px',
-      fontFamily: 'Poppins, sans-serif',
+      fontFamily: BODY,
     }}>
       <style>{`
         @media print {
@@ -91,22 +96,22 @@ export default function ReceiptPage() {
             <img
               src={LOGO_SRC}
               alt="Pescadero Music Logo"
-              style={{ width: 52, height: 52, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(214,40,40,0.35))' }}
+              style={{ width: 52, height: 52, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(200,32,42,0.35))' }}
             />
             <div>
-              <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: 'white', letterSpacing: '0.5px', fontFamily: 'Poppins, sans-serif' }}>
+              <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: CREAM, letterSpacing: '0.5px', fontFamily: BODY }}>
                 {BRAND_NAME}
               </p>
-              <p style={{ margin: 0, fontSize: 11, color: 'rgba(68,190,199,0.7)', fontFamily: 'Lora, serif', fontStyle: 'italic' }}>
+              <p style={{ margin: 0, fontSize: 11, color: 'rgba(68,190,199,0.7)', fontFamily: DISPLAY, fontStyle: 'italic' }}>
                 {BRAND_TAGLINE}
               </p>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)', fontFamily: 'Poppins, sans-serif' }}>
+            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)', fontFamily: BODY }}>
               {BRAND_EMAIL}
             </p>
-            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>
+            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: BODY }}>
               Prepared for: <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{fullName}</span>
             </p>
           </div>
@@ -129,7 +134,7 @@ export default function ReceiptPage() {
               <p style={{ margin: '0 0 6px', fontSize: 10, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontWeight: 600 }}>
                 Payment Receipt
               </p>
-              <h1 style={{ margin: '0 0 4px', fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 26, color: 'white' }}>
+              <h1 style={{ margin: '0 0 4px', fontFamily: DISPLAY, fontStyle: 'italic', fontSize: 26, color: CREAM }}>
                 {depositPaid ? 'Deposit Confirmed' : 'Payment Summary'}
               </h1>
               <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{receiptNum}</p>
@@ -151,7 +156,7 @@ export default function ReceiptPage() {
             {/* Billed to */}
             <div style={{ marginBottom: 28 }}>
               <p style={{ margin: '0 0 4px', fontSize: 10, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>Billed to</p>
-              <p style={{ margin: 0, fontSize: 14, color: 'white', fontWeight: 600 }}>{fullName}</p>
+              <p style={{ margin: 0, fontSize: 14, color: CREAM, fontWeight: 600 }}>{fullName}</p>
               <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{userEmail}</p>
             </div>
 
@@ -159,7 +164,7 @@ export default function ReceiptPage() {
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 20, marginBottom: 20 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <p style={{ margin: '0 0 2px', fontSize: 13, color: 'white', fontWeight: 600 }}>
+                  <p style={{ margin: '0 0 2px', fontSize: 13, color: CREAM, fontWeight: 600 }}>
                     Deposit — Non-Refundable
                   </p>
                   <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
@@ -236,14 +241,14 @@ export default function ReceiptPage() {
                   padding: '11px 24px', borderRadius: 8,
                   border: '1px solid rgba(68,190,199,0.3)',
                   background: 'transparent', color: BLUE, fontSize: 12, fontWeight: 700,
-                  cursor: 'pointer', fontFamily: 'Poppins, sans-serif',
+                  cursor: 'pointer', fontFamily: BODY,
                 }}
               >
                 🖨 Print / Save PDF
               </button>
               <Link href="/dashboard" style={{
                 padding: '11px 24px', borderRadius: 8,
-                background: RED, color: 'white', fontSize: 12, fontWeight: 700,
+                background: RED, color: CREAM, fontSize: 12, fontWeight: 700,
                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center',
               }}>
                 Back to Dashboard →

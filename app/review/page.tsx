@@ -4,10 +4,15 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
-const NAVY = '#0D1B2A'
+const NAVY = '#07111A'
 const BLUE = '#44BEC7'
-const RED  = '#D62828'
-const GOLD = '#F5A623'
+const RED  = '#C8202A'
+const GOLD     = '#F5A623'
+const CREAM    = '#F5EFE0'
+const DISPLAY  = "'freight-display-pro', Georgia, serif"
+const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
+const BODY     = "'inter', system-ui, sans-serif"
+const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
 
 export default function ReviewPage() {
   const router = useRouter()
@@ -72,19 +77,19 @@ export default function ReviewPage() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Poppins, sans-serif' }}>Loading…</p>
+      <p style={{ color: 'rgba(245,239,224,0.4)', fontFamily: BODY }}>Loading…</p>
     </div>
   )
 
   if (done) return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Poppins, sans-serif', padding: 24 }}>
+    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0D1E2B 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY, padding: 24 }}>
       <div style={{ maxWidth: 480, textAlign: 'center' }}>
         <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
-        <h2 style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 26, color: 'white', margin: '0 0 12px' }}>Thank You!</h2>
+        <h2 style={{ fontFamily: DISPLAY, fontSize: 28, fontWeight: 300, color: CREAM, margin: '0 0 12px' }}>Thank You!</h2>
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, margin: '0 0 28px' }}>
           Your feedback means everything. It was an honor being part of your day — congratulations again! 🎵
         </p>
-        <Link href="/dashboard" style={{ padding: '12px 28px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 700 }}>
+        <Link href="/dashboard" style={{ padding: '12px 28px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500 }}>
           Back to Dashboard →
         </Link>
       </div>
@@ -97,7 +102,7 @@ export default function ReviewPage() {
   const inputStyle: React.CSSProperties = {
     width: '100%', padding: '11px 14px', borderRadius: 8,
     background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
-    color: 'white', fontSize: 13, fontFamily: 'Poppins, sans-serif',
+    color: CREAM, fontSize: 13, fontFamily: BODY,
     outline: 'none', boxSizing: 'border-box',
   }
 
@@ -107,17 +112,17 @@ export default function ReviewPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(68,190,199,0.12)', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textTransform: 'uppercase' }}>PESCADERO MUSIC</span>
-        <Link href="/dashboard" style={{ fontSize: 11, color: 'rgba(232,224,213,0.4)', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '1px' }}>← Dashboard</Link>
+    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0D1E2B 100%)`, fontFamily: BODY }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(7,17,26,0.96)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(68,190,199,0.1)', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontFamily: WORDMARK, fontSize: 15, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
+        <Link href="/dashboard" style={{ fontSize: 11, fontFamily: UI_FONT, color: 'rgba(245,239,224,0.4)', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '1.5px' }}>← Dashboard</Link>
       </nav>
 
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '36px 24px 80px' }}>
 
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <p style={{ margin: '0 0 8px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Post-Event</p>
-          <h1 style={{ margin: '0 0 10px', fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 28, color: 'white' }}>How did we do, {firstName}?</h1>
+          <p style={{ margin: '0 0 8px', fontSize: 10, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Post-Event</p>
+          <h1 style={{ margin: '0 0 10px', fontFamily: DISPLAY, fontSize: 30, fontWeight: 300, color: CREAM }}>How did we do, {firstName}?</h1>
           <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
             We hope {eventName} was everything you dreamed of. Take a moment to share your experience — your feedback means everything to us.
           </p>
@@ -127,7 +132,7 @@ export default function ReviewPage() {
 
           {/* Star rating */}
           <div style={{ ...sectionStyle, textAlign: 'center' }}>
-            <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Overall Rating</p>
+            <p style={{ margin: '0 0 16px', fontSize: 10, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.3)' }}>Overall Rating</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
               {[1,2,3,4,5].map(star => (
                 <button key={star} type="button" onClick={() => set('rating', star)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 40, filter: star <= form.rating ? 'none' : 'grayscale(1) opacity(0.3)', transition: 'filter 0.15s', transform: star <= form.rating ? 'scale(1.1)' : 'scale(1)' }}>
@@ -144,7 +149,7 @@ export default function ReviewPage() {
 
           {/* Testimonial */}
           <div style={sectionStyle}>
-            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Tell Us About Your Experience</p>
+            <p style={{ margin: '0 0 6px', fontSize: 10, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.3)' }}>Tell Us About Your Experience</p>
             <p style={{ margin: '0 0 12px', fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>What stood out? What would you tell someone considering Pescadero Music?</p>
             <textarea
               value={form.testimonial}
@@ -156,7 +161,7 @@ export default function ReviewPage() {
 
           {/* Photo release */}
           <div style={sectionStyle}>
-            <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Photo & Testimonial Permissions</p>
+            <p style={{ margin: '0 0 14px', fontSize: 10, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.3)' }}>Photo & Testimonial Permissions</p>
             {[
               { key: 'photo_release',        label: 'Pescadero Music may use photos from my event for their portfolio and website' },
               { key: 'use_for_advertising',  label: 'My testimonial above may be used in advertising and social media' },
@@ -172,15 +177,15 @@ export default function ReviewPage() {
 
           {/* Referral */}
           <div style={sectionStyle}>
-            <p style={{ margin: '0 0 4px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Know Someone Getting Married?</p>
+            <p style={{ margin: '0 0 4px', fontSize: 10, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.3)' }}>Know Someone Getting Married?</p>
             <p style={{ margin: '0 0 14px', fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Totally optional — if you'd like to refer someone, drop their info below.</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 5 }}>Their Name</label>
+                <label style={{ display: 'block', fontSize: 10, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.4)', marginBottom: 5 }}>Their Name</label>
                 <input value={form.referral_name} onChange={e => set('referral_name', e.target.value)} placeholder="Alex & Jordan" style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 5 }}>Their Phone (optional)</label>
+                <label style={{ display: 'block', fontSize: 10, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.4)', marginBottom: 5 }}>Their Phone (optional)</label>
                 <input value={form.referral_phone} onChange={e => set('referral_phone', e.target.value)} placeholder="(555) 000-0000" style={inputStyle} />
               </div>
             </div>
@@ -188,17 +193,17 @@ export default function ReviewPage() {
 
           {/* Additional feedback */}
           <div style={sectionStyle}>
-            <p style={{ margin: '0 0 10px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Anything Else?</p>
+            <p style={{ margin: '0 0 10px', fontSize: 10, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.3)' }}>Anything Else?</p>
             <textarea value={form.additional_feedback} onChange={e => set('additional_feedback', e.target.value)} placeholder="Suggestions, things we could improve, or anything you'd like us to know…" style={{ ...inputStyle, height: 80, resize: 'vertical' }} />
           </div>
 
           {error && (
-            <div style={{ background: 'rgba(214,40,40,0.1)', border: '1px solid rgba(214,40,40,0.3)', borderRadius: 8, padding: '10px 14px', marginBottom: 16, color: '#FF8A80', fontSize: 12 }}>
+            <div style={{ background: 'rgba(200,32,42,0.1)', border: '1px solid rgba(200,32,42,0.3)', borderRadius: 8, padding: '10px 14px', marginBottom: 16, color: '#FF8A80', fontSize: 12 }}>
               {error}
             </div>
           )}
 
-          <button type="submit" disabled={saving} style={{ width: '100%', padding: '14px', borderRadius: 10, border: 'none', background: saving ? 'rgba(214,40,40,0.5)' : RED, color: 'white', fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'Poppins, sans-serif', boxShadow: saving ? 'none' : '0 4px 24px rgba(214,40,40,0.35)' }}>
+          <button type="submit" disabled={saving} style={{ width: '100%', padding: '14px', borderRadius: 10, border: 'none', background: saving ? 'rgba(200,32,42,0.5)' : RED, color: 'white', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : '0 4px 24px rgba(200,32,42,0.35)' }}>
             {saving ? 'Submitting…' : 'Submit My Review →'}
           </button>
         </form>
