@@ -410,6 +410,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           {eventDone && (
             <Link href="/review" style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid rgba(245,166,35,0.3)`, background: `rgba(245,166,35,0.08)`, color: GOLD, fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>Leave a Review ⭐</Link>
           )}
+          <Link href="/policy" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>Service Policy</Link>
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 48, fontSize: 12, fontFamily: BODY, color: 'rgba(245,239,224,0.18)' }}>

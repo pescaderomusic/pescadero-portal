@@ -178,6 +178,7 @@ const BODY = `<div id="inquiry-root">
         <div style="background:rgba(68,190,199,0.06);border:1px solid rgba(68,190,199,0.18);border-radius:8px;padding:12px 15px;font-size:0.78rem;color:#4A5E6E;line-height:1.55;">\ud83d\udd12 Your information is only shared with Garrett \u2014 never sold or shared with third parties.</div>
       </div>
       <div class="slide-footer">
+        <a href="/policy" target="_blank" style="font-size:0.72rem;color:#37A8B0;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;font-family:'futura-pt-condensed','Barlow Condensed',sans-serif;">View Service Policy</a>
         <button class="btn btn-next" onclick="goTo(2,'forward')">Get Started \u2192</button>
       </div>
     </div>

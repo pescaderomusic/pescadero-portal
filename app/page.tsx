@@ -376,11 +376,12 @@ export default function HomePage() {
       <footer style={{ padding: '48px 24px', textAlign: 'center', borderTop: '1px solid rgba(245,239,224,0.06)' }}>
         <p style={{ margin: '0 0 4px', fontFamily: WORDMARK, fontSize: 16, letterSpacing: '4px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
         <p style={{ margin: '0 0 16px', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.25)' }}>Professional Wedding Sound · Utah</p>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
           <a href="mailto:garrett@pescaderomusic.com" style={{ fontSize: 12, color: BLUE, textDecoration: 'none' }}>garrett@pescaderomusic.com</a>
           <span style={{ color: 'rgba(245,239,224,0.15)', fontSize: 12 }}>·</span>
           <a href="tel:2107279328" style={{ fontSize: 12, color: BLUE, textDecoration: 'none' }}>(210) 727-9328</a>
         </div>
+        <Link href="/policy" style={{ fontSize: 11, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.25)', textDecoration: 'none' }}>Service Policy</Link>
       </footer>
 
       {/* ── Auth Modal ─────────────────────────────────────── */}
