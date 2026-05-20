@@ -3,10 +3,14 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-const NAVY  = '#0D1B2A'
+const NAVY  = '#07111A'
 const BLUE  = '#44BEC7'
-const RED   = '#D62828'
-const GREEN = '#4CAF50'
+const RED   = '#C8202A'
+const GREEN    = '#4CAF50'
+const CREAM    = '#F5EFE0'
+const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
+const BODY     = "'inter', system-ui, sans-serif"
+const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
 
 export default function ContractViewer() {
   const router = useRouter()
@@ -91,15 +95,15 @@ export default function ContractViewer() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'Poppins, sans-serif' }}>Loading your contract...</p>
+      <p style={{ color: 'rgba(245,239,224,0.3)', fontFamily: BODY }}>Loading your contract...</p>
     </div>
   )
 
   if (!contract) return (
-    <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY }}>
       <div style={{ textAlign: 'center' }}>
         <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Your contract is not ready yet. Garrett will send it soon.</p>
-        <button onClick={() => router.push('/dashboard')} style={{ padding: '10px 24px', borderRadius: 8, background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.4)', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>Back to Dashboard</button>
+        <button onClick={() => router.push('/dashboard')} style={{ padding: '10px 24px', borderRadius: 8, background: 'rgba(245,239,224,0.07)', color: 'rgba(245,239,224,0.4)', border: 'none', cursor: 'pointer', fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' as const }}>Back to Dashboard</button>
       </div>
     </div>
   )
@@ -109,11 +113,11 @@ export default function ContractViewer() {
   const signedDate = contract.client_signed_at ? new Date(contract.client_signed_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f0ebe3', fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#f0ebe3', fontFamily: BODY }}>
 
-      <div style={{ background: NAVY, padding: '0 24px', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => router.push('/dashboard')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>Back to Dashboard</button>
-        <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 16, color: 'white' }}>Pescadero Music</span>
+      <div style={{ background: NAVY, padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <button onClick={() => router.push('/dashboard')} style={{ background: 'none', border: 'none', color: 'rgba(245,239,224,0.35)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' as const, cursor: 'pointer' }}>Back to Dashboard</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 28, width: 28, objectFit: 'contain' }} /><span style={{ fontFamily: WORDMARK, fontSize: 14, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span></div>
         <div style={{ width: 120 }} />
       </div>
 
@@ -123,7 +127,7 @@ export default function ContractViewer() {
           <div style={{ background: NAVY, padding: '32px 40px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <p style={{ margin: '0 0 2px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, fontWeight: 700, color: 'white' }}>Pescadero Music</p>
+                <p style={{ margin: '0 0 2px', fontFamily: WORDMARK, fontSize: 20, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
                 <p style={{ margin: 0, fontSize: 12, color: BLUE }}>Wedding Sound Service Agreement</p>
               </div>
               {signed && (
@@ -343,11 +347,11 @@ export default function ContractViewer() {
 
             {!signed && (
               <div>
-                {error && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(214,40,40,0.08)', border: '1px solid rgba(214,40,40,0.2)', color: RED, fontSize: 13, marginBottom: 16 }}>{error}</div>}
+                {error && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(200,32,42,0.08)', border: '1px solid rgba(200,32,42,0.2)', color: RED, fontSize: 13, marginBottom: 16 }}>{error}</div>}
                 <div style={{ background: '#faf7f3', border: '1.5px solid #DDD3BC', borderRadius: 10, padding: '16px 20px', marginBottom: 16 }}>
                   <p style={{ margin: 0, fontSize: 12, color: '#6A7E8E', lineHeight: 1.6 }}>Upon submission of this form, you will be directed to a secure Stripe payment page to submit your <strong>${Number(contract.deposit_amount || 0).toFixed(2)} deposit</strong>, which secures your event date. This service agreement is effective as soon as your deposit is received.</p>
                 </div>
-                <button onClick={handleSign} disabled={submitting} style={{ width: '100%', padding: '15px', borderRadius: 10, border: 'none', background: submitting ? 'rgba(214,40,40,0.5)' : RED, color: 'white', fontSize: 15, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: 'inherit', boxShadow: submitting ? 'none' : '0 6px 24px rgba(214,40,40,0.3)' }}>
+                <button onClick={handleSign} disabled={submitting} style={{ width: '100%', padding: '15px', borderRadius: 10, border: 'none', background: submitting ? 'rgba(200,32,42,0.5)' : RED, color: 'white', fontSize: 14, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: submitting ? 'not-allowed' : 'pointer', boxShadow: submitting ? 'none' : '0 6px 24px rgba(200,32,42,0.3)' }}>
                   {submitting ? 'Processing...' : `Sign & Pay $${Number(contract.deposit_amount || 0).toFixed(2)} Deposit`}
                 </button>
               </div>
@@ -360,7 +364,7 @@ export default function ContractViewer() {
                   <span style={{ fontSize: 13, color: GREEN, fontWeight: 700 }}>Signed and deposit paid — your date is secured!</span>
                 </div>
                 <div style={{ marginTop: 16 }}>
-                  <button onClick={() => router.push('/dashboard')} style={{ padding: '10px 24px', borderRadius: 9, background: 'rgba(13,27,42,0.08)', border: '1px solid rgba(13,27,42,0.12)', color: '#4A5E6E', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Back to Dashboard</button>
+                  <button onClick={() => router.push('/dashboard')} style={{ padding: '10px 24px', borderRadius: 9, background: 'rgba(13,27,42,0.08)', border: '1px solid rgba(13,27,42,0.12)', color: '#4A5E6E', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>Back to Dashboard</button>
                 </div>
               </div>
             )}
@@ -378,7 +382,7 @@ const bt: React.CSSProperties = { margin: '0 0 12px', fontSize: 13, color: '#4A5
 function SH({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-      <h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#0D1B2A', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{children}</h3>
+      <h3 style={{ margin: 0, fontFamily: UI_FONT, fontSize: 13, fontWeight: 500, color: '#07111A', textTransform: 'uppercase', letterSpacing: '2px' }}>{children}</h3>
       <div style={{ flex: 1, height: 1, background: '#EAE0CC' }} />
     </div>
   )
