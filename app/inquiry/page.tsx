@@ -291,6 +291,28 @@ const BODY = `<div id="inquiry-root">
           <div class="field-label">Additional Details &amp; Questions</div>
           <textarea id="additionalDetails" placeholder="Share any additional details, questions, or special requests\u2026"></textarea>
         </div>
+        <div class="field-group">
+          <div class="field-label">How did you hear about us? <span style="color:#D62828;">*</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Google / Internet Search" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Google / Internet Search</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Instagram" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Instagram</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="TikTok" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> TikTok</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Facebook" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Facebook</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Word of Mouth" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Word of Mouth</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Friend of Garrett's" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Friend of Garrett's</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Another Wedding Vendor" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Another Wedding Vendor</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Wedding Wire / The Knot" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Wedding Wire / The Knot</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Other" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Other</label>
+          </div>
+          <div id="vendorNameGroup" style="display:none;margin-top:10px;">
+            <div class="field-label" style="margin-bottom:6px;">Vendor Name <span style="color:#4A5E6E;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.78rem;">(Photographer, florist, venue, etc.)</span></div>
+            <input type="text" id="vendorName" placeholder="e.g. Sarah Johnson Photography" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
+          </div>
+          <div id="otherHearGroup" style="display:none;margin-top:10px;">
+            <div class="field-label" style="margin-bottom:6px;">Tell us more</div>
+            <input type="text" id="otherHear" placeholder="How did you find us?" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
+          </div>
+        </div>
       </div>
       <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(3,'back')">\u2190 Back</button>
@@ -353,6 +375,11 @@ const SCRIPT = `
     });
   }
 
+  function toggleReferralFields(val) {
+    document.getElementById('vendorNameGroup').style.display = val === 'Another Wedding Vendor' ? 'block' : 'none';
+    document.getElementById('otherHearGroup').style.display = val === 'Other' ? 'block' : 'none';
+  }
+
   function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
   function r(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
 
@@ -382,6 +409,10 @@ const SCRIPT = `
       if (!v('venueAddress')) { showError(3, 'Venue address is required.'); return false; }
       if (!r('entry.1884292728')) { showError(3, 'Please select indoor or outdoor.'); return false; }
       if (!v('attendance'))   { showError(3, 'Estimated attendance is required.'); return false; }
+    }
+    if (slide === 4) {
+      if (!r('hearAbout')) { showError(4, 'Please tell us how you heard about us.'); return false; }
+      if (r('hearAbout') === 'Another Wedding Vendor' && !v('vendorName')) { showError(4, 'Please enter the vendor name.'); return false; }
     }
     return true;
   }
@@ -439,6 +470,8 @@ const SCRIPT = `
       ['Setting', r('entry.1884292728') || '\u2014'],
       ['Attendance', v('attendance')],
       ['Notes', v('additionalDetails') || '\u2014'],
+      ['Heard About Us', r('hearAbout') || '\u2014'],
+      ['Vendor Referral', v('vendorName') || '\u2014'],
     ];
     document.getElementById('reviewList').innerHTML = rows.map(function(row) {
       return '<div class="review-row"><span class="review-key">' + row[0] + '</span><span class="review-val">' + (row[1] || '\u2014') + '</span></div>';
@@ -467,7 +500,7 @@ const SCRIPT = `
         eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
         venue: v('venue'), venueAddress: v('venueAddress'),
         indoorOutdoor: r('entry.1884292728'),
-        attendance: v('attendance'), additionalDetails: v('additionalDetails'),
+        attendance: v('attendance'), additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), otherHear: v('otherHear'),
       }));
     } catch(e) {}
   }
@@ -517,6 +550,8 @@ const SCRIPT = `
       set('venue', d.venue); set('venueAddress', d.venueAddress);
       setR('entry.1884292728', d.indoorOutdoor);
       set('attendance', d.attendance); set('additionalDetails', d.additionalDetails);
+      if(d.hearAbout){var el=document.querySelector('input[name="hearAbout"][value="'+d.hearAbout+'"]');if(el){el.checked=true;toggleReferralFields(d.hearAbout);}}
+      set('vendorName', d.vendorName); set('otherHear', d.otherHear);
     } catch(e) {}
   }
 
@@ -529,7 +564,7 @@ const SCRIPT = `
       eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
       venue: v('venue'), venueAddress: v('venueAddress'),
       indoorOutdoor: r('entry.1884292728'), attendance: v('attendance'),
-      additionalDetails: v('additionalDetails'),
+      additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), otherHear: v('otherHear'),
     };
     fetch('/api/inquiry/submit', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
