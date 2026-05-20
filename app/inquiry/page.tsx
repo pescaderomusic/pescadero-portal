@@ -207,6 +207,41 @@ const BODY = `<div id="inquiry-root">
         </div>
         <div class="field-group"><div class="field-label">Name of Bride &amp; Groom <span class="req">*</span></div><input type="text" id="coupleNames" placeholder="e.g. Emily &amp; James" /></div>
       </div>
+        <div class="field-group">
+          <div class="field-label">How did you hear about us? <span style="color:#D62828;">*</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Google / Internet Search" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Google / Internet Search</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Instagram" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Instagram</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="TikTok" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> TikTok</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Facebook" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Facebook</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Word of Mouth" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Word of Mouth</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Friend of Garrett's" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Friend of Garrett's</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Another Wedding Vendor" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Another Wedding Vendor</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Wedding Wire / The Knot" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Wedding Wire / The Knot</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Other" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Other</label>
+          </div>
+          <div id="vendorNameGroup" style="display:none;margin-top:10px;">
+            <div class="field-label" style="margin-bottom:6px;">Vendor Type</div>
+            <select id="vendorType" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;background:#fff;margin-bottom:10px;" onchange="updateVendorTypeHidden()">
+              <option value="">Select vendor type...</option>
+              <option value="Photographer">Photographer</option>
+              <option value="Videographer">Videographer</option>
+              <option value="Florist">Florist</option>
+              <option value="Venue">Venue</option>
+              <option value="Wedding Planner / Coordinator">Wedding Planner / Coordinator</option>
+              <option value="Caterer">Caterer</option>
+              <option value="Hair & Makeup">Hair &amp; Makeup</option>
+              <option value="DJ / Entertainment">DJ / Entertainment</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="field-label" style="margin-bottom:6px;">Vendor Name</div>
+            <input type="text" id="vendorName" placeholder="e.g. Sarah Johnson Photography" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
+          </div>
+          <div id="otherHearGroup" style="display:none;margin-top:10px;">
+            <div class="field-label" style="margin-bottom:6px;">Tell us more</div>
+            <input type="text" id="otherHear" placeholder="How did you find us?" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
+          </div>
+        </div>
       <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(1,'back')">\u2190 Back</button>
         <button class="btn btn-next" onclick="goTo(3,'forward')">Next \u2192</button>
@@ -291,41 +326,7 @@ const BODY = `<div id="inquiry-root">
           <div class="field-label">Additional Details &amp; Questions</div>
           <textarea id="additionalDetails" placeholder="Share any additional details, questions, or special requests\u2026"></textarea>
         </div>
-        <div class="field-group">
-          <div class="field-label">How did you hear about us? <span style="color:#D62828;">*</span></div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Google / Internet Search" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Google / Internet Search</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Instagram" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Instagram</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="TikTok" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> TikTok</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Facebook" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Facebook</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Word of Mouth" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Word of Mouth</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Friend of Garrett's" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Friend of Garrett's</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Another Wedding Vendor" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Another Wedding Vendor</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Wedding Wire / The Knot" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Wedding Wire / The Knot</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Other" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Other</label>
-          </div>
-          <div id="vendorNameGroup" style="display:none;margin-top:10px;">
-            <div class="field-label" style="margin-bottom:6px;">Vendor Type</div>
-            <select id="vendorType" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;background:#fff;margin-bottom:10px;" onchange="updateVendorTypeHidden()">
-              <option value="">Select vendor type...</option>
-              <option value="Photographer">Photographer</option>
-              <option value="Videographer">Videographer</option>
-              <option value="Florist">Florist</option>
-              <option value="Venue">Venue</option>
-              <option value="Wedding Planner / Coordinator">Wedding Planner / Coordinator</option>
-              <option value="Caterer">Caterer</option>
-              <option value="Hair & Makeup">Hair &amp; Makeup</option>
-              <option value="DJ / Entertainment">DJ / Entertainment</option>
-              <option value="Other">Other</option>
-            </select>
-            <div class="field-label" style="margin-bottom:6px;">Vendor Name</div>
-            <input type="text" id="vendorName" placeholder="e.g. Sarah Johnson Photography" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
-          </div>
-          <div id="otherHearGroup" style="display:none;margin-top:10px;">
-            <div class="field-label" style="margin-bottom:6px;">Tell us more</div>
-            <input type="text" id="otherHear" placeholder="How did you find us?" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
-          </div>
-        </div>
+
       </div>
       <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(3,'back')">\u2190 Back</button>
