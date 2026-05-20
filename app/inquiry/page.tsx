@@ -305,7 +305,20 @@ const BODY = `<div id="inquiry-root">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Other" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Other</label>
           </div>
           <div id="vendorNameGroup" style="display:none;margin-top:10px;">
-            <div class="field-label" style="margin-bottom:6px;">Vendor Name <span style="color:#4A5E6E;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.78rem;">(Photographer, florist, venue, etc.)</span></div>
+            <div class="field-label" style="margin-bottom:6px;">Vendor Type</div>
+            <select id="vendorType" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;background:#fff;margin-bottom:10px;" onchange="updateVendorTypeHidden()">
+              <option value="">Select vendor type...</option>
+              <option value="Photographer">Photographer</option>
+              <option value="Videographer">Videographer</option>
+              <option value="Florist">Florist</option>
+              <option value="Venue">Venue</option>
+              <option value="Wedding Planner / Coordinator">Wedding Planner / Coordinator</option>
+              <option value="Caterer">Caterer</option>
+              <option value="Hair & Makeup">Hair &amp; Makeup</option>
+              <option value="DJ / Entertainment">DJ / Entertainment</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="field-label" style="margin-bottom:6px;">Vendor Name</div>
             <input type="text" id="vendorName" placeholder="e.g. Sarah Johnson Photography" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
           </div>
           <div id="otherHearGroup" style="display:none;margin-top:10px;">
@@ -500,7 +513,7 @@ const SCRIPT = `
         eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
         venue: v('venue'), venueAddress: v('venueAddress'),
         indoorOutdoor: r('entry.1884292728'),
-        attendance: v('attendance'), additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), otherHear: v('otherHear'),
+        attendance: v('attendance'), additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), vendorType: v('vendorType'), otherHear: v('otherHear'),
       }));
     } catch(e) {}
   }
@@ -551,7 +564,7 @@ const SCRIPT = `
       setR('entry.1884292728', d.indoorOutdoor);
       set('attendance', d.attendance); set('additionalDetails', d.additionalDetails);
       if(d.hearAbout){var el=document.querySelector('input[name="hearAbout"][value="'+d.hearAbout+'"]');if(el){el.checked=true;toggleReferralFields(d.hearAbout);}}
-      set('vendorName', d.vendorName); set('otherHear', d.otherHear);
+      set('vendorName', d.vendorName); set('otherHear', d.otherHear); if(d.vendorType){var vt=document.getElementById('vendorType');if(vt)vt.value=d.vendorType;}
     } catch(e) {}
   }
 
@@ -564,7 +577,7 @@ const SCRIPT = `
       eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
       venue: v('venue'), venueAddress: v('venueAddress'),
       indoorOutdoor: r('entry.1884292728'), attendance: v('attendance'),
-      additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), otherHear: v('otherHear'),
+      additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), otherHear: v('otherHear'),
     };
     fetch('/api/inquiry/submit', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
