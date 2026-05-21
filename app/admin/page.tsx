@@ -322,11 +322,18 @@ export default async function AdminPage() {
                 Quick Links
               </p>
               {[
-                { href: 'mailto:garrett@pescaderomusic.com', label: '✉️ Compose Email' },
+                { href: '/', label: '🏠 Homepage' },
+                { href: '/dashboard?client=true', label: '📊 Client Dashboard' },
+                { href: '/inquiry', label: '📝 Inquiry Form' },
+                { href: '/contract', label: '📄 Contract Viewer' },
+                { href: '/contract/payment', label: '💳 Payment Page' },
+                { href: '/planning', label: '📋 Planning Form' },
+                { href: '/review', label: '⭐ Review Page' },
                 { href: '/admin/availability', label: '📅 Set Availability' },
-                
+                { href: 'mailto:garrett@pescaderomusic.com', label: '✉️ Compose Email' },
                 { href: 'https://dashboard.stripe.com', label: '💳 Stripe Dashboard', ext: true },
                 { href: 'https://resend.com', label: '📬 Resend Logs', ext: true },
+                { href: 'https://supabase.com/dashboard', label: '🗄️ Supabase', ext: true },
               ].map(link => (
                 <a key={link.href} href={link.href} target={link.ext ? '_blank' : undefined} rel={link.ext ? 'noopener noreferrer' : undefined} style={{ display: 'block', fontSize: 12, color: 'rgba(232,224,213,0.55)', textDecoration: 'none', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                   {link.label}

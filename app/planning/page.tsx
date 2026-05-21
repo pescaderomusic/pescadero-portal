@@ -59,13 +59,30 @@ export default function PlanningPage() {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { router.push('/auth/login'); return }
       supabase.from('bookings').select('*').eq('client_id', user.id).single()
-        .then(({ data }) => {
+        .then(async ({ data }) => {
           setBooking(data)
           setLoading(false)
           if (data?.step_planning === 'submitted') setSubmitted(true)
+          // Restore from Supabase draft first, then localStorage fallback
+          const { data: draft } = await supabase.from('planning_forms').select('*').eq('client_id', user.id).single()
+          if (draft && data?.step_planning !== 'submitted') {
+            if (draft.day_of_contact_name)    setContactName(draft.day_of_contact_name)
+            if (draft.day_of_contact_phone)   setContactPhone(draft.day_of_contact_phone)
+            if (draft.day_of_contact_role)    setContactRole(draft.day_of_contact_role)
+            if (draft.venue_setup_notes)      setSetupNotes(draft.venue_setup_notes)
+            if (draft.garrett_expectations)   setExpectations(draft.garrett_expectations)
+            if (draft.itinerary?.length)      setItinerary(draft.itinerary)
+            if (draft.first_dance_song)       setFirstDanceSong(draft.first_dance_song)
+            if (draft.first_dance_artist)     setFirstDanceArtist(draft.first_dance_artist)
+            if (draft.father_daughter_song)   setFatherDaughterSong(draft.father_daughter_song)
+            if (draft.father_daughter_artist) setFatherDaughterArtist(draft.father_daughter_artist)
+            if (draft.mother_son_song)        setMotherSonSong(draft.mother_son_song)
+            if (draft.mother_son_artist)      setMotherSonArtist(draft.mother_son_artist)
+            if (draft.special_requests)       setSpecialRequests(draft.special_requests)
+          }
           // Restore saved draft
           try {
             const saved = localStorage.getItem('pescadero_planning')
@@ -102,6 +119,32 @@ export default function PlanningPage() {
         fatherDaughterArtist, motherSonSong, motherSonArtist, specialRequests,
       }))
     } catch(e) {}
+  }
+
+  const saveDraft = async () => {
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || !booking) return
+      await supabase.from('planning_forms').upsert({
+        client_id:              user.id,
+        booking_id:             booking.id,
+        day_of_contact_name:    contactName,
+        day_of_contact_phone:   contactPhone,
+        day_of_contact_role:    contactRole,
+        venue_setup_notes:      setupNotes,
+        garrett_expectations:   expectations,
+        itinerary:              itinerary.filter(r => r.time || r.description),
+        first_dance_song:       firstDanceSong,
+        first_dance_artist:     firstDanceArtist,
+        father_daughter_song:   fatherDaughterSong,
+        father_daughter_artist: fatherDaughterArtist,
+        mother_son_song:        motherSonSong,
+        mother_son_artist:      motherSonArtist,
+        special_requests:       specialRequests,
+      }, { onConflict: 'client_id' })
+      saveToLocal()
+    } catch(e) { console.error('Draft save error:', e) }
   }
 
   const handleSubmit = async () => {
@@ -190,7 +233,7 @@ export default function PlanningPage() {
 
       {/* Print nav */}
       <div className="no-print" style={{ background: NAVY, padding: '0 24px', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => { saveToLocal(); router.push('/dashboard') }} style={{ background: 'none', border: 'none', color: 'rgba(245,239,224,0.4)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>← Save & Exit</button>
+        <button onClick={async () => { await saveDraft(); router.push('/dashboard') }} style={{ background: 'none', border: 'none', color: 'rgba(245,239,224,0.4)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>← Save & Exit</button>
         <span style={{ fontFamily: WORDMARK, fontSize: 14, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</span>
         <button onClick={() => window.print()} style={{ background: 'none', border: '1px solid rgba(68,190,199,0.4)', borderRadius: 6, color: BLUE, fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', padding: '5px 14px', cursor: 'pointer' }}>🖨 Print</button>
       </div>
