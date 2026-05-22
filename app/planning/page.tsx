@@ -35,7 +35,6 @@ export default function PlanningPage() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError]       = useState('')
 
-  // Form state
   const [contactName,  setContactName]  = useState('')
   const [contactPhone, setContactPhone] = useState('')
   const [contactRole,  setContactRole]  = useState('')
@@ -66,7 +65,6 @@ export default function PlanningPage() {
           setBooking(data)
           setLoading(false)
           if (data?.step_planning === 'submitted') setSubmitted(true)
-          // Restore from Supabase draft first, then localStorage fallback
           const { data: draft } = await supabase.from('planning_forms').select('*').eq('client_id', user.id).single()
           if (draft && data?.step_planning !== 'submitted') {
             if (draft.day_of_contact_name)    setContactName(draft.day_of_contact_name)
@@ -83,7 +81,6 @@ export default function PlanningPage() {
             if (draft.mother_son_artist)      setMotherSonArtist(draft.mother_son_artist)
             if (draft.special_requests)       setSpecialRequests(draft.special_requests)
           }
-          // Restore saved draft
           try {
             const saved = localStorage.getItem('pescadero_planning')
             if (saved && data?.step_planning !== 'submitted') {
@@ -183,7 +180,6 @@ export default function PlanningPage() {
 
     await supabase.from('bookings').update({ step_planning: 'submitted' }).eq('client_id', user.id)
 
-    // Notify Garrett
     await fetch('/api/admin/notify-planning-submitted', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -203,7 +199,7 @@ export default function PlanningPage() {
 
   if (submitted) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY }}>
-      <div style={{ textAlign: 'center', padding: 40 }}>
+      <div style={{ textAlign: 'center', padding: '40px 24px' }}>
         <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, #44BEC7, #37A8B0)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 8px 30px rgba(68,190,199,0.35)' }}>
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
@@ -219,7 +215,7 @@ export default function PlanningPage() {
   const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
   if (!booking || (booking.step_planning === 'locked' && booking.client_id !== GARRETT_ID)) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY }}>
-      <div style={{ textAlign: 'center', padding: 40 }}>
+      <div style={{ textAlign: 'center', padding: '40px 24px' }}>
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Your planning form isn't available yet. Garrett will send it after your deposit is confirmed.</p>
         <button onClick={() => router.push('/dashboard')} style={{ padding: '10px 24px', borderRadius: 8, background: 'rgba(245,239,224,0.06)', color: 'rgba(245,239,224,0.45)', border: 'none', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>← Back to Dashboard</button>
       </div>
@@ -230,26 +226,36 @@ export default function PlanningPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f5f0ea', fontFamily: BODY }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .pf-two-col { grid-template-columns: 1fr !important; }
+          .pf-header-row { flex-direction: column !important; gap: 6px !important; }
+          .pf-header-right { text-align: left !important; }
+          .pf-itinerary-row { grid-template-columns: 100px 1fr !important; }
+          .pf-doc-padding { padding: 20px 18px !important; }
+          .pf-header-padding { padding: 20px 20px !important; }
+          .pf-outer-padding { padding: 16px 12px 60px !important; }
+        }
+      `}</style>
 
-      {/* Print nav */}
-      <div className="no-print" style={{ background: NAVY, padding: '0 24px', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* Nav */}
+      <div className="no-print" style={{ background: NAVY, padding: '0 16px', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button onClick={async () => { await saveDraft(); router.push('/dashboard') }} style={{ background: 'none', border: 'none', color: 'rgba(245,239,224,0.4)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>← Save & Exit</button>
-        <span style={{ fontFamily: WORDMARK, fontSize: 14, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</span>
-        <button onClick={() => window.print()} style={{ background: 'none', border: '1px solid rgba(68,190,199,0.4)', borderRadius: 6, color: BLUE, fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', padding: '5px 14px', cursor: 'pointer' }}>🖨 Print</button>
+        <span style={{ fontFamily: WORDMARK, fontSize: 13, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</span>
+        <button onClick={() => window.print()} style={{ background: 'none', border: '1px solid rgba(68,190,199,0.4)', borderRadius: 6, color: BLUE, fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', padding: '5px 12px', cursor: 'pointer' }}>🖨 Print</button>
       </div>
 
-      {/* Form document */}
-      <div style={{ maxWidth: 780, margin: '0 auto', padding: '32px 24px 80px' }}>
+      <div className="pf-outer-padding" style={{ maxWidth: 780, margin: '0 auto', padding: '28px 16px 80px' }}>
         <div style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 20px rgba(0,0,0,0.08)' }}>
 
           {/* Header */}
-          <div style={{ background: NAVY, padding: '28px 36px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div className="pf-header-padding" style={{ background: NAVY, padding: '24px 28px' }}>
+            <div className="pf-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <p style={{ margin: '0 0 2px', fontFamily: WORDMARK, fontSize: 17, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
+                <p style={{ margin: '0 0 2px', fontFamily: WORDMARK, fontSize: 16, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
                 <p style={{ margin: 0, fontSize: 12, color: BLUE }}>Event Planning Form</p>
               </div>
-              <div style={{ textAlign: 'right' }}>
+              <div className="pf-header-right" style={{ textAlign: 'right' }}>
                 {eventDate && <p style={{ margin: '0 0 2px', fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{eventDate}</p>}
                 {booking.venue_name && <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{booking.venue_name}</p>}
               </div>
@@ -257,13 +263,13 @@ export default function PlanningPage() {
           </div>
           <div style={{ height: 3, background: `linear-gradient(90deg, ${BLUE}, ${RED})` }} />
 
-          <div style={{ padding: '32px 36px' }}>
+          <div className="pf-doc-padding" style={{ padding: '28px 28px' }}>
 
             {error && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(200,32,42,0.08)', border: '1px solid rgba(200,32,42,0.2)', color: RED, fontSize: 13, marginBottom: 24 }}>{error}</div>}
 
             {/* Day-of Contact */}
             <Section title="Day-of Contact" subtitle="Who should Garrett coordinate with on the day of the event?">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+              <div className="pf-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
                 <div style={{ marginBottom: 16 }}>
                   <label style={labelStyle}>Name <span style={{ color: RED }}>*</span></label>
                   <input style={inputStyle} value={contactName} onChange={e => setContactName(e.target.value)} placeholder="Full name" />
@@ -291,18 +297,18 @@ export default function PlanningPage() {
             <Section title="Garrett's Role & Expectations" subtitle="What would you like Garrett to handle as MC? List any specific announcements, introductions, or important notes.">
               <div style={{ marginBottom: 16 }}>
                 <label style={labelStyle}>MC Duties & Special Instructions</label>
-                <textarea style={{ ...inputStyle, minHeight: 100, resize: 'vertical' }} value={expectations} onChange={e => setExpectations(e.target.value)} placeholder="e.g. Please announce the wedding party introductions with the names listed below. Pause music during toasts. Keep energy up between dinner and dancing. Don't mention the surprise — the couple doesn't know about the slideshow." />
+                <textarea style={{ ...inputStyle, minHeight: 100, resize: 'vertical' }} value={expectations} onChange={e => setExpectations(e.target.value)} placeholder="e.g. Please announce the wedding party introductions with the names listed below. Pause music during toasts. Keep energy up between dinner and dancing." />
               </div>
             </Section>
 
             {/* Itinerary */}
             <Section title="Event Itinerary" subtitle="List the timeline of events. Use the description for exact timing cues, announcements, or MC script prompts.">
-              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '0 12px', marginBottom: 8 }}>
+              <div className="pf-itinerary-row" style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: '0 12px', marginBottom: 8 }}>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: '#8A9EAA' }}>Time</span>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: '#8A9EAA' }}>Description / MC Cue</span>
               </div>
               {itinerary.map((row, i) => (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '0 12px', marginBottom: 10 }}>
+                <div key={i} className="pf-itinerary-row" style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: '0 12px', marginBottom: 10 }}>
                   <input
                     style={inputStyle}
                     type="time"
@@ -313,7 +319,7 @@ export default function PlanningPage() {
                     style={inputStyle}
                     value={row.description}
                     onChange={e => updateRow(i, 'description', e.target.value)}
-                    placeholder={i === 0 ? 'e.g. Guests arrive / background music begins' : i === 1 ? 'e.g. Ceremony begins — cue processional music' : i === 2 ? 'e.g. "Ladies and gentlemen, please welcome…"' : 'Add event or cue…'}
+                    placeholder={i === 0 ? 'e.g. Guests arrive / background music begins' : i === 1 ? 'e.g. Ceremony begins' : 'Add event or cue…'}
                   />
                 </div>
               ))}
@@ -323,7 +329,7 @@ export default function PlanningPage() {
             </Section>
 
             {/* Key Songs */}
-            <Section title="Key Songs" subtitle="Song title and artist for your three featured dances. All other music preferences can be shared with Garrett directly.">
+            <Section title="Key Songs" subtitle="Song title and artist for your three featured dances.">
               {[
                 { label: 'First Dance', song: firstDanceSong, setSong: setFirstDanceSong, artist: firstDanceArtist, setArtist: setFirstDanceArtist },
                 { label: 'Father-Daughter Dance', song: fatherDaughterSong, setSong: setFatherDaughterSong, artist: fatherDaughterArtist, setArtist: setFatherDaughterArtist },
@@ -331,12 +337,12 @@ export default function PlanningPage() {
               ].map(({ label, song, setSong, artist, setArtist }) => (
                 <div key={label} style={{ marginBottom: 20 }}>
                   <p style={{ margin: '0 0 8px', fontFamily: UI_FONT, fontSize: 13, fontWeight: 500, letterSpacing: '1px', color: '#1A2D3F' }}>{label}</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
+                  <div className="pf-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
                     <div>
                       <label style={labelStyle}>Song Title</label>
                       <input style={inputStyle} value={song} onChange={e => setSong(e.target.value)} placeholder="Song title" />
                     </div>
-                    <div>
+                    <div style={{ marginTop: 0 }}>
                       <label style={labelStyle}>Artist</label>
                       <input style={inputStyle} value={artist} onChange={e => setArtist(e.target.value)} placeholder="Artist name" />
                     </div>
@@ -351,8 +357,8 @@ export default function PlanningPage() {
             </Section>
 
             {/* Submit */}
-            <div className="no-print" style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid #EAE0CC', display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={handleSubmit} disabled={saving} style={{ padding: '13px 36px', borderRadius: 10, background: saving ? 'rgba(200,32,42,0.5)' : RED, color: 'white', border: 'none', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : '0 4px 20px rgba(200,32,42,0.3)' }}>
+            <div className="no-print" style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid #EAE0CC' }}>
+              <button onClick={handleSubmit} disabled={saving} style={{ width: '100%', padding: '14px 36px', borderRadius: 10, background: saving ? 'rgba(200,32,42,0.5)' : RED, color: 'white', border: 'none', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : '0 4px 20px rgba(200,32,42,0.3)' }}>
                 {saving ? 'Submitting…' : 'Submit Planning Form →'}
               </button>
             </div>
@@ -374,9 +380,9 @@ export default function PlanningPage() {
 
 function Section({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 36 }}>
+    <div style={{ marginBottom: 32 }}>
       <div style={{ marginBottom: 14, paddingBottom: 8, borderBottom: '2px solid #EAE0CC' }}>
-        <h3 style={{ margin: '0 0 3px', fontFamily: UI_FONT, fontSize: 15, fontWeight: 500, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#07111A' }}>{title}</h3>
+        <h3 style={{ margin: '0 0 3px', fontFamily: UI_FONT, fontSize: 14, fontWeight: 500, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#07111A' }}>{title}</h3>
         <p style={{ margin: 0, fontSize: 12, color: '#8A9EAA', lineHeight: 1.5 }}>{subtitle}</p>
       </div>
       {children}

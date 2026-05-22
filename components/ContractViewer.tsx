@@ -46,8 +46,10 @@ export default function ContractViewer() {
 
   const getPos = (e: React.MouseEvent | React.TouchEvent, canvas: HTMLCanvasElement) => {
     const rect = canvas.getBoundingClientRect()
-    if ('touches' in e) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top }
-    return { x: (e as React.MouseEvent).clientX - rect.left, y: (e as React.MouseEvent).clientY - rect.top }
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    if ('touches' in e) return { x: (e.touches[0].clientX - rect.left) * scaleX, y: (e.touches[0].clientY - rect.top) * scaleY }
+    return { x: ((e as React.MouseEvent).clientX - rect.left) * scaleX, y: ((e as React.MouseEvent).clientY - rect.top) * scaleY }
   }
 
   const startDraw = (e: React.MouseEvent | React.TouchEvent) => {
@@ -101,7 +103,7 @@ export default function ContractViewer() {
 
   if (!contract) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY }}>
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', padding: '0 24px' }}>
         <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Your contract is not ready yet. Garrett will send it soon.</p>
         <button onClick={() => router.push('/dashboard')} style={{ padding: '10px 24px', borderRadius: 8, background: 'rgba(245,239,224,0.07)', color: 'rgba(245,239,224,0.4)', border: 'none', cursor: 'pointer', fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' as const }}>Back to Dashboard</button>
       </div>
@@ -114,25 +116,40 @@ export default function ContractViewer() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f0ebe3', fontFamily: BODY }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .cv-parties-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .cv-sig-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+          .cv-doc-padding { padding: 20px 18px !important; }
+          .cv-header-padding { padding: 22px 20px !important; }
+          .cv-outer-padding { padding: 16px 10px 60px !important; }
+          .cv-header-row { flex-direction: column !important; gap: 8px !important; }
+          .cv-cancel-table div { flex-direction: column !important; }
+        }
+      `}</style>
 
-      <div style={{ background: NAVY, padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => router.push('/dashboard')} style={{ background: 'none', border: 'none', color: 'rgba(245,239,224,0.35)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' as const, cursor: 'pointer' }}>Back to Dashboard</button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 28, width: 28, objectFit: 'contain' }} /><span style={{ fontFamily: WORDMARK, fontSize: 14, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span></div>
-        <div style={{ width: 120 }} />
+      {/* Nav */}
+      <div style={{ background: NAVY, padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <button onClick={() => router.push('/dashboard')} style={{ background: 'none', border: 'none', color: 'rgba(245,239,224,0.35)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' as const, cursor: 'pointer' }}>← Dashboard</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 26, width: 26, objectFit: 'contain' }} />
+          <span style={{ fontFamily: WORDMARK, fontSize: 13, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
+        </div>
+        <div style={{ width: 80 }} />
       </div>
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '32px 24px 80px' }}>
+      <div className="cv-outer-padding" style={{ maxWidth: 760, margin: '0 auto', padding: '24px 16px 80px' }}>
         <div style={{ background: 'white', borderRadius: 12, overflow: 'hidden', boxShadow: '0 4px 32px rgba(0,0,0,0.12)' }}>
 
-          <div style={{ background: NAVY, padding: '32px 40px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div className="cv-header-padding" style={{ background: NAVY, padding: '28px 32px' }}>
+            <div className="cv-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <p style={{ margin: '0 0 2px', fontFamily: WORDMARK, fontSize: 20, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
+                <p style={{ margin: '0 0 2px', fontFamily: WORDMARK, fontSize: 18, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
                 <p style={{ margin: 0, fontSize: 12, color: BLUE }}>Wedding Sound Service Agreement</p>
               </div>
               {signed && (
-                <div style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(76,175,80,0.15)', border: '1px solid rgba(76,175,80,0.3)' }}>
-                  <span style={{ fontSize: 12, color: GREEN, fontWeight: 700 }}>Signed and Deposited</span>
+                <div style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(76,175,80,0.15)', border: '1px solid rgba(76,175,80,0.3)', flexShrink: 0 }}>
+                  <span style={{ fontSize: 12, color: GREEN, fontWeight: 700 }}>Signed ✓</span>
                 </div>
               )}
             </div>
@@ -145,11 +162,11 @@ export default function ContractViewer() {
           </div>
           <div style={{ height: 3, background: `linear-gradient(90deg, ${BLUE}, ${RED})` }} />
 
-          <div style={{ padding: '36px 40px' }}>
+          <div className="cv-doc-padding" style={{ padding: '28px 32px' }}>
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Parties</SH>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+              <div className="cv-parties-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <IC title="Service Provider">
                   <p style={il}><strong>Garrett Eldredge</strong></p>
                   <p style={il}>Pescadero Music</p>
@@ -166,9 +183,9 @@ export default function ContractViewer() {
             </section>
 
             {(contract.event_date || contract.venue_name) && (
-              <section style={{ marginBottom: 32 }}>
+              <section style={{ marginBottom: 28 }}>
                 <SH>Event Details</SH>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
                   {[['Event Date', eventDate], ['Venue', contract.venue_name], ['Address', contract.venue_address], ['Attendance', contract.attendance]].filter(([, v]) => v).map(([k, v]) => (
                     <div key={k as string}>
                       <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 700, color: '#8A9EAA', textTransform: 'uppercase', letterSpacing: '1px' }}>{k}</p>
@@ -179,10 +196,10 @@ export default function ContractViewer() {
               </section>
             )}
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>The All-Inclusive Premium Experience</SH>
               <p style={bt}>This agreement covers the complete Pescadero Music premium experience. All of the following services are included in your investment — no add-ons, no hidden fees.</p>
-              <div style={{ background: '#f8f5f0', borderRadius: 10, padding: '18px 20px', marginBottom: 12 }}>
+              <div style={{ background: '#f8f5f0', borderRadius: 10, padding: '16px 18px', marginBottom: 12 }}>
                 {[
                   ['Full Day Coverage', 'Ceremony, Cocktail Hour, Dinner & Reception'],
                   ['Design Consultations', 'Collaborative sessions for custom lighting & music planning'],
@@ -201,7 +218,7 @@ export default function ContractViewer() {
               <p style={{ margin: '10px 0 0', fontSize: 12, color: '#8A9EAA', lineHeight: 1.6, fontStyle: 'italic' }}>These services can be tailored to your specific event. Some celebrations may not require every element — we will work through the details together during your consultation.</p></p>
             </section>
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Rates & Payment Schedule</SH>
               <div style={{ border: '1.5px solid #EAE0CC', borderRadius: 10, overflow: 'hidden' }}>
                 {[
@@ -209,43 +226,43 @@ export default function ContractViewer() {
                   Number(contract.travel_fee) > 0 ? ['Travel Fee', `$${Number(contract.travel_fee).toFixed(2)}`] : null,
                   Number(contract.sales_tax_rate) > 0 ? [`Sales Tax (${contract.sales_tax_rate}%)`, `$${Number(contract.sales_tax_amount || 0).toFixed(2)}`] : null,
                 ].filter(Boolean).map((row, i, arr) => (
-                  <div key={row![0]} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 18px', borderBottom: i < arr.length - 1 ? '1px solid #EAE0CC' : 'none' }}>
-                    <span style={{ fontSize: 14, color: '#1A2D3F' }}>{row![0]}</span>
-                    <span style={{ fontSize: 14, color: '#1A2D3F', fontWeight: 600 }}>{row![1]}</span>
+                  <div key={row![0]} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: i < arr.length - 1 ? '1px solid #EAE0CC' : 'none', gap: 8 }}>
+                    <span style={{ fontSize: 13, color: '#1A2D3F' }}>{row![0]}</span>
+                    <span style={{ fontSize: 13, color: '#1A2D3F', fontWeight: 600, flexShrink: 0 }}>{row![1]}</span>
                   </div>
                 ))}
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 18px', background: '#f8f5f0', borderTop: '2px solid #DDD3BC' }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#0D1B2A' }}>Total Due</span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: BLUE }}>${Number(contract.total_due || 0).toFixed(2)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '13px 16px', background: '#f8f5f0', borderTop: '2px solid #DDD3BC', gap: 8 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#0D1B2A' }}>Total Due</span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: BLUE, flexShrink: 0 }}>${Number(contract.total_due || 0).toFixed(2)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 18px', background: 'rgba(214,40,40,0.04)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', background: 'rgba(214,40,40,0.04)', gap: 8 }}>
                   <span style={{ fontSize: 13, color: '#4A5E6E' }}>Deposit (due now — non-refundable)</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: RED }}>${Number(contract.deposit_amount || 0).toFixed(2)}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: RED, flexShrink: 0 }}>${Number(contract.deposit_amount || 0).toFixed(2)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 18px', background: 'rgba(214,40,40,0.04)', borderTop: '1px solid rgba(214,40,40,0.1)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', background: 'rgba(214,40,40,0.04)', borderTop: '1px solid rgba(214,40,40,0.1)', gap: 8 }}>
                   <span style={{ fontSize: 13, color: '#4A5E6E' }}>Final Payment (due after planning form)</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1A2D3F' }}>${Number(contract.final_payment_amount || 0).toFixed(2)}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1A2D3F', flexShrink: 0 }}>${Number(contract.final_payment_amount || 0).toFixed(2)}</span>
                 </div>
               </div>
             </section>
 
             {Number(contract.sales_tax_rate) > 0 && (
-              <section style={{ marginBottom: 32 }}>
+              <section style={{ marginBottom: 28 }}>
                 <SH>Sales Tax</SH>
-                <p style={{ ...bt, margin: 0 }}>In accordance with applicable state and local tax regulations, sales tax may be required on services rendered by Pescadero Music. Where applicable, the tax rate is calculated based on the total service amount and itemized in the payment schedule above. Sales tax must be paid in full as part of the final payment. If you have questions about the tax rate applied to your booking, do not hesitate to ask.</p>
+                <p style={{ ...bt, margin: 0 }}>In accordance with applicable state and local tax regulations, sales tax may be required on services rendered by Pescadero Music. Where applicable, the tax rate is calculated based on the total service amount and itemized in the payment schedule above.</p>
               </section>
             )}
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Playlist & Program Consultation</SH>
               <p style={bt}>After your booking is confirmed, Garrett will reach out to schedule a consultation to go over your playlist and the order of events. All playlists are curated in collaboration with you — your input and song selections guide everything that gets played.</p>
               <p style={{ ...bt, margin: 0 }}>As a general rule, Pescadero Music steers away from explicit content. If you have specific preferences or questions around music content, please bring them up during your consultation and we will find the right fit together.</p>
             </section>
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Final Planning Deadline</SH>
               <p style={bt}>To give your event the preparation it deserves, all major event details are due no later than 7 days before your event date, unless otherwise agreed upon in writing. This includes:</p>
-              <div style={{ background: '#f8f5f0', borderRadius: 8, padding: '14px 18px', marginBottom: 12 }}>
+              <div style={{ background: '#f8f5f0', borderRadius: 8, padding: '14px 16px', marginBottom: 12 }}>
                 {['Event timeline and schedule of moments', 'Venue address(es) and ceremony/reception layout', 'Music preferences, must-plays, and do-not-plays', 'Introductions, special announcements, and dedications', 'Vendor contacts (photographer, planner, catering, etc.)', 'Any other special requests or considerations'].map(item => (
                   <div key={item} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 6 }}>
                     <span style={{ color: BLUE, fontWeight: 700, flexShrink: 0, fontSize: 13 }}>—</span>
@@ -253,69 +270,70 @@ export default function ContractViewer() {
                   </div>
                 ))}
               </div>
-              <p style={{ ...bt, margin: 0 }}>Your event details will be submitted via the Event Planning Form, accessible through your step tracker dashboard. Last-minute changes are always welcome when timing allows — we will do our best to accommodate.</p>
+              <p style={{ ...bt, margin: 0 }}>Your event details will be submitted via the Event Planning Form, accessible through your step tracker dashboard.</p>
             </section>
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Venue Logistics, Site Readiness & Power</SH>
               <p style={bt}>To ensure a seamless setup, the client is responsible for providing accurate venue logistics in advance, including setup location, load-in access, stair or elevator availability, indoor/outdoor placement, power outlet locations, and any venue-specific sound restrictions or requirements.</p>
-              <p style={bt}>The client and/or venue agrees to provide safe, reliable, grounded electrical power reasonably near the setup area, along with timely access for setup and teardown. Any delays or performance issues resulting from unavailable power or restricted access are outside the responsibility of Pescadero Music.</p>
-              <p style={{ ...bt, margin: 0 }}>If setup location has not been finalized prior to the event, or if conflicting instructions are received, Pescadero Music may use professional judgment to determine the most suitable placement based on safety, acoustics, workflow efficiency, and venue guidelines. A pre-event site walkthrough is available upon request — just ask during your planning call.</p>
+              <p style={bt}>The client and/or venue agrees to provide safe, reliable, grounded electrical power reasonably near the setup area, along with timely access for setup and teardown.</p>
+              <p style={{ ...bt, margin: 0 }}>If setup location has not been finalized prior to the event, or if conflicting instructions are received, Pescadero Music may use professional judgment to determine the most suitable placement.</p>
             </section>
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Equipment Policy</SH>
               <p style={{ ...bt, margin: 0 }}>All sound operations will remain under the supervision and control of the Pescadero Music technician at all times. Pescadero Music does not rent out or leave equipment unattended. Any damage or tampering by individuals other than the on-site technician will result in financial liability for the responsible parties.</p>
             </section>
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Vendor Coordination</SH>
-              <p style={bt}>Pescadero Music is committed to working professionally and cooperatively with all event vendors — including venue staff, photographers, videographers, planners, and caterers. We believe a great event is a team effort and we show up ready to collaborate.</p>
-              <p style={{ ...bt, margin: 0 }}>Please note that while we coordinate closely with your team, Pescadero Music is not responsible for managing or supervising third-party vendors unless specifically contracted to do so. We recommend designating a coordinator or planner as the central point of contact for vendor logistics.</p>
+              <p style={bt}>Pescadero Music is committed to working professionally and cooperatively with all event vendors — including venue staff, photographers, videographers, planners, and caterers.</p>
+              <p style={{ ...bt, margin: 0 }}>Please note that while we coordinate closely with your team, Pescadero Music is not responsible for managing or supervising third-party vendors unless specifically contracted to do so.</p>
             </section>
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Designated Day-of Contact</SH>
-              <p style={{ ...bt, margin: 0 }}>The client is responsible for designating a day-of contact — a person who will be on-site and reachable during the event to coordinate with the Pescadero Music technician on logistics, setup, and any real-time decisions. This person's name, phone number, and role should be submitted via the planning form prior to the event.</p>
+              <p style={{ ...bt, margin: 0 }}>The client is responsible for designating a day-of contact — a person who will be on-site and reachable during the event to coordinate with the Pescadero Music technician on logistics, setup, and any real-time decisions.</p>
             </section>
 
             {contract.special_notes && (
-              <section style={{ marginBottom: 32 }}>
+              <section style={{ marginBottom: 28 }}>
                 <SH>Special Notes</SH>
-                <div style={{ background: '#f8f5f0', borderRadius: 8, padding: '14px 18px', borderLeft: `3px solid ${BLUE}` }}>
+                <div style={{ background: '#f8f5f0', borderRadius: 8, padding: '14px 16px', borderLeft: `3px solid ${BLUE}` }}>
                   <p style={{ margin: 0, fontSize: 13, color: '#4A5E6E', lineHeight: 1.7 }}>{contract.special_notes}</p>
                 </div>
               </section>
             )}
 
-            <section style={{ marginBottom: 32 }}>
+            <section style={{ marginBottom: 28 }}>
               <SH>Terms & Conditions</SH>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: 12, color: '#6A7E8E', lineHeight: 1.8 }}>
-                <div><strong style={{ color: '#1A2D3F' }}>1. Deposit:</strong> The deposit is non-refundable under all circumstances and is required to secure your event date. No date is held without a paid deposit. The sole exception is in the event that Pescadero Music must cancel and is unable to fulfill the agreed service — in which case the deposit will be refunded in full and the client will be notified as soon as possible.</div>
+                <div><strong style={{ color: '#1A2D3F' }}>1. Deposit:</strong> The deposit is non-refundable under all circumstances and is required to secure your event date. No date is held without a paid deposit. The sole exception is in the event that Pescadero Music must cancel — in which case the deposit will be refunded in full.</div>
                 <div>
                   <strong style={{ color: '#1A2D3F' }}>2. Final Payment & Cancellation:</strong> The remaining balance is due after the planning form is submitted. In the event of cancellation, the following refund schedule applies to the final payment only — the deposit is never refunded:
-                  <div style={{ background: '#f8f5f0', borderRadius: 8, overflow: 'hidden', marginTop: 10 }}>
+                  <div className="cv-cancel-table" style={{ background: '#f8f5f0', borderRadius: 8, overflow: 'hidden', marginTop: 10 }}>
                     {[['14 days – 72 hours before event', '100% refund'], ['72 – 24 hours before event', '80% refund'], ['Less than 24 hours before event', '50% refund']].map(([w, r], i) => (
-                      <div key={w} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 14px', borderBottom: i < 2 ? '1px solid #EAE0CC' : 'none' }}>
-                        <span>{w}</span><span style={{ fontWeight: 700, color: '#1A2D3F' }}>{r}</span>
+                      <div key={w} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 14px', borderBottom: i < 2 ? '1px solid #EAE0CC' : 'none', gap: 8 }}>
+                        <span>{w}</span><span style={{ fontWeight: 700, color: '#1A2D3F', flexShrink: 0 }}>{r}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div><strong style={{ color: '#1A2D3F' }}>3. Rescheduling:</strong> Events may be rescheduled between 14 days and 24 hours before the event with minimal or no additional fees, subject to availability. Pescadero Music reserves the right to decline rescheduling requests based on availability, in which case the final payment is refunded in full.</div>
+                <div><strong style={{ color: '#1A2D3F' }}>3. Rescheduling:</strong> Events may be rescheduled between 14 days and 24 hours before the event with minimal or no additional fees, subject to availability.</div>
                 <div><strong style={{ color: '#1A2D3F' }}>4. Event Changes:</strong> Any significant changes to the event scope — including venue, date, or format — must be communicated at least 14 days in advance and may be subject to an updated agreement.</div>
-                <div><strong style={{ color: '#1A2D3F' }}>5. Weather, Safety & Incidents:</strong> For outdoor events, the client is responsible for providing a safe, covered, weather-appropriate setup area for all audio equipment. If weather or environmental conditions create a risk to people or equipment, Pescadero Music reserves the right to pause, relocate, or take protective measures. Pescadero Music is not responsible for injuries or damages resulting from unauthorized use of or interference with equipment. Safety concerns during the event should be directed to the on-site technician.</div>
+                <div><strong style={{ color: '#1A2D3F' }}>5. Weather, Safety & Incidents:</strong> For outdoor events, the client is responsible for providing a safe, covered, weather-appropriate setup area for all audio equipment.</div>
                 <div><strong style={{ color: '#1A2D3F' }}>6. Force Majeure:</strong> In the event of circumstances beyond either party's control, both parties will work together in good faith to reschedule or find a resolution.</div>
-                <div><strong style={{ color: '#1A2D3F' }}>7. Governing Agreement:</strong> The full Pescadero Music Service Policy is incorporated by reference into this agreement. By signing below, you confirm you have read and agree to all terms outlined in this document. This contract becomes binding upon receipt of the signed document and deposit payment.</div>
+                <div><strong style={{ color: '#1A2D3F' }}>7. Governing Agreement:</strong> The full Pescadero Music Service Policy is incorporated by reference into this agreement. By signing below, you confirm you have read and agree to all terms outlined in this document.</div>
               </div>
             </section>
 
-            <section style={{ marginBottom: signed ? 0 : 32 }}>
+            {/* Signatures */}
+            <section style={{ marginBottom: signed ? 0 : 28 }}>
               <SH>Agreement & Signatures</SH>
-              <div style={{ background: '#f8f5f0', borderRadius: 8, padding: '14px 18px', marginBottom: 24, borderLeft: `3px solid ${BLUE}` }}>
-                <p style={{ margin: 0, fontSize: 12, color: '#6A7E8E', lineHeight: 1.7 }}>By signing below, both parties confirm they have read and agree to all terms outlined in this agreement. This contract becomes binding upon receipt of the signed document and deposit payment. Pescadero Music is honored to be part of your event and committed to delivering an outstanding experience.</p>
+              <div style={{ background: '#f8f5f0', borderRadius: 8, padding: '14px 16px', marginBottom: 20, borderLeft: `3px solid ${BLUE}` }}>
+                <p style={{ margin: 0, fontSize: 12, color: '#6A7E8E', lineHeight: 1.7 }}>By signing below, both parties confirm they have read and agree to all terms outlined in this agreement. This contract becomes binding upon receipt of the signed document and deposit payment.</p>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              <div className="cv-sig-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                 <div>
                   <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 700, color: '#8A9EAA', textTransform: 'uppercase', letterSpacing: '1px' }}>Garrett Eldredge</p>
                   <div style={{ height: 80, border: '1.5px solid #DDD3BC', borderRadius: 8, background: '#faf7f3', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
@@ -331,7 +349,8 @@ export default function ContractViewer() {
                     </div>
                   ) : (
                     <div style={{ border: '1.5px solid #DDD3BC', borderRadius: 8, overflow: 'hidden', background: 'white', cursor: 'crosshair' }}>
-                      <canvas ref={canvasRef} width={300} height={80} onMouseDown={startDraw} onMouseMove={draw} onMouseUp={stopDraw} onMouseLeave={stopDraw} onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={stopDraw} style={{ display: 'block', width: '100%', height: 80, touchAction: 'none' }} />
+                      {/* Canvas height fixed at 90, width fills container — scaling handled in getPos */}
+                      <canvas ref={canvasRef} width={600} height={90} onMouseDown={startDraw} onMouseMove={draw} onMouseUp={stopDraw} onMouseLeave={stopDraw} onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={stopDraw} style={{ display: 'block', width: '100%', height: 90, touchAction: 'none' }} />
                     </div>
                   )}
                   {!signed && (
@@ -348,8 +367,8 @@ export default function ContractViewer() {
             {!signed && (
               <div>
                 {error && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(200,32,42,0.08)', border: '1px solid rgba(200,32,42,0.2)', color: RED, fontSize: 13, marginBottom: 16 }}>{error}</div>}
-                <div style={{ background: '#faf7f3', border: '1.5px solid #DDD3BC', borderRadius: 10, padding: '16px 20px', marginBottom: 16 }}>
-                  <p style={{ margin: 0, fontSize: 12, color: '#6A7E8E', lineHeight: 1.6 }}>Upon submission of this form, you will be directed to a secure Stripe payment page to submit your <strong>${Number(contract.deposit_amount || 0).toFixed(2)} deposit</strong>, which secures your event date. This service agreement is effective as soon as your deposit is received.</p>
+                <div style={{ background: '#faf7f3', border: '1.5px solid #DDD3BC', borderRadius: 10, padding: '16px 18px', marginBottom: 16 }}>
+                  <p style={{ margin: 0, fontSize: 12, color: '#6A7E8E', lineHeight: 1.6 }}>Upon submission of this form, you will be directed to a secure Stripe payment page to submit your <strong>${Number(contract.deposit_amount || 0).toFixed(2)} deposit</strong>, which secures your event date.</p>
                 </div>
                 <button onClick={handleSign} disabled={submitting} style={{ width: '100%', padding: '15px', borderRadius: 10, border: 'none', background: submitting ? 'rgba(200,32,42,0.5)' : RED, color: 'white', fontSize: 14, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: submitting ? 'not-allowed' : 'pointer', boxShadow: submitting ? 'none' : '0 6px 24px rgba(200,32,42,0.3)' }}>
                   {submitting ? 'Processing...' : `Sign & Pay $${Number(contract.deposit_amount || 0).toFixed(2)} Deposit`}
@@ -382,7 +401,7 @@ const bt: React.CSSProperties = { margin: '0 0 12px', fontSize: 13, color: '#4A5
 function SH({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-      <h3 style={{ margin: 0, fontFamily: UI_FONT, fontSize: 13, fontWeight: 500, color: '#07111A', textTransform: 'uppercase', letterSpacing: '2px' }}>{children}</h3>
+      <h3 style={{ margin: 0, fontFamily: UI_FONT, fontSize: 13, fontWeight: 500, color: '#07111A', textTransform: 'uppercase', letterSpacing: '2px', whiteSpace: 'nowrap' }}>{children}</h3>
       <div style={{ flex: 1, height: 1, background: '#EAE0CC' }} />
     </div>
   )

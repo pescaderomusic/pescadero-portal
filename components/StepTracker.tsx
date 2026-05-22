@@ -185,10 +185,10 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
 
   const steps = [
     { key: 'inquiry',       num: 1, label: 'Inquiry',       s: inquiryStatus },
-    { key: 'consultation',  num: 2, label: 'Consultation',  s: noBooking ? 'locked' as const : stepStatus(b.step_consultation)  },
+    { key: 'consultation',  num: 2, label: 'Consult',       s: noBooking ? 'locked' as const : stepStatus(b.step_consultation)  },
     { key: 'contract',      num: 3, label: 'Sign & Pay',    s: noBooking ? 'locked' as const : stepStatus(b.step_contract)      },
     { key: 'planning',      num: 4, label: 'Planning',      s: noBooking ? 'locked' as const : stepStatus(b.step_planning)      },
-    { key: 'final_payment', num: 5, label: 'Final Payment', s: noBooking ? 'locked' as const : stepStatus(b.step_final_payment) },
+    { key: 'final_payment', num: 5, label: 'Final Pay',     s: noBooking ? 'locked' as const : stepStatus(b.step_final_payment) },
   ]
 
   const completedCount = steps.filter(s => s.s === 'complete').length
@@ -281,18 +281,38 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #07111A 0%, #0D1E2B 100%)', fontFamily: BODY }}>
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(7,17,26,0.96)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(68,190,199,0.1)', padding: '0 28px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .st-nav-name { display: none !important; }
+          .st-event-card { flex-direction: column !important; gap: 12px !important; }
+          .st-event-countdown { text-align: left !important; }
+          .st-card-inner { flex-direction: column !important; gap: 12px !important; }
+          .st-card-btn { width: 100% !important; text-align: center !important; }
+          .st-links { flex-direction: column !important; }
+          .st-links a { text-align: center !important; }
+          .st-step-label { font-size: 8px !important; letter-spacing: 0 !important; }
+          .st-step-circle { width: 36px !important; height: 36px !important; }
+          .st-step-circle-active { width: 40px !important; height: 40px !important; }
+          .st-step-circle-sel { width: 44px !important; height: 44px !important; }
+          .st-event-circle { width: 52px !important; height: 52px !important; }
+          .st-event-circle-sel { width: 56px !important; height: 56px !important; }
+          .st-review-circle { width: 36px !important; height: 36px !important; }
+          .st-tracker-padding { padding: '36px 16px 80px' !important; }
+        }
+      `}</style>
+
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(7,17,26,0.96)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(68,190,199,0.1)', padding: '0 16px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 32, width: 32, objectFit: 'contain' }} />
-          <span style={{ fontFamily: WORDMARK, fontSize: 15, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
+          <span className="st-nav-name" style={{ fontFamily: WORDMARK, fontSize: 15, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontSize: 12, color: 'rgba(245,239,224,0.4)', fontFamily: UI_FONT, letterSpacing: '1px' }}>Hi, {firstName}</span>
           <Link href="/auth/signout" style={{ fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.25)', textDecoration: 'none' }}>Sign Out</Link>
         </div>
       </nav>
 
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '36px 24px 80px' }}>
+      <div className="st-tracker-padding" style={{ maxWidth: 900, margin: '0 auto', padding: '36px 16px 80px' }}>
         {justPaid && (
           <div style={{ background: 'rgba(76,175,80,0.1)', border: '1px solid rgba(76,175,80,0.2)', borderRadius: 10, padding: '14px 20px', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 22 }}>🎉</span>
@@ -304,14 +324,14 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
         )}
 
         {!noBooking && (
-          <div style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 14, padding: '20px 24px', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-            <div>
+          <div className="st-event-card" style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 14, padding: '20px 20px', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)' }}>Your Event</p>
-              <p style={{ margin: '0 0 4px', fontFamily: DISPLAY, fontSize: 24, color: CREAM, fontWeight: 300 }}>{b?.couple_names || b?.event_name || b?.event_type || `${firstName}'s Event`}</p>
+              <p style={{ margin: '0 0 4px', fontFamily: DISPLAY, fontSize: 22, color: CREAM, fontWeight: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b?.couple_names || b?.event_name || b?.event_type || `${firstName}'s Event`}</p>
               {b?.event_date && <p style={{ margin: '2px 0 0', fontSize: 13, fontFamily: BODY, color: 'rgba(245,239,224,0.4)' }}>{fmtDate(b.event_date)}{b.venue_name ? ` · ${b.venue_name}` : ''}</p>}
             </div>
             {daysUntil !== null && daysUntil > 0 && (
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div className="st-event-countdown" style={{ textAlign: 'right', flexShrink: 0 }}>
                 <p style={{ margin: 0, fontSize: 38, fontFamily: DISPLAY, fontWeight: 300, color: RED, lineHeight: 1 }}>{daysUntil}</p>
                 <p style={{ margin: '2px 0 0', fontSize: 10, fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>days away</p>
               </div>
@@ -322,48 +342,52 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
 
         {noBooking && (
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <h1 style={{ margin: '0 0 8px', fontFamily: DISPLAY, fontSize: 32, fontWeight: 300, color: CREAM }}>Let's Make Your Day Unforgettable</h1>
+            <h1 style={{ margin: '0 0 8px', fontFamily: DISPLAY, fontSize: 28, fontWeight: 300, color: CREAM }}>Let's Make Your Day Unforgettable</h1>
             <p style={{ margin: 0, fontSize: 14, fontFamily: BODY, color: 'rgba(245,239,224,0.4)' }}>Start by submitting your inquiry below.</p>
           </div>
         )}
 
+        {/* Step tracker */}
         <div style={{ marginBottom: 8, position: 'relative' }}>
-          <div style={{ position: 'absolute', top: 24, left: '4%', right: '4%', height: 2, background: 'rgba(245,239,224,0.06)', zIndex: 0 }} />
-          <div style={{ position: 'absolute', top: 24, left: '4%', height: 2, zIndex: 1, background: `linear-gradient(90deg, ${GREEN}, ${BLUE})`, width: completedCount === 0 ? '0%' : `${Math.min((completedCount / (steps.length + 0.8)) * 92, 88)}%`, transition: 'width 0.8s ease' }} />
+          <div style={{ position: 'absolute', top: 22, left: '4%', right: '4%', height: 2, background: 'rgba(245,239,224,0.06)', zIndex: 0 }} />
+          <div style={{ position: 'absolute', top: 22, left: '4%', height: 2, zIndex: 1, background: `linear-gradient(90deg, ${GREEN}, ${BLUE})`, width: completedCount === 0 ? '0%' : `${Math.min((completedCount / (steps.length + 0.8)) * 92, 88)}%`, transition: 'width 0.8s ease' }} />
           <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative', zIndex: 2 }}>
             {steps.map(step => {
               const isComplete = step.s === 'complete'
               const isActive   = step.s === 'active'
               const isLocked   = step.s === 'locked'
               const isSel      = selectedStep === step.key
+              const size = isSel ? 44 : isActive ? 40 : 36
               return (
-                <div key={step.key} onClick={() => handleStepClick(step.key)} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
-                  <div style={{ width: isSel ? 52 : isActive ? 48 : 44, height: isSel ? 52 : isActive ? 48 : 44, borderRadius: '50%', border: `2px solid ${isSel ? CREAM : isComplete ? GREEN : isActive ? BLUE : 'rgba(245,239,224,0.1)'}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: isSel ? `0 0 0 3px rgba(245,239,224,0.15)` : isActive ? `0 0 20px ${BLUE}40` : 'none', transition: 'all 0.2s', flexShrink: 0 }}>
-                    {isComplete ? <span style={{ fontSize: 18, color: GREEN }}>✓</span> : <span style={{ fontSize: 12, fontFamily: UI_FONT, fontWeight: 500, color: isSel ? CREAM : isActive ? BLUE : 'rgba(245,239,224,0.2)' }}>{step.num}</span>}
+                <div key={step.key} onClick={() => handleStepClick(step.key)} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', userSelect: 'none' }}>
+                  <div style={{ width: size, height: size, borderRadius: '50%', border: `2px solid ${isSel ? CREAM : isComplete ? GREEN : isActive ? BLUE : 'rgba(245,239,224,0.1)'}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: isSel ? `0 0 0 3px rgba(245,239,224,0.15)` : isActive ? `0 0 20px ${BLUE}40` : 'none', transition: 'all 0.2s', flexShrink: 0 }}>
+                    {isComplete ? <span style={{ fontSize: 16, color: GREEN }}>✓</span> : <span style={{ fontSize: 11, fontFamily: UI_FONT, fontWeight: 500, color: isSel ? CREAM : isActive ? BLUE : 'rgba(245,239,224,0.2)' }}>{step.num}</span>}
                   </div>
-                  <p style={{ margin: 0, fontSize: 10, fontFamily: UI_FONT, letterSpacing: '1px', fontWeight: 500, color: isSel ? CREAM : isLocked ? 'rgba(245,239,224,0.2)' : CREAM, textAlign: 'center', transition: 'color 0.2s' }}>{step.label}</p>
+                  <p className="st-step-label" style={{ margin: 0, fontSize: 9, fontFamily: UI_FONT, letterSpacing: '0.5px', fontWeight: 500, color: isSel ? CREAM : isLocked ? 'rgba(245,239,224,0.2)' : CREAM, textAlign: 'center', transition: 'color 0.2s' }}>{step.label}</p>
                 </div>
               )
             })}
 
-            <div onClick={() => handleStepClick('event')} style={{ flex: 1.3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
-              <div style={{ width: selectedStep === 'event' ? 68 : 64, height: selectedStep === 'event' ? 68 : 64, borderRadius: '50%', border: `3px solid ${selectedStep === 'event' ? CREAM : eventDone ? GREEN : RED}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: selectedStep === 'event' ? `0 0 0 3px rgba(245,239,224,0.15)` : `0 0 28px ${eventDone ? GREEN : RED}35`, transition: 'all 0.2s', flexShrink: 0 }}>
-                {eventDone ? <span style={{ fontSize: 24, color: GREEN }}>✓</span> : <span style={{ fontSize: 22 }}>🎵</span>}
+            {/* Event Day */}
+            <div onClick={() => handleStepClick('event')} style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', userSelect: 'none' }}>
+              <div className={selectedStep === 'event' ? 'st-event-circle-sel' : 'st-event-circle'} style={{ width: selectedStep === 'event' ? 56 : 52, height: selectedStep === 'event' ? 56 : 52, borderRadius: '50%', border: `3px solid ${selectedStep === 'event' ? CREAM : eventDone ? GREEN : RED}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: selectedStep === 'event' ? `0 0 0 3px rgba(245,239,224,0.15)` : `0 0 28px ${eventDone ? GREEN : RED}35`, transition: 'all 0.2s', flexShrink: 0 }}>
+                {eventDone ? <span style={{ fontSize: 20, color: GREEN }}>✓</span> : <span style={{ fontSize: 18 }}>🎵</span>}
               </div>
-              <p style={{ margin: 0, fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1px', fontWeight: 500, color: selectedStep === 'event' ? CREAM : eventDone ? GREEN : RED, textAlign: 'center' }}>Event Day</p>
+              <p className="st-step-label" style={{ margin: 0, fontSize: 9, fontFamily: UI_FONT, letterSpacing: '0.5px', fontWeight: 500, color: selectedStep === 'event' ? CREAM : eventDone ? GREEN : RED, textAlign: 'center' }}>Event Day</p>
               {daysUntil !== null && daysUntil > 0 && selectedStep !== 'event' && (
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ margin: 0, fontSize: 17, fontFamily: DISPLAY, fontWeight: 300, color: CREAM, lineHeight: 1 }}>{daysUntil}d</p>
-                  <p style={{ margin: 0, fontSize: 9, fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)' }}>to go</p>
+                  <p style={{ margin: 0, fontSize: 14, fontFamily: DISPLAY, fontWeight: 300, color: CREAM, lineHeight: 1 }}>{daysUntil}d</p>
+                  <p style={{ margin: 0, fontSize: 8, fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)' }}>to go</p>
                 </div>
               )}
             </div>
 
-            <div onClick={() => handleStepClick('review')} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
-              <div style={{ width: selectedStep === 'review' ? 48 : 44, height: selectedStep === 'review' ? 48 : 44, borderRadius: '50%', border: `2px solid ${selectedStep === 'review' ? CREAM : eventDone ? GOLD : 'rgba(245,239,224,0.08)'}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', flexShrink: 0, boxShadow: selectedStep === 'review' ? `0 0 0 3px rgba(245,239,224,0.15)` : 'none' }}>
-                <span style={{ fontSize: 18, filter: eventDone ? 'none' : 'grayscale(1) opacity(0.2)' }}>⭐</span>
+            {/* Review */}
+            <div onClick={() => handleStepClick('review')} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', userSelect: 'none' }}>
+              <div className="st-review-circle" style={{ width: selectedStep === 'review' ? 40 : 36, height: selectedStep === 'review' ? 40 : 36, borderRadius: '50%', border: `2px solid ${selectedStep === 'review' ? CREAM : eventDone ? GOLD : 'rgba(245,239,224,0.08)'}`, background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', flexShrink: 0, boxShadow: selectedStep === 'review' ? `0 0 0 3px rgba(245,239,224,0.15)` : 'none' }}>
+                <span style={{ fontSize: 15, filter: eventDone ? 'none' : 'grayscale(1) opacity(0.2)' }}>⭐</span>
               </div>
-              <p style={{ margin: 0, fontSize: 10, fontFamily: UI_FONT, letterSpacing: '1px', fontWeight: 500, color: selectedStep === 'review' ? CREAM : eventDone ? GOLD : 'rgba(245,239,224,0.2)', textAlign: 'center' }}>Review</p>
+              <p className="st-step-label" style={{ margin: 0, fontSize: 9, fontFamily: UI_FONT, letterSpacing: '0.5px', fontWeight: 500, color: selectedStep === 'review' ? CREAM : eventDone ? GOLD : 'rgba(245,239,224,0.2)', textAlign: 'center' }}>Review</p>
             </div>
           </div>
         </div>
@@ -377,40 +401,42 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           const borderCol = isLocked ? 'rgba(245,239,224,0.08)' : card.color === GREEN ? 'rgba(76,175,80,0.25)' : card.color === RED ? 'rgba(200,32,42,0.2)' : card.color === GOLD ? 'rgba(245,166,35,0.25)' : 'rgba(68,190,199,0.2)'
           const bgCol     = isLocked ? 'rgba(245,239,224,0.03)' : card.color === GREEN ? 'rgba(76,175,80,0.07)' : card.color === RED ? 'rgba(200,32,42,0.05)' : card.color === GOLD ? 'rgba(245,166,35,0.07)' : 'rgba(68,190,199,0.07)'
           return (
-            <div style={{ background: bgCol, border: `1px solid ${borderCol}`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <p style={{ margin: 0, fontSize: 10, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: isLocked ? 'rgba(245,239,224,0.25)' : card.color, fontWeight: 500 }}>{card.eyebrow}</p>
-                  {isLocked && <span style={{ fontSize: 11, color: 'rgba(245,239,224,0.2)' }}>🔒 Locked</span>}
+            <div style={{ background: bgCol, border: `1px solid ${borderCol}`, borderRadius: 12, padding: '20px 20px', marginBottom: 20 }}>
+              <div className="st-card-inner" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <p style={{ margin: 0, fontSize: 10, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: isLocked ? 'rgba(245,239,224,0.25)' : card.color, fontWeight: 500 }}>{card.eyebrow}</p>
+                    {isLocked && <span style={{ fontSize: 11, color: 'rgba(245,239,224,0.2)' }}>🔒 Locked</span>}
+                  </div>
+                  <p style={{ margin: '0 0 6px', fontSize: 17, fontFamily: DISPLAY, fontWeight: 300, color: isLocked ? 'rgba(245,239,224,0.35)' : CREAM }}>{card.title}</p>
+                  <p style={{ margin: 0, fontSize: 13, fontFamily: BODY, color: isLocked ? 'rgba(245,239,224,0.25)' : 'rgba(245,239,224,0.6)', lineHeight: 1.7 }}>{card.body}</p>
+                  {selectedStep && (
+                    <button onClick={() => setSelectedStep(null)} style={{ marginTop: 12, background: 'none', border: 'none', color: 'rgba(245,239,224,0.25)', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1px', cursor: 'pointer', padding: 0 }}>
+                      ← Back to your next step
+                    </button>
+                  )}
                 </div>
-                <p style={{ margin: '0 0 6px', fontSize: 17, fontFamily: DISPLAY, fontWeight: 300, color: isLocked ? 'rgba(245,239,224,0.35)' : CREAM }}>{card.title}</p>
-                <p style={{ margin: 0, fontSize: 13, fontFamily: BODY, color: isLocked ? 'rgba(245,239,224,0.25)' : 'rgba(245,239,224,0.6)', lineHeight: 1.7 }}>{card.body}</p>
-                {selectedStep && (
-                  <button onClick={() => setSelectedStep(null)} style={{ marginTop: 12, background: 'none', border: 'none', color: 'rgba(245,239,224,0.25)', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1px', cursor: 'pointer', padding: 0 }}>
-                    ← Back to your next step
-                  </button>
+                {card.action && !isLocked && (
+                  <Link className="st-card-btn" href={card.action.href} style={{ padding: '12px 24px', borderRadius: 9, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', whiteSpace: 'nowrap', boxShadow: '0 4px 18px rgba(200,32,42,0.35)', flexShrink: 0, display: 'block' }}>
+                    {card.action.label}
+                  </Link>
                 )}
               </div>
-              {card.action && !isLocked && (
-                <Link href={card.action.href} style={{ padding: '11px 26px', borderRadius: 9, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', whiteSpace: 'nowrap', boxShadow: '0 4px 18px rgba(200,32,42,0.35)', flexShrink: 0 }}>
-                  {card.action.label}
-                </Link>
-              )}
             </div>
           )
         })()}
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="st-links" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {b?.step_contract && ['signed','client_signed','complete'].includes(b.step_contract) && (
-            <Link href="/contract" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>View Contract</Link>
+            <Link href="/contract" style={{ flex: '1 1 auto', padding: '10px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>View Contract</Link>
           )}
           {b?.step_inquiry === 'complete' && (
-            <Link href="/inquiry/view" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>View Inquiry</Link>
+            <Link href="/inquiry/view" style={{ flex: '1 1 auto', padding: '10px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>View Inquiry</Link>
           )}
           {eventDone && (
-            <Link href="/review" style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid rgba(245,166,35,0.3)`, background: `rgba(245,166,35,0.08)`, color: GOLD, fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>Leave a Review ⭐</Link>
+            <Link href="/review" style={{ flex: '1 1 auto', padding: '10px 16px', borderRadius: 8, border: `1px solid rgba(245,166,35,0.3)`, background: `rgba(245,166,35,0.08)`, color: GOLD, fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>Leave a Review ⭐</Link>
           )}
-          <Link href="/policy" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>Service Policy</Link>
+          <Link href="/policy" style={{ flex: '1 1 auto', padding: '10px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>Service Policy</Link>
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 48, fontSize: 12, fontFamily: BODY, color: 'rgba(245,239,224,0.18)' }}>
