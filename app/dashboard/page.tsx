@@ -47,6 +47,7 @@ export default async function DashboardPage({
       clientName={profile?.full_name || ''}
       justPaid={justPaid}
       paymentType={searchParams.type}
+      userId={user.id}
     />
   )
 }

@@ -29,11 +29,14 @@ interface Booking {
   step_event: string
 }
 
+const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
+
 interface Props {
   booking: Booking | null
   clientName: string
   justPaid?: boolean
   paymentType?: string
+  userId?: string
 }
 
 const COPY: Record<string, Record<string, { title: string; body: string; action?: { label: string; href: string } }>> = {
@@ -170,11 +173,12 @@ function getCopyForStep(stepKey: string, booking: Booking | null) {
   return null
 }
 
-export default function StepTracker({ booking, clientName, justPaid, paymentType }: Props) {
+export default function StepTracker({ booking, clientName, justPaid, paymentType, userId }: Props) {
   const [selectedStep, setSelectedStep] = useState<string | null>(null)
   const b = booking
   const noBooking = !b
   const firstName = clientName?.split(' ')[0] || 'there'
+  const isGarrett = userId === GARRETT_ID
   const daysUntil = useCountdown(b?.event_date || null)
   const eventDone = b?.step_event === 'complete'
 
@@ -438,6 +442,25 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           )}
           <Link href="/policy" style={{ flex: '1 1 auto', padding: '10px 16px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.1)', background: 'rgba(245,239,224,0.04)', color: 'rgba(245,239,224,0.5)', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>Service Policy</Link>
         </div>
+
+        {isGarrett && (
+          <div style={{ marginTop: 12, padding: '12px 16px', borderRadius: 10, border: '1px solid rgba(68,190,199,0.2)', background: 'rgba(68,190,199,0.04)' }}>
+            <p style={{ margin: '0 0 8px', fontSize: 9, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(68,190,199,0.5)' }}>Dev Access</p>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Inquiry', href: '/inquiry' },
+                { label: 'Contract', href: '/contract' },
+                { label: 'Planning', href: '/planning' },
+                { label: 'Final Pay', href: '/contract/final-payment' },
+                { label: 'Admin', href: '/admin' },
+              ].map(({ label, href }) => (
+                <Link key={href} href={href} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid rgba(68,190,199,0.25)', background: 'rgba(68,190,199,0.07)', color: BLUE, fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none' }}>
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <p style={{ textAlign: 'center', marginTop: 48, fontSize: 12, fontFamily: BODY, color: 'rgba(245,239,224,0.18)' }}>
           Questions? <a href="mailto:garrett@pescaderomusic.com" style={{ color: BLUE, textDecoration: 'none' }}>garrett@pescaderomusic.com</a> · (210) 727-9328
