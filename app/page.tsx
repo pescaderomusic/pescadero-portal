@@ -73,23 +73,36 @@ export default function HomePage() {
     <div style={{ background: 'linear-gradient(160deg, #07111A 0%, #0D1E2B 100%)', minHeight: '100vh', fontFamily: BODY, color: CREAM }}>
 
       {/* ── NAV ─────────────────────────────────────────────────── */}
+      <style>{`
+        @media (max-width: 640px) {
+          .hp-wordmark { display: none !important; }
+          .hp-nav-links { display: none !important; }
+          .hp-nav-gap { gap: 8px !important; }
+          .hp-dashboard-label { display: none !important; }
+          .hp-dashboard-icon { display: inline !important; }
+        }
+        @media (min-width: 641px) {
+          .hp-dashboard-icon { display: none !important; }
+        }
+      `}</style>
+
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
         background: scrolled ? 'rgba(7,17,26,0.96)' : 'transparent',
         backdropFilter: scrolled ? 'blur(20px)' : 'none',
         borderBottom: scrolled ? '1px solid rgba(68,190,199,0.1)' : 'none',
-        padding: '0 40px', height: 68,
+        padding: '0 20px', height: 64,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         transition: 'background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease',
       }}>
         {/* Left: logo + wordmark */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 38, width: 38, objectFit: 'contain' }} />
-          <span style={{ fontFamily: WORDMARK, fontSize: 17, letterSpacing: '4px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 32, width: 32, objectFit: 'contain' }} />
+          <span className="hp-wordmark" style={{ fontFamily: WORDMARK, fontSize: 16, letterSpacing: '4px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
         </div>
 
-        {/* Center: nav links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+        {/* Center: nav links — hidden on mobile */}
+        <div className="hp-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
           {[['Services', '#services'], ['Pricing', '#pricing']].map(([label, href]) => (
             <a key={label} href={href} style={{ fontSize: 13, color: 'rgba(245,239,224,0.6)', textDecoration: 'none', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: UI_FONT, fontWeight: 500, transition: 'color 0.2s' }}
               onMouseEnter={e => (e.target as HTMLElement).style.color = CREAM}
@@ -99,11 +112,13 @@ export default function HomePage() {
         </div>
 
         {/* Right: auth */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div className="hp-nav-gap" style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           {user ? (
             <>
               <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: BLUE, textDecoration: 'none', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: UI_FONT }}>
-                <span style={{ fontSize: 10 }}>◇</span> My Dashboard
+                <span style={{ fontSize: 10 }}>◇</span>
+                <span className="hp-dashboard-label">My Dashboard</span>
+                <span className="hp-dashboard-icon" style={{ fontSize: 12 }}>Dashboard</span>
               </Link>
               <div ref={userMenuRef} style={{ position: 'relative' }}>
                 <button
