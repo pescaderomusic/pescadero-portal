@@ -4,6 +4,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
+const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
+
 const NAVY     = '#07111A'
 const RED      = '#C8202A'
 const BLUE     = '#44BEC7'
@@ -20,12 +22,14 @@ function PaymentContent() {
   const [loading, setLoading]   = useState(true)
   const [paying, setPaying]     = useState(false)
   const [error, setError]       = useState('')
+  const [userId, setUserId]     = useState<string | null>(null)
   const cancelled = searchParams.get('cancelled')
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { router.push('/auth/login'); return }
+      setUserId(user.id)
       supabase
         .from('contracts')
         .select('*')
@@ -65,7 +69,7 @@ function PaymentContent() {
     </div>
   )
 
-  const depositAmount = contract?.deposit_amount ?? 100
+  const depositAmount = contract?.deposit_amount ?? (userId === GARRETT_ID ? 99 : 100)
   const finalAmount   = contract?.final_payment_amount ?? 0
 
   const depositPaid = contract?.status === 'deposit_paid'

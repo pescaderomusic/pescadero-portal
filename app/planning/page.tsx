@@ -213,7 +213,8 @@ export default function PlanningPage() {
   )
 
   const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
-  if (!booking || (booking.step_planning === 'locked' && booking.client_id !== GARRETT_ID)) return (
+  const isGarrett = booking?.client_id === GARRETT_ID
+  if (!isGarrett && (!booking || booking.step_planning === 'locked')) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY }}>
       <div style={{ textAlign: 'center', padding: '40px 24px' }}>
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Your planning form isn't available yet. Garrett will send it after your deposit is confirmed.</p>
