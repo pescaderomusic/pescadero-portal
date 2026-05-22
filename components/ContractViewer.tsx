@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
+const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
+
 const NAVY  = '#07111A'
 const BLUE  = '#44BEC7'
 const RED   = '#C8202A'
@@ -25,6 +27,7 @@ export default function ContractViewer() {
   const [error,      setError]      = useState('')
   const [userEmail,  setUserEmail]  = useState('')
   const [profile,    setProfile]    = useState<any>(null)
+  const [userId,     setUserId]     = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -39,6 +42,7 @@ export default function ContractViewer() {
       setGarrettSig(s?.value || null)
       setProfile(p)
       setUserEmail(user.email || '')
+      setUserId(user.id)
       if (c?.status === 'signed' || c?.status === 'client_signed') setSigned(true)
       setLoading(false)
     })
@@ -101,7 +105,7 @@ export default function ContractViewer() {
     </div>
   )
 
-  if (!contract) return (
+  if (!contract && userId !== GARRETT_ID) return (
     <div style={{ minHeight: '100vh', background: NAVY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: BODY }}>
       <div style={{ textAlign: 'center', padding: '0 24px' }}>
         <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Your contract is not ready yet. Garrett will send it soon.</p>
@@ -111,8 +115,10 @@ export default function ContractViewer() {
   )
 
   const fmtDate = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-  const eventDate  = contract.event_date       ? fmtDate(contract.event_date) : null
-  const signedDate = contract.client_signed_at ? new Date(contract.client_signed_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null
+  const eventDate  = contract?.event_date       ? fmtDate(contract?.event_date) : null
+  const signedDate = contract?.client_signed_at ? new Date(contract?.client_signed_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null
+  const mockContract = !contract ? { package_price: 0, travel_fee: 0, sales_tax_rate: 0, sales_tax_amount: 0, total_due: 0, deposit_amount: 0, final_payment_amount: 0 } : null
+  const c = contract || mockContract
 
   return (
     <div style={{ minHeight: '100vh', background: '#f0ebe3', fontFamily: BODY }}>
@@ -153,10 +159,10 @@ export default function ContractViewer() {
                 </div>
               )}
             </div>
-            {contract.garrett_message && (
+            {contract?.garrett_message && (
               <div style={{ marginTop: 20, padding: '14px 16px', background: 'rgba(255,255,255,0.06)', borderRadius: 8, borderLeft: `3px solid ${BLUE}` }}>
                 <p style={{ margin: '0 0 2px', fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Message from Garrett</p>
-                <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>{contract.garrett_message}</p>
+                <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>{contract?.garrett_message}</p>
               </div>
             )}
           </div>
@@ -174,19 +180,19 @@ export default function ContractViewer() {
                   <p style={il}>(210) 727-9328</p>
                 </IC>
                 <IC title="Client">
-                  <p style={il}><strong>{profile?.full_name || contract.client_name || 'Client'}</strong></p>
-                  {contract.couple_names && <p style={il}>{contract.couple_names}</p>}
+                  <p style={il}><strong>{profile?.full_name || contract?.client_name || 'Client'}</strong></p>
+                  {contract?.couple_names && <p style={il}>{contract?.couple_names}</p>}
                   <p style={il}>{userEmail}</p>
                   {profile?.phone && <p style={il}>{profile.phone}</p>}
                 </IC>
               </div>
             </section>
 
-            {(contract.event_date || contract.venue_name) && (
+            {(contract?.event_date || contract?.venue_name) && (
               <section style={{ marginBottom: 28 }}>
                 <SH>Event Details</SH>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
-                  {[['Event Date', eventDate], ['Venue', contract.venue_name], ['Address', contract.venue_address], ['Attendance', contract.attendance]].filter(([, v]) => v).map(([k, v]) => (
+                  {[['Event Date', eventDate], ['Venue', contract?.venue_name], ['Address', contract?.venue_address], ['Attendance', contract?.attendance]].filter(([, v]) => v).map(([k, v]) => (
                     <div key={k as string}>
                       <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 700, color: '#8A9EAA', textTransform: 'uppercase', letterSpacing: '1px' }}>{k}</p>
                       <p style={{ margin: 0, fontSize: 13, color: '#1A2D3F' }}>{v}</p>
@@ -222,9 +228,9 @@ export default function ContractViewer() {
               <SH>Rates & Payment Schedule</SH>
               <div style={{ border: '1.5px solid #EAE0CC', borderRadius: 10, overflow: 'hidden' }}>
                 {[
-                  ['The All-Inclusive Premium Experience', `$${Number(contract.package_price || 0).toFixed(2)}`],
-                  Number(contract.travel_fee) > 0 ? ['Travel Fee', `$${Number(contract.travel_fee).toFixed(2)}`] : null,
-                  Number(contract.sales_tax_rate) > 0 ? [`Sales Tax (${contract.sales_tax_rate}%)`, `$${Number(contract.sales_tax_amount || 0).toFixed(2)}`] : null,
+                  ['The All-Inclusive Premium Experience', `$${Number(contract?.package_price || 0).toFixed(2)}`],
+                  Number(contract?.travel_fee) > 0 ? ['Travel Fee', `$${Number(contract?.travel_fee).toFixed(2)}`] : null,
+                  Number(contract?.sales_tax_rate) > 0 ? [`Sales Tax (${contract?.sales_tax_rate}%)`, `$${Number(contract?.sales_tax_amount || 0).toFixed(2)}`] : null,
                 ].filter(Boolean).map((row, i, arr) => (
                   <div key={row![0]} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: i < arr.length - 1 ? '1px solid #EAE0CC' : 'none', gap: 8 }}>
                     <span style={{ fontSize: 13, color: '#1A2D3F' }}>{row![0]}</span>
@@ -233,20 +239,20 @@ export default function ContractViewer() {
                 ))}
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '13px 16px', background: '#f8f5f0', borderTop: '2px solid #DDD3BC', gap: 8 }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#0D1B2A' }}>Total Due</span>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: BLUE, flexShrink: 0 }}>${Number(contract.total_due || 0).toFixed(2)}</span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: BLUE, flexShrink: 0 }}>${Number(contract?.total_due || 0).toFixed(2)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', background: 'rgba(214,40,40,0.04)', gap: 8 }}>
                   <span style={{ fontSize: 13, color: '#4A5E6E' }}>Deposit (due now — non-refundable)</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: RED, flexShrink: 0 }}>${Number(contract.deposit_amount || 0).toFixed(2)}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: RED, flexShrink: 0 }}>${Number(contract?.deposit_amount || 0).toFixed(2)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', background: 'rgba(214,40,40,0.04)', borderTop: '1px solid rgba(214,40,40,0.1)', gap: 8 }}>
                   <span style={{ fontSize: 13, color: '#4A5E6E' }}>Final Payment (due after planning form)</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1A2D3F', flexShrink: 0 }}>${Number(contract.final_payment_amount || 0).toFixed(2)}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1A2D3F', flexShrink: 0 }}>${Number(contract?.final_payment_amount || 0).toFixed(2)}</span>
                 </div>
               </div>
             </section>
 
-            {Number(contract.sales_tax_rate) > 0 && (
+            {Number(contract?.sales_tax_rate) > 0 && (
               <section style={{ marginBottom: 28 }}>
                 <SH>Sales Tax</SH>
                 <p style={{ ...bt, margin: 0 }}>In accordance with applicable state and local tax regulations, sales tax may be required on services rendered by Pescadero Music. Where applicable, the tax rate is calculated based on the total service amount and itemized in the payment schedule above.</p>
@@ -296,11 +302,11 @@ export default function ContractViewer() {
               <p style={{ ...bt, margin: 0 }}>The client is responsible for designating a day-of contact — a person who will be on-site and reachable during the event to coordinate with the Pescadero Music technician on logistics, setup, and any real-time decisions.</p>
             </section>
 
-            {contract.special_notes && (
+            {contract?.special_notes && (
               <section style={{ marginBottom: 28 }}>
                 <SH>Special Notes</SH>
                 <div style={{ background: '#f8f5f0', borderRadius: 8, padding: '14px 16px', borderLeft: `3px solid ${BLUE}` }}>
-                  <p style={{ margin: 0, fontSize: 13, color: '#4A5E6E', lineHeight: 1.7 }}>{contract.special_notes}</p>
+                  <p style={{ margin: 0, fontSize: 13, color: '#4A5E6E', lineHeight: 1.7 }}>{contract?.special_notes}</p>
                 </div>
               </section>
             )}
@@ -345,7 +351,7 @@ export default function ContractViewer() {
                   <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 700, color: '#8A9EAA', textTransform: 'uppercase', letterSpacing: '1px' }}>Client Signature</p>
                   {signed ? (
                     <div style={{ height: 80, border: '1.5px solid #DDD3BC', borderRadius: 8, background: '#faf7f3', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                      {contract.client_signature ? <img src={contract.client_signature} alt="Client signature" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} /> : <span style={{ color: '#8A9EAA', fontStyle: 'italic', fontSize: 14 }}>Signed</span>}
+                      {contract?.client_signature ? <img src={contract?.client_signature} alt="Client signature" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} /> : <span style={{ color: '#8A9EAA', fontStyle: 'italic', fontSize: 14 }}>Signed</span>}
                     </div>
                   ) : (
                     <div style={{ border: '1.5px solid #DDD3BC', borderRadius: 8, overflow: 'hidden', background: 'white', cursor: 'crosshair' }}>
@@ -368,10 +374,10 @@ export default function ContractViewer() {
               <div>
                 {error && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(200,32,42,0.08)', border: '1px solid rgba(200,32,42,0.2)', color: RED, fontSize: 13, marginBottom: 16 }}>{error}</div>}
                 <div style={{ background: '#faf7f3', border: '1.5px solid #DDD3BC', borderRadius: 10, padding: '16px 18px', marginBottom: 16 }}>
-                  <p style={{ margin: 0, fontSize: 12, color: '#6A7E8E', lineHeight: 1.6 }}>Upon submission of this form, you will be directed to a secure Stripe payment page to submit your <strong>${Number(contract.deposit_amount || 0).toFixed(2)} deposit</strong>, which secures your event date.</p>
+                  <p style={{ margin: 0, fontSize: 12, color: '#6A7E8E', lineHeight: 1.6 }}>Upon submission of this form, you will be directed to a secure Stripe payment page to submit your <strong>${Number(contract?.deposit_amount || 0).toFixed(2)} deposit</strong>, which secures your event date.</p>
                 </div>
                 <button onClick={handleSign} disabled={submitting} style={{ width: '100%', padding: '15px', borderRadius: 10, border: 'none', background: submitting ? 'rgba(200,32,42,0.5)' : RED, color: 'white', fontSize: 14, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: submitting ? 'not-allowed' : 'pointer', boxShadow: submitting ? 'none' : '0 6px 24px rgba(200,32,42,0.3)' }}>
-                  {submitting ? 'Processing...' : `Sign & Pay $${Number(contract.deposit_amount || 0).toFixed(2)} Deposit`}
+                  {submitting ? 'Processing...' : `Sign & Pay $${Number(contract?.deposit_amount || 0).toFixed(2)} Deposit`}
                 </button>
               </div>
             )}
