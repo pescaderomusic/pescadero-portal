@@ -205,7 +205,7 @@ export default function PolicyPage() {
 
 function Section({ eyebrow, title, children }: { eyebrow: string; title: string; children: React.ReactNode }) {
   const BLUE = '#44BEC7'; const RED = '#C8202A'
-  const CREAM = '#F5EFE0'; const DISPLAY = "'freight-display-pro', Georgia, serif"; const UI_FONT = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"; const BODY = "'inter', system-ui, sans-serif"
+  const CREAM = '#F5EFE0'; const DISPLAY = "'Playfair Display', Georgia, serif"; const UI_FONT = "'Barlow Condensed', sans-serif"; const BODY = "'inter', system-ui, sans-serif"
   return (
     <div style={{ marginBottom: 44 }}>
       <p style={{ margin: '0 0 6px', fontSize: 10, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>{eyebrow}</p>
