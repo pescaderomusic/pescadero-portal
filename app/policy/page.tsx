@@ -5,14 +5,16 @@ import Link from 'next/link'
 const NAVY  = '#07111A'
 const BLUE     = '#44BEC7'
 const CREAM    = '#F5EFE0'
-const DISPLAY  = "'freight-display-pro', Georgia, serif"
-const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
+const DISPLAY  = "'Playfair Display', Georgia, serif"
+const UI_FONT  = "'Barlow Condensed', sans-serif"
 const BODY     = "'inter', system-ui, sans-serif"
-const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
+const WORDMARK = "'Barlow Condensed', sans-serif"
 const RED   = '#C8202A'
 
 export default function PolicyPage() {
   return (
+    <>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Barlow+Condensed:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap');`}</style>
     <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0D1E2B 100%)`, fontFamily: BODY }}>
 
       <nav className="no-print" style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(7,17,26,0.96)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(68,190,199,0.1)', padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -30,7 +32,7 @@ export default function PolicyPage() {
       <div style={{ borderBottom: `1px solid rgba(68,190,199,0.12)`, padding: '52px 24px 44px', textAlign: 'center' }}>
         <p style={{ margin: '0 0 10px', fontSize: 10, fontFamily: UI_FONT, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE }}>Wedding Sound Services</p>
         <h1 style={{ margin: '0 0 10px', fontFamily: DISPLAY, fontSize: 40, fontWeight: 300, color: CREAM, lineHeight: 1.1 }}>Service Policy</h1>
-        <p style={{ margin: '0 auto', fontSize: 14, fontFamily: "'cormorant-garamond', Georgia, serif", fontStyle: 'italic', color: 'rgba(245,239,224,0.55)', maxWidth: 480 }}>Professional Sound for Your Perfect Day</p>
+        <p style={{ margin: '0 auto', fontSize: 14, fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', color: 'rgba(245,239,224,0.55)', maxWidth: 480 }}>Professional Sound for Your Perfect Day</p>
         <p style={{ marginTop: 16, fontSize: 12, fontFamily: BODY, color: 'rgba(245,239,224,0.25)' }}>garrett@pescaderomusic.com · (210) 727-9328 · pescaderomusic.com</p>
       </div>
 
@@ -197,6 +199,7 @@ export default function PolicyPage() {
       </div>
       <style>{`@media print { .no-print { display: none !important; } nav { display: none !important; } }`}</style>
     </div>
+    </>
   )
 }
 
