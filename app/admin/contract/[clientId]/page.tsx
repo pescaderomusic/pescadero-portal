@@ -155,17 +155,24 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
         {/* Client & Event Info */}
         <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '20px 24px', marginBottom: 28 }}>
           <p style={{ margin: '0 0 12px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Client & Event</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
             {[
               ['Client', client?.full_name],
-              ['Email', inquiry?.email || '—'],
-              ['Phone', inquiry?.phone || '—'],
-              ['Couple', inquiry?.couple_names || '—'],
+              ['Email', inquiry?.email],
+              ['Phone', inquiry?.phone],
+              ['Preferred Contact', inquiry?.preferred_contact],
+              ['Couple / Event Name', inquiry?.couple_names || inquiry?.event_name],
+              ['Event Type', Array.isArray(inquiry?.event_types) ? inquiry.event_types.join(', ') : inquiry?.event_type],
               ['Event Date', eventDate],
-              ['Venue', inquiry?.venue_name || '—'],
-              ['Address', inquiry?.venue_address || '—'],
-              ['Attendance', inquiry?.attendance || '—'],
-            ].map(([label, value]) => (
+              ['Start Time', inquiry?.start_time],
+              ['End Time', inquiry?.end_time],
+              ['Venue', inquiry?.venue_name],
+              ['Address', inquiry?.venue_address],
+              ['Setting', inquiry?.indoor_outdoor],
+              ['Guests', inquiry?.attendance],
+              ['How They Found Us', inquiry?.hear_about || inquiry?.how_did_you_hear],
+              ['Vendor', inquiry?.vendor_name ? `${inquiry.vendor_name}${inquiry.vendor_type ? ` (${inquiry.vendor_type})` : ''}` : null],
+            ].filter(([, v]) => v).map(([label, value]) => (
               <div key={label as string}>
                 <p style={{ margin: '0 0 2px', fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>{label}</p>
                 <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>{value || '—'}</p>
@@ -181,11 +188,26 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
           )}
         </div>
 
-        {/* Inquiry Notes */}
-        {inquiry?.additional_details && (
+        {/* Inquiry Notes & Services */}
+        {(inquiry?.additional_details || inquiry?.additional_notes || inquiry?.services_requested?.length) && (
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '16px 20px', marginBottom: 28 }}>
-            <p style={{ margin: '0 0 6px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Client Notes from Inquiry</p>
-            <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>{inquiry.additional_details}</p>
+            <p style={{ margin: '0 0 12px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Inquiry Notes & Services</p>
+            {inquiry?.services_requested?.length > 0 && (
+              <div style={{ marginBottom: 12 }}>
+                <p style={{ margin: '0 0 6px', fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Services Requested</p>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {inquiry.services_requested.map((s: string) => (
+                    <span key={s} style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(79,185,175,0.1)', border: '1px solid rgba(79,185,175,0.25)', color: TEAL }}>{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {(inquiry?.additional_notes || inquiry?.additional_details) && (
+              <div>
+                <p style={{ margin: '0 0 6px', fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Additional Notes</p>
+                <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>{inquiry.additional_notes || inquiry.additional_details}</p>
+              </div>
+            )}
           </div>
         )}
 

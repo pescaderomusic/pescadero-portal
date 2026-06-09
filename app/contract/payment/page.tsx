@@ -27,21 +27,51 @@ function PaymentContent() {
 
   useEffect(() => {
     const supabase = createClient()
+    let pollInterval: ReturnType<typeof setInterval> | null = null
+
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { router.push('/auth/login'); return }
       setUserId(user.id)
-      supabase
-        .from('contracts')
-        .select('*')
-        .eq('client_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
-        .then(({ data }) => {
-          setContract(data)
-          setLoading(false)
-        })
+
+      const fetchContract = async () => {
+        const { data } = await supabase
+          .from('contracts')
+          .select('*')
+          .eq('client_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+        setContract(data)
+        setLoading(false)
+
+        // If returning from Stripe success but webhook hasn't fired yet, poll until DB updates
+        const returning = new URLSearchParams(window.location.search).get('returning')
+        if (returning && data && !['deposit_paid','fully_paid'].includes(data.status)) {
+          let attempts = 0
+          pollInterval = setInterval(async () => {
+            attempts++
+            const { data: fresh } = await supabase
+              .from('contracts')
+              .select('*')
+              .eq('client_id', user.id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .single()
+            if (fresh && ['deposit_paid','fully_paid'].includes(fresh.status)) {
+              setContract(fresh)
+              if (pollInterval) clearInterval(pollInterval)
+            }
+            if (attempts >= 10) {
+              if (pollInterval) clearInterval(pollInterval) // give up after ~30s
+            }
+          }, 3000)
+        }
+      }
+
+      fetchContract()
     })
+
+    return () => { if (pollInterval) clearInterval(pollInterval) }
   }, [router])
 
   const handlePay = async (type: 'deposit' | 'final') => {
@@ -104,6 +134,12 @@ function PaymentContent() {
         {cancelled && (
           <div style={{ background: 'rgba(200,32,42,0.12)', border: '1px solid rgba(200,32,42,0.3)', borderRadius: 8, padding: '12px 16px', marginBottom: 20, color: '#FF8A80', fontSize: 13, fontFamily: BODY, textAlign: 'center' }}>
             Payment was cancelled. You can try again below.
+          </div>
+        )}
+
+        {searchParams.get('returning') && !depositPaid && (
+          <div style={{ background: 'rgba(68,190,199,0.08)', border: '1px solid rgba(68,190,199,0.25)', borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 13, fontFamily: BODY, textAlign: 'center', color: BLUE }}>
+            ⏳ Verifying your payment… this usually takes a few seconds. If your payment went through, this page will update automatically. You can also safely try again below if needed.
           </div>
         )}
 

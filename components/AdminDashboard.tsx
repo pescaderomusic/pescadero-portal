@@ -220,38 +220,82 @@ export default function AdminDashboard({ bookings, inquiries, profiles, contract
         </div>
         {isOpen && (
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '16px' }}>
-            <style>{`@media(min-width:600px){.inq-grid{display:grid !important;grid-template-columns:repeat(3,1fr);gap:20px;}}`}</style>
-            <div className="inq-grid" style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 14 }}>
+            <style>{`@media(min-width:600px){.inq-grid{display:grid !important;grid-template-columns:repeat(3,1fr);gap:20px;}.inq-grid2{display:grid !important;grid-template-columns:1fr 1fr;gap:20px;}}`}</style>
+
+            {/* Row 1: Contact / Event / Services */}
+            <div className="inq-grid" style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 16 }}>
               <div>
                 <p style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL, marginBottom: 10, fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>Contact</p>
-                {[['Email', inq.email], ['Phone', inq.phone], ['Preferred', inq.preferred_contact], ['Budget', inq.budget]].map(([k, v]) => v && (
+                {[
+                  ['Name', `${inq.first_name || ''} ${inq.last_name || ''}`.trim()],
+                  ['Email', inq.email],
+                  ['Phone', inq.phone],
+                  ['Preferred Contact', inq.preferred_contact],
+                  ['Couple / Event Name', inq.couple_names || inq.event_name],
+                ].map(([k, v]) => v && (
                   <div key={k as string} style={{ display: 'flex', gap: 8, marginBottom: 5 }}>
-                    <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.3)', minWidth: 70, fontFamily: 'Poppins, sans-serif' }}>{k as string}</span>
+                    <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.3)', minWidth: 90, flexShrink: 0, fontFamily: 'Poppins, sans-serif' }}>{k as string}</span>
                     <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.75)', fontFamily: 'Poppins, sans-serif', wordBreak: 'break-all' }}>{v as string}</span>
                   </div>
                 ))}
               </div>
               <div>
-                <p style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL, marginBottom: 10, fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>Event</p>
-                {[['Date', fmtDate(inq.event_date)], ['Time', `${inq.start_time || '—'} – ${inq.end_time || '—'}`], ['Venue', inq.venue_name], ['Setting', inq.indoor_outdoor], ['Guests', inq.attendance]].map(([k, v]) => v && (
+                <p style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL, marginBottom: 10, fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>Event Details</p>
+                {[
+                  ['Date', fmtDate(inq.event_date)],
+                  ['Start Time', inq.start_time],
+                  ['End Time', inq.end_time],
+                  ['Venue', inq.venue_name],
+                  ['Address', inq.venue_address],
+                  ['Setting', inq.indoor_outdoor],
+                  ['Guests', inq.attendance],
+                  ['Event Type', Array.isArray(inq.event_types) ? inq.event_types.join(', ') : inq.event_type],
+                ].map(([k, v]) => v && (
                   <div key={k as string} style={{ display: 'flex', gap: 8, marginBottom: 5 }}>
-                    <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.3)', minWidth: 70, fontFamily: 'Poppins, sans-serif' }}>{k as string}</span>
+                    <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.3)', minWidth: 90, flexShrink: 0, fontFamily: 'Poppins, sans-serif' }}>{k as string}</span>
                     <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.75)', fontFamily: 'Poppins, sans-serif' }}>{v as string}</span>
                   </div>
                 ))}
               </div>
               <div>
-                <p style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL, marginBottom: 10, fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>Services</p>
-                {inq.services_requested?.map((s: string) => (
+                <p style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL, marginBottom: 10, fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>Services Requested</p>
+                {(inq.services_requested || inq.event_types || []).map((s: string) => (
                   <div key={s} style={{ fontSize: 10, color: 'rgba(232,224,213,0.75)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'Poppins, sans-serif' }}>
                     <span style={{ width: 4, height: 4, borderRadius: '50%', background: TEAL, display: 'inline-block', flexShrink: 0 }} />{s}
                   </div>
                 ))}
-                {inq.additional_notes && (
-                  <p style={{ fontSize: 10, color: 'rgba(232,224,213,0.5)', lineHeight: 1.5, margin: '10px 0 0', fontFamily: 'Poppins, sans-serif' }}>{inq.additional_notes}</p>
+                {!inq.services_requested?.length && !inq.event_types?.length && (
+                  <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.25)', fontFamily: 'Poppins, sans-serif' }}>None listed</span>
                 )}
               </div>
             </div>
+
+            {/* Row 2: Referral / Notes */}
+            <div className="inq-grid2" style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 16, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <div>
+                <p style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL, marginBottom: 10, fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>How They Found Us</p>
+                {[
+                  ['Source', inq.hear_about || inq.how_did_you_hear],
+                  ['Vendor Name', inq.vendor_name],
+                  ['Vendor Type', inq.vendor_type],
+                ].map(([k, v]) => v && (
+                  <div key={k as string} style={{ display: 'flex', gap: 8, marginBottom: 5 }}>
+                    <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.3)', minWidth: 90, flexShrink: 0, fontFamily: 'Poppins, sans-serif' }}>{k as string}</span>
+                    <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.75)', fontFamily: 'Poppins, sans-serif' }}>{v as string}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <p style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: TEAL, marginBottom: 10, fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>Additional Notes</p>
+                {(inq.additional_notes || inq.additional_details) ? (
+                  <p style={{ fontSize: 10, color: 'rgba(232,224,213,0.6)', lineHeight: 1.6, margin: 0, fontFamily: 'Poppins, sans-serif' }}>{inq.additional_notes || inq.additional_details}</p>
+                ) : (
+                  <span style={{ fontSize: 10, color: 'rgba(232,224,213,0.25)', fontFamily: 'Poppins, sans-serif' }}>None</span>
+                )}
+              </div>
+            </div>
+
+            {/* Status controls */}
             <div style={{ display: 'flex', gap: 6, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', flexWrap: 'wrap' }}>
               <span style={{ fontSize: 9, color: 'rgba(232,224,213,0.3)', letterSpacing: '1px', textTransform: 'uppercase', marginRight: 4, fontFamily: 'Poppins, sans-serif', alignSelf: 'center' }}>Mark as:</span>
               {['pending', 'reviewed', 'declined'].map(s => (
