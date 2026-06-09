@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       venue_address:       body.venueAddress,
       indoor_outdoor:      body.indoorOutdoor,
       attendance:          body.attendance,
-      services_requested:  body.services,
+      services_requested:  body.eventTypes || body.services || [],
       budget:              body.budget,
       additional_notes:    body.additionalDetails,
       status:              'new',
@@ -88,18 +88,29 @@ export async function POST(req: NextRequest) {
   try {
     const { Resend } = await import('resend')
     const resend = new Resend(process.env.RESEND_API_KEY!)
+    const services = body.eventTypes || body.services || []
     await resend.emails.send({
       from: 'Pescadero Music <garrett@pescaderomusic.com>',
       to: 'garrett@pescaderomusic.com',
       subject: `📋 New Inquiry — ${clientName}`,
       html: `
         <p><strong>${clientName}</strong> just submitted an inquiry.</p>
-        <p><strong>Event:</strong> ${body.eventName || '—'}<br>
-        <strong>Date:</strong> ${body.eventDate || '—'}<br>
-        <strong>Venue:</strong> ${body.venue || '—'}<br>
-        <strong>Services:</strong> ${Array.isArray(body.services) ? body.services.join(', ') : body.services || '—'}<br>
-        <strong>Budget:</strong> ${body.budget || '—'}</p>
-        <p><a href="https://pescaderomusic.com/admin">View in Admin Panel →</a></p>
+        <table style="font-size:14px;border-collapse:collapse;width:100%;max-width:500px;">
+          <tr><td style="padding:4px 8px;color:#888;width:140px;">Couple/Event</td><td><strong>${body.coupleNames || body.eventName || '—'}</strong></td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Email</td><td>${body.email || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Phone</td><td>${body.phone || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Preferred Contact</td><td>${body.contactMethod || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Event Date</td><td>${body.eventDate || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Time</td><td>${body.startTime || '—'} – ${body.endTime || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Venue</td><td>${body.venue || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Address</td><td>${body.venueAddress || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Setting</td><td>${body.indoorOutdoor || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Guests</td><td>${body.attendance || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Services</td><td>${Array.isArray(services) ? services.join(', ') : services || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">How They Found Us</td><td>${body.hearAbout || '—'}${body.vendorName ? ` — ${body.vendorName}` : ''}</td></tr>
+          <tr><td style="padding:4px 8px;color:#888;">Notes</td><td>${body.additionalDetails || '—'}</td></tr>
+        </table>
+        <p style="margin-top:16px;"><a href="https://pescaderomusic.com/admin" style="background:#D62828;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;font-weight:bold;">View in Admin Panel →</a></p>
       `,
     })
   } catch (e) { console.error('Garrett notify error:', e) }
