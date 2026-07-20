@@ -7,6 +7,7 @@ const NAVY = '#0D1B2A'
 const BLUE = '#44BEC7'
 const RED  = '#D62828'
 const GREEN = '#4CAF50'
+const TEAL  = '#4FB9AF'
 const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
 const inputStyle: React.CSSProperties = {
@@ -34,6 +35,7 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
   const [error,   setError]   = useState('')
 
   const [packagePrice,   setPackagePrice]   = useState('')
+  const [packageType,    setPackageType]    = useState('dance_dj')
   const [travelFee,      setTravelFee]      = useState('0')
   const [depositAmount,  setDepositAmount]  = useState('500')
   const [salesTaxRate,   setSalesTaxRate]   = useState('0')
@@ -65,16 +67,15 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
         if (cRes.data) {
           const c = cRes.data
           setPackagePrice(c.package_price?.toString() || '')
+          setPackageType(c.package_type || (Number(c.package_price) >= 850 ? 'full_service' : 'dance_dj'))
           setTravelFee(c.travel_fee?.toString() || '0')
           setDepositAmount(c.deposit_amount?.toString() || '500')
           setSalesTaxRate(c.sales_tax_rate?.toString() || '0')
           setSpecialNotes(c.special_notes || '')
           setGarrettMessage(c.garrett_message || '')
         } else if (bRes.data?.event_date) {
-          const dow = new Date(bRes.data.event_date + 'T12:00:00').getDay()
-          if (dow === 6) setPackagePrice('1500')
-          else if (dow === 5 || dow === 4) setPackagePrice('1400')
-          else setPackagePrice('1200')
+          setPackageType('dance_dj')
+          setPackagePrice('600')
         }
         setLoading(false)
       })
@@ -89,6 +90,7 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
       client_id:            params.clientId,
       booking_id:           booking?.id,
       package_price:        pkg,
+      package_type:         packageType,
       travel_fee:           travel,
       deposit_amount:       deposit,
       final_payment_amount: finalPayment,
@@ -214,11 +216,28 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
         {/* Investment */}
         <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '24px', marginBottom: 20 }}>
           <p style={{ margin: '0 0 20px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Investment</p>
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>Package *</label>
+            <select
+              style={inputStyle}
+              value={packageType}
+              onChange={e => {
+                const val = e.target.value
+                setPackageType(val)
+                if (val === 'dance_dj') setPackagePrice('600')
+                if (val === 'full_service') setPackagePrice('850')
+              }}
+            >
+              <option value="dance_dj">Dance DJ — $600</option>
+              <option value="full_service">Full-Service Sound — $850</option>
+              <option value="custom">Custom / Other</option>
+            </select>
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px', marginBottom: 16 }}>
             <div>
               <label style={labelStyle}>Package Price ($) *</label>
-              <input style={inputStyle} type="number" value={packagePrice} onChange={e => setPackagePrice(e.target.value)} placeholder="1500" />
-              <p style={{ margin: '4px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Sat $1,500 · Fri/Thu $1,400 · Mon–Wed $1,200</p>
+              <input style={inputStyle} type="number" value={packagePrice} onChange={e => setPackagePrice(e.target.value)} placeholder="600" />
+              <p style={{ margin: '4px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Dance DJ $600 · Full-Service Sound $850</p>
             </div>
             <div>
               <label style={labelStyle}>Travel Fee ($)</label>
@@ -230,6 +249,7 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
             <div>
               <label style={labelStyle}>Deposit Amount ($)</label>
               <input style={inputStyle} type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="500" />
+              <p style={{ margin: '4px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Deposit is 50% of package price</p>
             </div>
             <div>
               <label style={labelStyle}>Sales Tax Rate (%)</label>

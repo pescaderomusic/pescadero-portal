@@ -203,17 +203,22 @@ export default function ContractViewer() {
             )}
 
             <section style={{ marginBottom: 28 }}>
-              <SH>The All-Inclusive Premium Experience</SH>
-              <p style={bt}>This agreement covers the complete Pescadero Music premium experience. All of the following services are included in your investment — no add-ons, no hidden fees.</p>
+              <SH>{c?.package_type === 'full_service' ? 'Full-Service Sound' : c?.package_type === 'custom' ? 'Your Package' : 'Dance DJ'}</SH>
+              <p style={bt}>This agreement covers the following services included in your investment — no add-ons, no hidden fees.</p>
               <div style={{ background: '#f8f5f0', borderRadius: 10, padding: '16px 18px', marginBottom: 12 }}>
-                {[
-                  ['Full Day Coverage', 'Ceremony, Cocktail Hour, Dinner & Reception'],
-                  ['Design Consultations', 'Collaborative sessions for custom lighting & music planning'],
-                  ['Two Independent Sound Systems', 'Dedicated setups for ceremony and dance floor'],
-                  ['Dual-Channel Professional Microphones', 'Handheld or lapel options for speeches and vows'],
-                  ['Professional MC & Performance', 'Expert announcements and event flow management'],
-                  ['Bespoke Visuals', 'Handcrafted DJ furniture + dance floor lighting'],
-                ].map(([title, desc]) => (
+                {(c?.package_type === 'full_service' ? [
+                  ['Up to 4 Hours', 'Dedicated DJ service for your reception'],
+                  ['Two Independent Sound Systems', 'One for ceremony & speeches, one for the dance floor'],
+                  ['Two Wireless Microphones', 'For vows, toasts, and speeches'],
+                  ['DJ-Curated or Custom Playlist', 'Your call — as much or as little input as you want'],
+                  ['Dance Floor Lighting', 'Handcrafted, venue-matching lighting design'],
+                ] : [
+                  ['Up to 4 Hours', 'Dedicated DJ service for your reception'],
+                  ['One Professional Sound System', 'For your dance floor'],
+                  ['Wired MC Microphone', 'For announcements and toasts'],
+                  ['DJ-Curated or Custom Playlist', 'Your call — as much or as little input as you want'],
+                  ['Dance Floor Lighting', 'Handcrafted, venue-matching lighting design'],
+                ]).map(([title, desc]) => (
                   <div key={title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
                     <span style={{ color: BLUE, fontWeight: 700, fontSize: 14, flexShrink: 0, marginTop: 1 }}>&#10003;</span>
                     <div><span style={{ fontSize: 13, fontWeight: 700, color: '#1A2D3F' }}>{title}</span><span style={{ fontSize: 13, color: '#6A7E8E' }}> — {desc}</span></div>
@@ -228,7 +233,7 @@ export default function ContractViewer() {
               <SH>Rates & Payment Schedule</SH>
               <div style={{ border: '1.5px solid #EAE0CC', borderRadius: 10, overflow: 'hidden' }}>
                 {[
-                  ['The All-Inclusive Premium Experience', `$${Number(contract?.package_price || 0).toFixed(2)}`],
+                  [c?.package_type === 'full_service' ? 'Full-Service Sound' : c?.package_type === 'custom' ? 'Package' : 'Dance DJ', `$${Number(contract?.package_price || 0).toFixed(2)}`],
                   Number(contract?.travel_fee) > 0 ? ['Travel Fee', `$${Number(contract?.travel_fee).toFixed(2)}`] : null,
                   Number(contract?.sales_tax_rate) > 0 ? [`Sales Tax (${contract?.sales_tax_rate}%)`, `$${Number(contract?.sales_tax_amount || 0).toFixed(2)}`] : null,
                 ].filter(Boolean).map((row, i, arr) => (

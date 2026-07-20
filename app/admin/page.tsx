@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import ClientRowActions from '@/components/admin/ClientRowActions'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,7 +53,8 @@ function fmtDate(d: string | null) {
   return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }: { searchParams: { view?: string } }) {
+  const showArchived = searchParams?.view === 'archived'
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.id !== GARRETT_ID) redirect('/dashboard')
@@ -78,12 +80,16 @@ export default async function AdminPage() {
   const inquiryMap  = Object.fromEntries((inquiries || []).map(i => [i.client_id, i]))
   const contractMap = Object.fromEntries((contracts || []).map(c => [c.client_id, c]))
 
+  const activeBookings   = (bookings || []).filter(b => !b.archived_at)
+  const archivedBookings = (bookings || []).filter(b => b.archived_at)
+  const visibleBookings  = showArchived ? archivedBookings : activeBookings
+
   // Stats
-  const total          = bookings?.length || 0
-  const consultPending = bookings?.filter(b => b.step_consultation === 'pending').length || 0
-  const depositPaid    = bookings?.filter(b => b.step_deposit === 'paid').length || 0
+  const total          = activeBookings?.length || 0
+  const consultPending = activeBookings?.filter(b => b.step_consultation === 'pending').length || 0
+  const depositPaid    = activeBookings?.filter(b => b.step_deposit === 'paid').length || 0
   const now            = new Date()
-  const upcoming30     = bookings?.filter(b => {
+  const upcoming30     = activeBookings?.filter(b => {
     const d = contractMap[b.client_id]?.event_date || inquiryMap[b.client_id]?.event_date
     if (!d) return false
     const diff = Math.ceil((new Date(d + 'T12:00:00').getTime() - now.getTime()) / 86400000)
@@ -91,7 +97,7 @@ export default async function AdminPage() {
   }).length || 0
 
   // Upcoming events (next 90 days) for sidebar
-  const upcomingEvents = (bookings || [])
+  const upcomingEvents = activeBookings
     .map(b => {
       const d = contractMap[b.client_id]?.event_date || inquiryMap[b.client_id]?.event_date
       const daysAway = d ? Math.ceil((new Date(d + 'T12:00:00').getTime() - now.getTime()) / 86400000) : null
@@ -102,7 +108,7 @@ export default async function AdminPage() {
     .slice(0, 5)
 
   // Clients needing action
-  const needsAction = (bookings || []).filter(b =>
+  const needsAction = activeBookings.filter(b =>
     b.step_consultation === 'pending' ||
     (b.step_consultation === 'complete' && b.step_contract === 'locked') ||
     (b.step_contract === 'signed' && b.step_deposit === 'locked')
@@ -200,17 +206,24 @@ export default async function AdminPage() {
             <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
 
               {/* Table header */}
-              <div style={{ padding: '12px 18px', background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'grid', gridTemplateColumns: '180px 1fr auto', gap: 16, alignItems: 'center' }}>
-                <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Client</p>
-                <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Progress</p>
-                <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Actions</p>
+              <div style={{ padding: '12px 18px', background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr auto', gap: 16, alignItems: 'center', flex: 1 }}>
+                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Client</p>
+                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Progress</p>
+                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Actions</p>
+                </div>
+                <Link href={showArchived ? '/admin' : '/admin?view=archived'} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: BLUE, textDecoration: 'none', whiteSpace: 'nowrap', marginLeft: 16 }}>
+                  {showArchived ? '← Active Clients' : `Archived (${archivedBookings.length})`}
+                </Link>
               </div>
 
-              {(!bookings || bookings.length === 0) && (
-                <p style={{ padding: 40, textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: 13, margin: 0 }}>No clients yet.</p>
+              {visibleBookings.length === 0 && (
+                <p style={{ padding: 40, textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: 13, margin: 0 }}>
+                  {showArchived ? 'No archived clients.' : 'No clients yet.'}
+                </p>
               )}
 
-              {bookings?.map((booking, i) => {
+              {visibleBookings.map((booking, i) => {
                 const profile  = profileMap[booking.client_id]
                 const email    = emailMap[booking.client_id]
                 const inquiry  = inquiryMap[booking.client_id]
@@ -221,7 +234,7 @@ export default async function AdminPage() {
                 return (
                   <div key={booking.id} style={{
                     padding: '14px 18px',
-                    borderBottom: i < (bookings.length - 1) ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                    borderBottom: i < (visibleBookings.length - 1) ? '1px solid rgba(255,255,255,0.05)' : 'none',
                     background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
                     display: 'grid', gridTemplateColumns: '180px 1fr auto', gap: 16, alignItems: 'center',
                   }}>
@@ -283,6 +296,7 @@ export default async function AdminPage() {
                           {contract.status.replace('_', ' ')}
                         </span>
                       )}
+                      <ClientRowActions clientId={booking.client_id} isArchived={!!booking.archived_at} />
                     </div>
 
                   </div>

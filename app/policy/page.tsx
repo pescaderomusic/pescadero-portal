@@ -40,12 +40,12 @@ export default function PolicyPage() {
 
         {/* The Vision */}
         <Section eyebrow="About" title="The Vision">
-          <p style={{ marginTop: 0 }}>We believe your wedding shouldn't be a puzzle of "silver" or "gold" packages. We provide a single, premium service designed to eliminate the guesswork. You receive our highest level of sound, lighting, and handcrafted design regardless of the venue. If it's needed to make your day perfect, it is already included.</p>
+          <p style={{ marginTop: 0 }}>We keep things simple: two clear packages, transparent pricing, and no hidden fees. Whichever you choose, you get our full attention, our custom-built equipment, and a setup designed to look like an extension of your venue — not a folding table dropped in the corner.</p>
         </Section>
 
         {/* Part 1 */}
-        <Section eyebrow="Part 1" title="Ceremony & Dinner Excellence">
-          <p style={{ marginTop: 0 }}>We prioritize clarity and elegance for the most intimate moments of your day.</p>
+        <Section eyebrow="Part 1 · Full-Service Sound" title="Ceremony & Speech Excellence">
+          <p style={{ marginTop: 0 }}>Included with the Full-Service Sound package, we prioritize clarity and elegance for the most intimate moments of your day.</p>
           <PolicyRow label='The "Anywhere" Ceremony System'>
             Our dedicated ceremony and dinner setup is completely battery-powered. Whether you are saying your vows in an open meadow or a remote mountain overlook, we provide high-fidelity audio without the need for messy extension cords or noisy generators.
           </PolicyRow>
@@ -55,8 +55,8 @@ export default function PolicyPage() {
         </Section>
 
         {/* Part 2 */}
-        <Section eyebrow="Part 2" title="The High-Energy Reception">
-          <p style={{ marginTop: 0 }}>When the formal moments transition into the celebration, we provide a dedicated environment built specifically for the party.</p>
+        <Section eyebrow="Part 2 · Every Package" title="The High-Energy Reception">
+          <p style={{ marginTop: 0 }}>Included with every package, we provide a dedicated environment built specifically for the party.</p>
           <PolicyRow label="The Pro-Grade Dance Floor System">
             Our reception setup features a powerful, high-output sound system hardwired for 100% reliability. Controlled by a professional Allen & Heath console, this system is designed to fill the dance floor with rich, punchy sound while keeping your music crisp and clear.
           </PolicyRow>
@@ -76,47 +76,32 @@ export default function PolicyPage() {
           </PolicyRow>
         </Section>
 
-        {/* What's Included */}
-        <Section eyebrow="Package" title="What's Included in Every Celebration">
-          {[
-            ['Full Day Coverage', 'Ceremony, Cocktail Hour, Dinner, and Reception.'],
-            ['Design Consultations', 'Collaborative sessions to plan your custom lighting and music.'],
-            ['Two Independent Sound Systems', 'Dedicated setups for the ceremony and the dance floor.'],
-            ['Dual-Channel Shure Microphones', 'Choice of handheld or lapel mics for speeches and vows.'],
-            ['Professional MC & Performance', 'Expertly handled announcements to keep the evening on track.'],
-            ['Bespoke Visuals', 'Handcrafted furniture and custom-programmed dance floor lighting.'],
-          ].map(([label, desc]) => (
-            <div key={label} style={{ marginBottom: 12 }}>
-              <p style={{ margin: '0 0 2px', fontFamily: DISPLAY, fontWeight: 400, color: CREAM, fontSize: 14 }}>{label}</p>
-              <p style={{ margin: 0, fontSize: 13, fontFamily: BODY, color: 'rgba(245,239,224,0.65)' }}>{desc}</p>
-            </div>
-          ))}
+        {/* Packages */}
+        <Section eyebrow="Investment & Availability" title="Simple, Transparent Pricing">
+          <p style={{ marginTop: 0 }}>Two clear packages. Travel fees additional beyond our free service area.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, margin: '16px 0' }}>
+            {[
+              {
+                name: 'Dance DJ', price: '$600',
+                items: ['Up to 4 hours', 'One professional sound system', 'DJ-curated or custom playlist', 'Wired MC microphone', 'Dance floor lighting'],
+              },
+              {
+                name: 'Full-Service Sound', price: '$850', popular: true,
+                items: ['Up to 4 hours', 'Two independent sound systems', 'Ceremony & speech sound', 'Two wireless microphones', 'DJ-curated or custom playlist', 'Dance floor lighting'],
+              },
+            ].map(pkg => (
+              <div key={pkg.name} style={{ background: pkg.popular ? 'rgba(68,190,199,0.06)' : 'rgba(255,255,255,0.03)', border: pkg.popular ? `1px solid rgba(68,190,199,0.3)` : '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: 20 }}>
+                {pkg.popular && <p style={{ margin: '0 0 8px', fontSize: 10, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: RED }}>Most Popular</p>}
+                <p style={{ margin: '0 0 4px', fontFamily: DISPLAY, fontSize: 18, fontWeight: 400, color: CREAM }}>{pkg.name}</p>
+                <p style={{ margin: '0 0 12px', fontSize: 26, fontWeight: 700, color: BLUE }}>{pkg.price}</p>
+                {pkg.items.map(item => (
+                  <p key={item} style={{ margin: '0 0 6px', fontSize: 12, fontFamily: BODY, color: 'rgba(245,239,224,0.65)' }}>✓ {item}</p>
+                ))}
+              </div>
+            ))}
+          </div>
         </Section>
 
-        {/* Investment & Availability */}
-        <Section eyebrow="Investment & Availability" title="Simple, Transparent Pricing">
-          <p style={{ marginTop: 0 }}>We offer simple, transparent pricing based on the day of your celebration.</p>
-          <table style={{ width: '100%', borderCollapse: 'collapse', margin: '16px 0' }}>
-            <thead>
-              <tr style={{ background: NAVY }}>
-                <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.5)' }}>Day of the Week</th>
-                <th style={{ padding: '10px 16px', textAlign: 'right', fontSize: 11, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>Investment</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ['Saturdays (Prime Time)', '$1,500'],
-                ['Fridays & Thursdays', '$1,400'],
-                ['Monday – Wednesday', '$1,200'],
-              ].map(([day, price], i) => (
-                <tr key={day} style={{ background: i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)' }}>
-                  <td style={{ padding: '12px 16px', fontSize: 13, fontFamily: BODY, color: 'rgba(245,239,224,0.8)' }}>{day}</td>
-                  <td style={{ padding: '12px 16px', fontSize: 15, fontWeight: 700, color: BLUE, textAlign: 'right' }}>{price}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Section>
 
         {/* Travel */}
         <Section eyebrow="Logistics" title="Travel & Service Area">
@@ -137,7 +122,7 @@ export default function PolicyPage() {
         {/* Payment Terms */}
         <Section eyebrow="Financials" title="Payment Terms">
           <PolicyRow label="Accepted Payment Methods">Venmo, PayPal, CashApp, or check. Cash and trade payments are not accepted.</PolicyRow>
-          <PolicyRow label="Deposit">A non-refundable deposit is required to secure your date. The remaining balance is due before the event.</PolicyRow>
+          <PolicyRow label="Deposit">A non-refundable deposit of 50% of your package price is required to secure your date. The remaining balance is due before the event.</PolicyRow>
           <PolicyRow label="Late Payments">If payments are not received by their due dates, Pescadero Music reserves the right to apply late fees or cancel the booking without refund of the deposit.</PolicyRow>
         </Section>
 
