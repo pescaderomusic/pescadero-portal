@@ -3,6 +3,15 @@ import { useEffect } from 'react'
 
 export default function InquiryPage() {
   useEffect(() => {
+    // Load Adobe Fonts if not already present
+    if (!document.getElementById('adobe-fonts')) {
+      const link = document.createElement('link')
+      link.id = 'adobe-fonts'
+      link.rel = 'stylesheet'
+      link.href = 'https://use.typekit.net/qmr3yfz.css'
+      document.head.appendChild(link)
+    }
+
     const style = document.createElement('style')
     style.id = 'inquiry-styles'
     style.textContent = STYLES
@@ -23,7 +32,7 @@ export default function InquiryPage() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: '#0D1B2A' }}>
       <div style={{ background: '#07111A', borderBottom: '1px solid rgba(79,185,175,0.15)', padding: '0 24px', height: 44, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, zIndex: 1000 }}>
         <button
-          onClick={() => { try { (window as any).saveProgress?.() } catch(e) {} window.location.href = '/dashboard' }}
+          onClick={() => { try { (window as any).saveProgress?.() } catch(e) {} window.location.href = '/' }}
           style={{ fontSize: 11, color: 'rgba(232,224,213,0.4)', background: 'none', border: '1px solid rgba(232,224,213,0.2)', borderRadius: 6, padding: '5px 12px', cursor: 'pointer', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: "'futura-pt-condensed', 'Barlow Condensed', sans-serif" }}
         >
           ← Save &amp; Exit
@@ -154,41 +163,47 @@ const BODY = `<div id="inquiry-root">
     <div class="panel-header-logo"><img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" /></div>
     <div class="panel-header-title">
       <span class="panel-header-sub">Pescadero Music</span>
-      <span class="panel-header-main">Wedding Sound Inquiry</span>
+      <span class="panel-header-main" id="headerTitle">Sound Inquiry</span>
     </div>
   </div>
 
   <div class="progress-bar" id="progressBar">
-    <button class="step-btn active" data-step="1" onclick="tabNav(1)"><div class="step-dot">1</div><div class="step-name">Intro</div></button>
+    <button class="step-btn active" data-step="1" onclick="tabNav(1)"><div class="step-dot">1</div><div class="step-name">Check Date</div></button>
     <button class="step-btn" data-step="2" onclick="tabNav(2)"><div class="step-dot">2</div><div class="step-name">Contact</div></button>
     <button class="step-btn" data-step="3" onclick="tabNav(3)"><div class="step-dot">3</div><div class="step-name">Event</div></button>
-    <button class="step-btn" data-step="4" onclick="tabNav(4)"><div class="step-dot">4</div><div class="step-name">Services</div></button>
+    <button class="step-btn" data-step="4" onclick="tabNav(4)"><div class="step-dot">4</div><div class="step-name">Details</div></button>
     <button class="step-btn" data-step="5" onclick="tabNav(5)"><div class="step-dot">5</div><div class="step-name">Review</div></button>
   </div>
 
   <div class="sections-wrap" id="sectionsWrap">
 
-    <!-- SLIDE 1: HOW IT WORKS -->
+    <!-- SLIDE 1: CHECK AVAILABILITY -->
     <div class="slide is-active" id="slide-1">
       <div class="slide-head">
         <div class="slide-eyebrow">Welcome to Pescadero Music</div>
-        <div class="slide-title">Let\u2019s Get You Booked</div>
-        <div class="slide-sub">This takes about 3 minutes.</div>
+        <div class="slide-title" id="slide1Title">Check Availability</div>
+        <div class="slide-sub">Pick your event type and date to get started. Takes about 3 minutes.</div>
       </div>
-      <div class="fields" style="gap:12px;">
-        <div style="display:flex;align-items:flex-start;gap:14px;background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:16px 18px;">
-          <div style="width:40px;height:40px;border-radius:50%;background:rgba(68,190,199,0.12);border:1.5px solid rgba(68,190,199,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">\u270f\ufe0f</div>
-          <div><div style="font-size:0.9rem;font-weight:700;color:#0D1B2A;margin-bottom:4px;">1 \u2014 Submit Your Inquiry</div><div style="font-size:0.83rem;color:#6A7E8E;line-height:1.6;">Tell us about your event \u2014 your contact info, date, venue, and any questions.</div></div>
+      <div id="error-1" class="form-error"></div>
+      <div class="fields" style="gap:14px;">
+        <div class="field-group">
+          <div class="field-label">What kind of event? <span class="req">*</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;" id="typeGroup">
+            <label class="choice-item"><input type="radio" name="inquiryType" value="wedding" onchange="selectType('wedding')" /> \ud83d\udc8d Wedding</label>
+            <label class="choice-item"><input type="radio" name="inquiryType" value="event" onchange="selectType('event')" /> \ud83c\udfb6 DJ / Party / Event</label>
+            <label class="choice-item"><input type="radio" name="inquiryType" value="movie" onchange="selectType('movie')" /> \ud83c\udfac Outdoor Movie Night</label>
+          </div>
         </div>
-        <div style="display:flex;align-items:flex-start;gap:14px;background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:16px 18px;">
-          <div style="width:40px;height:40px;border-radius:50%;background:rgba(68,190,199,0.12);border:1.5px solid rgba(68,190,199,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">\ud83d\udcde</div>
-          <div><div style="font-size:0.9rem;font-weight:700;color:#0D1B2A;margin-bottom:4px;">2 \u2014 Garrett Reaches Out</div><div style="font-size:0.83rem;color:#6A7E8E;line-height:1.6;">Within 24\u201348 hours, Garrett will contact you directly to talk through your vision, answer questions, and confirm availability.</div></div>
+        <div class="field-group">
+          <div class="field-label">Event Date <span class="req">*</span></div>
+          <input type="date" id="checkDate" onchange="checkDateAvailability(this.value)" />
         </div>
-        <div style="background:rgba(68,190,199,0.06);border:1px solid rgba(68,190,199,0.18);border-radius:8px;padding:12px 15px;font-size:0.78rem;color:#4A5E6E;line-height:1.55;">\ud83d\udd12 Your information is only shared with Garrett \u2014 never sold or shared with third parties.</div>
+        <div id="dateStatusBox" style="display:none;"></div>
+        <div style="background:rgba(68,190,199,0.06);border:1px solid rgba(68,190,199,0.18);border-radius:8px;padding:12px 15px;font-size:0.78rem;color:#4A5E6E;line-height:1.55;" id="slide1Notice">\ud83d\udd12 Your information is only shared with Garrett \u2014 never sold or shared with third parties.</div>
       </div>
       <div class="slide-footer">
         <a href="/policy" target="_blank" style="font-size:0.72rem;color:#37A8B0;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;font-family:'futura-pt-condensed','Barlow Condensed',sans-serif;">View Service Policy</a>
-        <button class="btn btn-next" onclick="goTo(2,'forward')">Get Started \u2192</button>
+        <button class="btn btn-next" onclick="prefillFromSlide1(); goTo(2,'forward')">Continue \u2192</button>
       </div>
     </div>
 
@@ -215,24 +230,28 @@ const BODY = `<div id="inquiry-root">
             <label class="choice-item"><input type="radio" name="entry.1289776342" value="Text" /> Text</label>
           </div>
         </div>
-        <div class="field-group"><div class="field-label">Name of Bride &amp; Groom <span class="req">*</span></div><input type="text" id="coupleNames" placeholder="e.g. Emily &amp; James" /></div>
-      </div>
+        <!-- Wedding only: couple names -->
+        <div class="field-group" id="coupleNamesGroup">
+          <div class="field-label">Name of Bride &amp; Groom <span class="req">*</span></div>
+          <input type="text" id="coupleNames" placeholder="e.g. Emily &amp; James" />
+        </div>
+        <!-- How did you hear about us -->
         <div class="field-group">
-          <div class="field-label">How did you hear about us? <span style="color:#D62828;">*</span></div>
+          <div class="field-label">How did you hear about us? <span class="req">*</span></div>
           <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Google / Internet Search" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Google / Internet Search</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Instagram" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Instagram</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="TikTok" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> TikTok</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Facebook" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Facebook</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Word of Mouth" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Word of Mouth</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Friend of Garrett's" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Friend of Garrett's</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Another Wedding Vendor" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Another Wedding Vendor</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Wedding Wire / The Knot" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Wedding Wire / The Knot</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Other" style="accent-color:#D62828;" onchange="toggleReferralFields(this.value)"> Other</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Google / Internet Search" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Google / Internet Search</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Instagram" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Instagram</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="TikTok" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> TikTok</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Facebook" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Facebook</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Word of Mouth" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Word of Mouth</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Friend of Garrett's" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Friend of Garrett's</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;" id="vendorReferralLabel"><input type="radio" name="hearAbout" value="Another Wedding Vendor" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Another Vendor / Referral</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Wedding Wire / The Knot" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Wedding Wire / The Knot</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Other" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Other</label>
           </div>
           <div id="vendorNameGroup" style="display:none;margin-top:10px;">
             <div class="field-label" style="margin-bottom:6px;">Vendor Type</div>
-            <select id="vendorType" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;background:#fff;margin-bottom:10px;" onchange="updateVendorTypeHidden()">
+            <select id="vendorType" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;background:#fff;margin-bottom:10px;">
               <option value="">Select vendor type...</option>
               <option value="Photographer">Photographer</option>
               <option value="Videographer">Videographer</option>
@@ -244,7 +263,7 @@ const BODY = `<div id="inquiry-root">
               <option value="DJ / Entertainment">DJ / Entertainment</option>
               <option value="Other">Other</option>
             </select>
-            <div class="field-label" style="margin-bottom:6px;">Vendor Name</div>
+            <div class="field-label" style="margin-bottom:6px;">Vendor / Referral Name</div>
             <input type="text" id="vendorName" placeholder="e.g. Sarah Johnson Photography" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
           </div>
           <div id="otherHearGroup" style="display:none;margin-top:10px;">
@@ -252,40 +271,54 @@ const BODY = `<div id="inquiry-root">
             <input type="text" id="otherHear" placeholder="How did you find us?" style="width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #DDD3BC;font-size:0.9rem;color:#1A2D3F;outline:none;font-family:inherit;" />
           </div>
         </div>
+      </div>
       <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(1,'back')">\u2190 Back</button>
         <button class="btn btn-next" onclick="goTo(3,'forward')">Next \u2192</button>
       </div>
     </div>
 
-    <!-- SLIDE 3: EVENT -->
+    <!-- SLIDE 3: EVENT DETAILS -->
     <div class="slide" id="slide-3">
       <div class="slide-head">
         <div class="slide-eyebrow">Step 2 of 4</div>
         <div class="slide-title">Event Details</div>
-        <div class="slide-sub">Tell us about your wedding day.</div>
+        <div class="slide-sub" id="slide3Sub">Tell us about your event.</div>
       </div>
       <div id="error-3" class="form-error"></div>
       <div class="fields">
-        <div class="field-group"><div class="field-label">Event Name <span class="req">*</span></div><input type="text" id="eventName" placeholder="e.g. Smith Wedding" /></div>
-        <div class="field-group">
-          <div class="field-label">Event Type <span style="font-size:11px;color:#8A9EAA;font-weight:400;">(select all that apply)</span></div>
-          <div class="choice-group" id="eventTypeGroup" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+        <div class="field-group"><div class="field-label">Event Name <span class="req">*</span></div><input type="text" id="eventName" placeholder="e.g. Smith Wedding Reception" /></div>
+
+        <!-- Wedding: event type checkboxes -->
+        <div class="field-group" id="weddingTypesGroup">
+          <div class="field-label">What parts need coverage? <span style="font-size:11px;color:#8A9EAA;font-weight:400;">(select all that apply)</span></div>
+          <div class="choice-group" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
             <label class="choice-item"><input type="checkbox" name="eventType" value="Ceremony" /> Ceremony</label>
             <label class="choice-item"><input type="checkbox" name="eventType" value="Cocktail Hour" /> Cocktail Hour</label>
             <label class="choice-item"><input type="checkbox" name="eventType" value="Reception" /> Reception</label>
             <label class="choice-item"><input type="checkbox" name="eventType" value="Dinner" /> Dinner</label>
             <label class="choice-item"><input type="checkbox" name="eventType" value="Dancing" /> Dancing</label>
-            <label class="choice-item"><input type="checkbox" name="eventType" value="Open House" /> Open House</label>
           </div>
         </div>
-        <div class="field-group"><div class="field-label">Event Date <span class="req">*</span></div><input type="date" id="eventDate" name="entry.1402594235" /></div>
-        <div class="field-row">
-          <div class="field-group"><div class="field-label">Start Time <span class="req">*</span></div><input type="time" id="startTime" name="entry.1145643384" /></div>
-          <div class="field-group"><div class="field-label">End Time <span class="req">*</span></div><input type="time" id="endTime" name="entry.839784182" /></div>
+
+        <!-- Movie: location type -->
+        <div class="field-group" id="movieLocationGroup" style="display:none;">
+          <div class="field-label">Location Type <span class="req">*</span></div>
+          <div class="choice-group inline">
+            <label class="choice-item"><input type="radio" name="movieLocation" value="Private Backyard" /> Private Backyard</label>
+            <label class="choice-item"><input type="radio" name="movieLocation" value="HOA / Neighborhood" /> HOA / Neighborhood</label>
+            <label class="choice-item"><input type="radio" name="movieLocation" value="Private Venue" /> Private Venue</label>
+            <label class="choice-item"><input type="radio" name="movieLocation" value="Other" /> Other</label>
+          </div>
         </div>
-        <div class="field-group"><div class="field-label">Venue Name <span class="req">*</span></div><input type="text" id="venue" placeholder="Venue name" /></div>
-        <div class="field-group"><div class="field-label">Venue Address <span class="req">*</span></div><input type="text" id="venueAddress" placeholder="Street, City, State, ZIP" /></div>
+
+        <div class="field-group"><div class="field-label">Event Date <span class="req">*</span></div><input type="date" id="eventDate" /></div>
+        <div class="field-row">
+          <div class="field-group"><div class="field-label">Start Time <span class="req">*</span></div><input type="time" id="startTime" /></div>
+          <div class="field-group"><div class="field-label" id="endTimeLabel">End Time <span class="req">*</span></div><input type="time" id="endTime" /></div>
+        </div>
+        <div class="field-group"><div class="field-label" id="venueLabel">Venue / Location Name <span class="req">*</span></div><input type="text" id="venue" placeholder="Venue or location name" /></div>
+        <div class="field-group"><div class="field-label">Address <span class="req">*</span></div><input type="text" id="venueAddress" placeholder="Street, City, State, ZIP" /></div>
         <div class="field-group">
           <div class="field-label">Indoor or Outdoor? <span class="req">*</span></div>
           <div class="choice-group inline" id="settingGroup">
@@ -294,7 +327,7 @@ const BODY = `<div id="inquiry-root">
             <label class="choice-item"><input type="radio" name="entry.1884292728" value="Both" /> Both</label>
           </div>
         </div>
-        <div class="field-group"><div class="field-label">Estimated Attendance <span class="req">*</span></div><input type="text" id="attendance" placeholder="e.g. 150" /></div>
+        <div class="field-group"><div class="field-label">Estimated Attendance <span class="req">*</span></div><input type="text" id="attendance" placeholder="e.g. 50" /></div>
       </div>
       <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(2,'back')">\u2190 Back</button>
@@ -302,41 +335,16 @@ const BODY = `<div id="inquiry-root">
       </div>
     </div>
 
-    <!-- SLIDE 4: WHAT'S INCLUDED -->
+    <!-- SLIDE 4: SERVICE DETAILS (type-specific) -->
     <div class="slide" id="slide-4">
       <div class="slide-head">
         <div class="slide-eyebrow">Step 3 of 4</div>
-        <div class="slide-title">What\u2019s Included</div>
-        <div class="slide-sub">Every booking includes the full premium experience.</div>
+        <div class="slide-title" id="slide4Title">What\u2019s Included</div>
+        <div class="slide-sub" id="slide4Sub">Review your package and add any notes.</div>
       </div>
-      <div class="fields" style="gap:10px;">
-        <div style="background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
-          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#4A5E6E;margin-bottom:10px;">Full Premium Experience \u2014 Included in Every Booking</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Full Event Coverage \u2014 Professional audio for your ceremony, dinner, speeches, and high-energy celebration</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Design Consultations \u2014 Personalized planning for custom event music and tailored lighting</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Dual Sound Systems \u2014 Two independent, high-fidelity audio setups to seamlessly cover multiple spaces</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Professional Microphones \u2014 Dual-channel wireless systems featuring robust, high-performance handheld mics</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Professional MC Service \u2014 Polished, engaging management of entrances, announcements, and timeline flow</span></div>
-            <div style="display:flex;gap:10px;font-size:0.84rem;color:#1A2D3F;line-height:1.4;"><span style="color:#37A8B0;font-weight:700;flex-shrink:0;">\u2713</span><span>Curated Aesthetic \u2014 Clean handcrafted wood-and-white setups designed to look like an extension of your venue</span></div>
-          </div>
-        </div>
-        <div style="background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:14px 16px;">
-          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#4A5E6E;margin-bottom:10px;">Investment \u2014 Based on Day of the Week</div>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #EAE0CC;"><span style="font-size:0.86rem;color:#4A5E6E;">Saturdays (Prime Time)</span><span style="font-size:0.92rem;font-weight:700;color:#0D1B2A;">$1,500</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #EAE0CC;"><span style="font-size:0.86rem;color:#4A5E6E;">Fridays &amp; Thursdays</span><span style="font-size:0.92rem;font-weight:700;color:#0D1B2A;">$1,400</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;"><span style="font-size:0.86rem;color:#4A5E6E;">Monday \u2013 Wednesday</span><span style="font-size:0.92rem;font-weight:700;color:#0D1B2A;">$1,200</span></div>
-          </div>
-        </div>
-        <div style="background:rgba(68,190,199,0.06);border:1px solid rgba(68,190,199,0.2);border-radius:8px;padding:12px 15px;font-size:0.8rem;color:#4A5E6E;line-height:1.6;flex-shrink:0;">
-          <strong style="color:#0D1B2A;">No selections needed.</strong> All services are included. We\u2019ll tailor the details during your consultation.
-        </div>
-        <div class="field-group">
-          <div class="field-label">Additional Details &amp; Questions</div>
-          <textarea id="additionalDetails" placeholder="Share any additional details, questions, or special requests\u2026"></textarea>
-        </div>
-
+      <div id="error-4" class="form-error"></div>
+      <div class="fields" style="gap:12px;" id="slide4Content">
+        <!-- Populated by JS based on event type -->
       </div>
       <div class="slide-footer slide-footer-split">
         <button class="btn btn-back" onclick="goTo(3,'back')">\u2190 Back</button>
@@ -352,25 +360,12 @@ const BODY = `<div id="inquiry-root">
         <div class="slide-sub">Confirm everything looks correct.</div>
       </div>
       <div class="review-list" id="reviewList"></div>
-      <iframe name="hidden_iframe" style="display:none"></iframe>
-      <form id="gform" action="https://docs.google.com/forms/d/e/1FAIpQLSf2DiCwlYpZOim1JBidS35KyBeIohJF8vcOzUpT0ScjSOLlww/formResponse" method="POST" target="hidden_iframe" onsubmit="handleSubmit(event)">
-        <input type="hidden" id="h_firstName" name="entry.315397321" />
-        <input type="hidden" id="h_lastName" name="entry.735438890" />
-        <input type="hidden" id="h_email" name="entry.1653024831" />
-        <input type="hidden" id="h_phone" name="entry.1505839442" />
-        <input type="hidden" id="h_contactMethod" name="entry.1289776342" />
-        <input type="hidden" id="h_coupleNames" name="entry.391503868" />
-        <input type="hidden" id="h_eventName" name="entry.167147996" />
-        <input type="hidden" id="h_venue" name="entry.1267295149" />
-        <input type="hidden" id="h_venueAddress" name="entry.1474838283" />
-        <input type="hidden" id="h_indoorOutdoor" name="entry.1884292728" />
-        <input type="hidden" id="h_attendance" name="entry.1801133532" />
-        <input type="hidden" id="h_additionalDetails" name="entry.1670641103" />
+      <div id="gform">
         <div class="slide-footer slide-footer-split">
-          <button type="button" class="btn btn-back" onclick="goTo(4,'back')">\u2190 Edit</button>
-          <button type="submit" class="btn btn-submit">Submit Inquiry \u2192</button>
+          <button type="button" class="btn btn-back" onclick="goTo(4,'back')">&#x2190; Edit</button>
+          <button type="button" class="btn btn-submit" onclick="handleSubmit(event)">Submit Inquiry &#x2192;</button>
         </div>
-      </form>
+      </div>
     </div>
 
     <!-- SUCCESS -->
@@ -379,19 +374,235 @@ const BODY = `<div id="inquiry-root">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <h2>Inquiry Received!</h2>
-      <p style="margin:0 0 8px;">We\u2019ve received your inquiry and will reach out within <strong>24\u201348 hours</strong>.</p>
+      <p style="margin:0 0 8px;">Garrett will reach out within <strong>24\u201348 hours</strong> to follow up.</p>
       <p style="font-size:13px;color:#888;margin:0 0 20px;">Questions? <a href="mailto:garrett@pescaderomusic.com" style="color:#44BEC7;">garrett@pescaderomusic.com</a></p>
-      <a href="/dashboard" style="display:inline-block;padding:12px 28px;background:#D62828;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;">Back to Dashboard \u2192</a>
+      <a href="/" style="display:inline-block;padding:12px 28px;background:#C8202A;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;">Back to Home \u2192</a>
     </div>
 
   </div>
 </div>
-
-
 </div>`
+
 const SCRIPT = `
   const DUR = 400;
   let current = 1, animating = false;
+
+  // ── Detect event type from URL ─────────────────────────────────────────────
+  var urlParams = new URLSearchParams(window.location.search);
+  var EVENT_TYPE = (urlParams.get('type') || 'wedding').toLowerCase();
+  // Normalize
+  if (EVENT_TYPE !== 'event' && EVENT_TYPE !== 'movie') EVENT_TYPE = 'wedding';
+
+  // ── Apply type-specific UI (callable again when user picks a type on Slide 1) ──
+  function applyEventType() {
+    var titles = {
+      wedding: 'Wedding Sound Inquiry',
+      event:   'DJ & Event Inquiry',
+      movie:   'Outdoor Movie Night Inquiry',
+    };
+    var slide3Subs = {
+      wedding: 'Tell us about your wedding day.',
+      event:   'Tell us about your event.',
+      movie:   'Tell us about your screening.',
+    };
+
+    // Header title
+    var ht = document.getElementById('headerTitle');
+    if (ht) ht.textContent = titles[EVENT_TYPE];
+
+    // Slide 3 sub
+    var s3sub = document.getElementById('slide3Sub');
+    if (s3sub) s3sub.textContent = slide3Subs[EVENT_TYPE];
+
+    // Couple names — wedding only
+    var cnGroup = document.getElementById('coupleNamesGroup');
+    if (cnGroup) cnGroup.style.display = EVENT_TYPE === 'wedding' ? '' : 'none';
+
+    // Wedding event type checkboxes — wedding only
+    var wtGroup = document.getElementById('weddingTypesGroup');
+    if (wtGroup) wtGroup.style.display = EVENT_TYPE === 'wedding' ? '' : 'none';
+
+    // Movie location type — movie only
+    var mlGroup = document.getElementById('movieLocationGroup');
+    if (mlGroup) mlGroup.style.display = EVENT_TYPE === 'movie' ? '' : 'none';
+
+    // Event name placeholder
+    var enPlaceholders = { wedding: 'e.g. Smith Wedding Reception', event: 'e.g. Johnson House Party / Grand Opening', movie: 'e.g. Martinez Backyard Movie Night' };
+    var enEl = document.getElementById('eventName');
+    if (enEl) enEl.placeholder = enPlaceholders[EVENT_TYPE] || enPlaceholders.wedding;
+
+    // Venue label tweak for movie
+    var vl = document.getElementById('venueLabel');
+    if (vl && EVENT_TYPE === 'movie') vl.innerHTML = 'Location / Host Name <span style="color:#C8202A;">*</span>';
+
+    // Slide 4 content
+    buildSlide4();
+  }
+  applyEventType();
+
+  function buildSlide4() {
+    var container = document.getElementById('slide4Content');
+    if (!container) return;
+
+    if (EVENT_TYPE === 'wedding') {
+      document.getElementById('slide4Title').textContent = 'Choose Your Package';
+      document.getElementById('slide4Sub').textContent = 'Select the tier that fits your wedding.';
+      container.innerHTML = \`
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:2px solid #DDD3BC;border-radius:10px;padding:16px;cursor:pointer;transition:border-color 0.2s;" id="pkg-dance-label">
+            <input type="radio" name="weddingPackage" value="Dance DJ - $600" style="margin-top:3px;accent-color:#C8202A;flex-shrink:0;" onchange="highlightPackage()" />
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:0.95rem;font-weight:700;color:#0D1B2A;">Dance DJ</span>
+                <span style="font-size:1.1rem;font-weight:700;color:#C8202A;">$600</span>
+              </div>
+              <div style="font-size:0.8rem;color:#4A5E6E;line-height:1.55;">One sound system. Up to 4 hours of DJ service \u2014 reception, party, or grand opening. Travel fees additional.</div>
+              <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;">
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 Up to 4 hours</div>
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 One pro sound system</div>
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 DJ-curated or custom playlist</div>
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 Wired MC mic</div>
+              </div>
+            </div>
+          </label>
+          <label style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:2px solid #DDD3BC;border-radius:10px;padding:16px;cursor:pointer;transition:border-color 0.2s;" id="pkg-full-label">
+            <input type="radio" name="weddingPackage" value="Full-Service Sound - $850" style="margin-top:3px;accent-color:#C8202A;flex-shrink:0;" onchange="highlightPackage()" />
+            <div style="width:100%;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:0.95rem;font-weight:700;color:#0D1B2A;">Full-Service Sound</span>
+                  <span style="background:#C8202A;color:#fff;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:2px 7px;border-radius:20px;text-transform:uppercase;">Popular</span>
+                </div>
+                <span style="font-size:1.1rem;font-weight:700;color:#C8202A;">$850</span>
+              </div>
+              <div style="font-size:0.8rem;color:#4A5E6E;line-height:1.55;">Two independent sound systems \u2014 ceremony/speeches + dance floor. The complete wedding experience. Travel fees additional.</div>
+              <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;">
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 Up to 4 hours</div>
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 Two independent sound systems</div>
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 Ceremony &amp; cocktail hour sound</div>
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 Two wireless mics for vows, speeches &amp; toasts</div>
+                <div style="font-size:0.78rem;color:#37A8B0;">\u2713 DJ-curated or custom playlist</div>
+              </div>
+            </div>
+          </label>
+        </div>
+        <div class="field-group" style="margin-top:4px;">
+          <div class="field-label">Additional Details &amp; Questions</div>
+          <textarea id="additionalDetails" placeholder="Share any questions, special requests, or details\u2026"></textarea>
+        </div>
+      \`;
+    } else if (EVENT_TYPE === 'event') {
+      document.getElementById('slide4Title').textContent = 'Your DJ Package';
+      document.getElementById('slide4Sub').textContent = 'Flat rate, no surprises.';
+      container.innerHTML = \`
+        <div style="background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:16px 18px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:1rem;font-weight:700;color:#0D1B2A;">Dance DJ</span>
+            <span style="font-size:1.2rem;font-weight:700;color:#C8202A;">$600</span>
+          </div>
+          <div style="font-size:0.82rem;color:#4A5E6E;line-height:1.6;margin-bottom:12px;">One sound system. Up to 4 hours. Perfect for parties, grand openings, corporate events, and private celebrations. Travel fees additional.</div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 Up to 4 hours</div>
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 One pro sound system</div>
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 DJ-curated or custom playlist</div>
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 Wired MC mic</div>
+          </div>
+        </div>
+        <div style="background:rgba(68,190,199,0.06);border:1px solid rgba(68,190,199,0.2);border-radius:8px;padding:12px 15px;font-size:0.8rem;color:#4A5E6E;line-height:1.6;">
+          Need more than 4 hours or a second sound system? Mention it in the notes below and Garrett will put together a custom quote.
+        </div>
+        <div class="field-group">
+          <div class="field-label">Additional Details &amp; Questions</div>
+          <textarea id="additionalDetails" placeholder="Share any questions, special requests, or details\u2026"></textarea>
+        </div>
+      \`;
+    } else if (EVENT_TYPE === 'movie') {
+      document.getElementById('slide4Title').textContent = 'Outdoor Movie Night';
+      document.getElementById('slide4Sub').textContent = 'Private events only \u2014 review your package.';
+      container.innerHTML = \`
+        <div style="background:#fff;border:1.5px solid #DDD3BC;border-radius:10px;padding:16px 18px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:1rem;font-weight:700;color:#0D1B2A;">Private Outdoor Cinema</span>
+          </div>
+          <div style="font-size:0.82rem;color:#4A5E6E;line-height:1.6;margin-bottom:12px;">Self-contained rig with inflatable screen, HD projector, and outdoor sound. Runs up to 3 hours with no power hookup required.</div>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 Up to 3 hours</div>
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 Large inflatable screen</div>
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 HD projector</div>
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 Outdoor speaker system</div>
+            <div style="font-size:0.8rem;color:#37A8B0;">\u2713 No power hookup needed</div>
+          </div>
+          <div style="border-top:1px solid #EAE0CC;padding-top:12px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.82rem;color:#4A5E6E;">Mon \u2013 Thu</span>
+            <span style="font-size:1rem;font-weight:700;color:#0D1B2A;">$250</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+            <span style="font-size:0.82rem;color:#4A5E6E;">Fri \u2013 Sat</span>
+            <span style="font-size:1rem;font-weight:700;color:#0D1B2A;">$350</span>
+          </div>
+          <div style="margin-top:8px;font-size:0.75rem;color:#8A9EAA;font-style:italic;">Travel fees may apply. Summer availability only.</div>
+        </div>
+        <div style="background:rgba(200,32,42,0.06);border:1.5px solid rgba(200,32,42,0.2);border-radius:8px;padding:14px 16px;">
+          <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+            <input type="checkbox" id="privateEventConfirm" style="margin-top:2px;accent-color:#C8202A;width:16px;height:16px;flex-shrink:0;" />
+            <span style="font-size:0.83rem;color:#1A2D3F;line-height:1.6;"><strong>I confirm this is a private event.</strong> Public screenings require separate licensing. Pescadero Music provides outdoor cinema for private gatherings only.</span>
+          </label>
+        </div>
+        <div class="field-group">
+          <div class="field-label">What movie / what are you celebrating?</div>
+          <textarea id="additionalDetails" placeholder="Tell us what you\u2019d like to screen, the occasion, and any other details\u2026" style="min-height:72px;"></textarea>
+        </div>
+      \`;
+    }
+  }
+
+  // ── Availability checker (Slide 1) ──────────────────────────────────────────
+  var busyDates = [];
+  fetch('/api/busy-dates')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      busyDates = d.dates || [];
+      var existing = v('checkDate');
+      if (existing) checkDateAvailability(existing);
+    })
+    .catch(function() {});
+
+  function selectType(type) {
+    EVENT_TYPE = type;
+    applyEventType();
+  }
+
+  function checkDateAvailability(val) {
+    var box = document.getElementById('dateStatusBox');
+    if (!box) return;
+    if (!val) { box.style.display = 'none'; return; }
+    var busy = busyDates.indexOf(val) !== -1;
+    box.style.display = 'block';
+    box.style.borderRadius = '8px'; box.style.padding = '10px 14px';
+    box.style.fontSize = '0.82rem'; box.style.marginTop = '2px';
+    if (busy) {
+      box.style.background = 'rgba(200,32,42,0.08)'; box.style.border = '1px solid rgba(200,32,42,0.25)'; box.style.color = '#C8202A';
+      box.innerHTML = '\u2717 That date is already booked. Try another date or reach out to ask.';
+    } else {
+      box.style.background = 'rgba(68,190,199,0.08)'; box.style.border = '1px solid rgba(68,190,199,0.25)'; box.style.color = '#37A8B0';
+      box.innerHTML = '\u2713 That date looks open \u2014 continue below to send your inquiry.';
+    }
+  }
+
+  function prefillFromSlide1() {
+    var d = v('checkDate');
+    var dateEl = document.getElementById('eventDate');
+    if (dateEl && d) dateEl.value = d;
+  }
+
+  function highlightPackage() {
+    var dance = document.getElementById('pkg-dance-label');
+    var full = document.getElementById('pkg-full-label');
+    var checked = document.querySelector('input[name="weddingPackage"]:checked');
+    if (!checked || !dance || !full) return;
+    dance.style.borderColor = checked.value.includes('Dance') ? '#C8202A' : '#DDD3BC';
+    full.style.borderColor = checked.value.includes('Full') ? '#C8202A' : '#DDD3BC';
+  }
 
   function showBg(step) {
     document.querySelectorAll('.bg-layer').forEach(function(el) {
@@ -416,27 +627,39 @@ const SCRIPT = `
   }
 
   function validate(slide) {
+    if (slide === 1) {
+      if (!r('inquiryType')) { showError(1, 'Please select an event type.'); return false; }
+      var checkD = v('checkDate');
+      if (!checkD) { showError(1, 'Please select an event date.'); return false; }
+      if (busyDates.indexOf(checkD) !== -1) { showError(1, 'That date is already booked \u2014 please choose another.'); return false; }
+    }
     if (slide === 2) {
       if (!v('firstName')) { showError(2, 'First name is required.'); return false; }
       if (!v('lastName'))  { showError(2, 'Last name is required.'); return false; }
       if (!v('email'))     { showError(2, 'Email address is required.'); return false; }
       if (!v('phone'))     { showError(2, 'Phone number is required.'); return false; }
       if (!r('entry.1289776342')) { showError(2, 'Please select a preferred contact method.'); return false; }
-      if (!v('coupleNames')) { showError(2, 'Please enter the names of the bride & groom.'); return false; }
+      if (EVENT_TYPE === 'wedding' && !v('coupleNames')) { showError(2, 'Please enter the names of the bride & groom.'); return false; }
+      if (!r('hearAbout')) { showError(2, 'Please tell us how you heard about us.'); return false; }
+      if (r('hearAbout') === 'Another Wedding Vendor' && !v('vendorName')) { showError(2, 'Please enter the vendor name.'); return false; }
     }
     if (slide === 3) {
       if (!v('eventName'))    { showError(3, 'Event name is required.'); return false; }
       if (!v('eventDate'))    { showError(3, 'Event date is required.'); return false; }
       if (!v('startTime'))    { showError(3, 'Start time is required.'); return false; }
       if (!v('endTime'))      { showError(3, 'End time is required.'); return false; }
-      if (!v('venue'))        { showError(3, 'Venue name is required.'); return false; }
-      if (!v('venueAddress')) { showError(3, 'Venue address is required.'); return false; }
+      if (!v('venue'))        { showError(3, 'Venue / location name is required.'); return false; }
+      if (!v('venueAddress')) { showError(3, 'Address is required.'); return false; }
       if (!r('entry.1884292728')) { showError(3, 'Please select indoor or outdoor.'); return false; }
       if (!v('attendance'))   { showError(3, 'Estimated attendance is required.'); return false; }
+      if (EVENT_TYPE === 'movie' && !r('movieLocation')) { showError(3, 'Please select a location type.'); return false; }
     }
     if (slide === 4) {
-      if (!r('hearAbout')) { showError(4, 'Please tell us how you heard about us.'); return false; }
-      if (r('hearAbout') === 'Another Wedding Vendor' && !v('vendorName')) { showError(4, 'Please enter the vendor name.'); return false; }
+      if (EVENT_TYPE === 'wedding' && !r('weddingPackage')) { showError(4, 'Please select a package.'); return false; }
+      if (EVENT_TYPE === 'movie') {
+        var confirm = document.getElementById('privateEventConfirm');
+        if (!confirm || !confirm.checked) { showError(4, 'Please confirm this is a private event to continue.'); return false; }
+      }
     }
     return true;
   }
@@ -465,6 +688,7 @@ const SCRIPT = `
         if (s.id !== 'slide-' + next) { s.classList.remove('is-active'); s.style.cssText = ''; }
       });
       current = next; updateProgress(next); animating = false;
+      applyResponsiveLayout();
     }, DUR + 50);
   }
 
@@ -479,12 +703,21 @@ const SCRIPT = `
   }
 
   function buildReview() {
+    var packageVal = r('weddingPackage') || (EVENT_TYPE === 'event' ? 'Dance DJ - $600' : '');
+    var movieLoc = r('movieLocation') || '';
+    var eventTypesChecked = Array.from(document.querySelectorAll('input[name="eventType"]:checked')).map(function(cb){return cb.value;}).join(', ');
+
+    var typeLabel = { wedding: 'Wedding Sound', event: 'DJ / Event', movie: 'Outdoor Movie Night' }[EVENT_TYPE];
+
     var rows = [
+      ['Inquiry Type', typeLabel],
       ['Name', v('firstName') + ' ' + v('lastName')],
       ['Email', v('email')],
       ['Phone', v('phone')],
       ['Contact Via', r('entry.1289776342') || '\u2014'],
-      ['Bride & Groom', v('coupleNames')],
+    ];
+    if (EVENT_TYPE === 'wedding') rows.push(['Bride & Groom', v('coupleNames')]);
+    rows.push(
       ['Event', v('eventName')],
       ['Date', v('eventDate')],
       ['Start', v('startTime')],
@@ -492,26 +725,20 @@ const SCRIPT = `
       ['Venue', v('venue')],
       ['Address', v('venueAddress')],
       ['Setting', r('entry.1884292728') || '\u2014'],
-      ['Attendance', v('attendance')],
-      ['Notes', v('additionalDetails') || '\u2014'],
+      ['Attendance', v('attendance')]
+    );
+    if (EVENT_TYPE === 'wedding' && eventTypesChecked) rows.push(['Coverage', eventTypesChecked]);
+    if (EVENT_TYPE === 'movie') rows.push(['Location Type', movieLoc]);
+    if (packageVal) rows.push(['Package', packageVal]);
+    rows.push(
       ['Heard About Us', r('hearAbout') || '\u2014'],
       ['Vendor Referral', v('vendorName') || '\u2014'],
-    ];
+      ['Notes', v('additionalDetails') || '\u2014']
+    );
+
     document.getElementById('reviewList').innerHTML = rows.map(function(row) {
       return '<div class="review-row"><span class="review-key">' + row[0] + '</span><span class="review-val">' + (row[1] || '\u2014') + '</span></div>';
     }).join('');
-    document.getElementById('h_firstName').value = v('firstName');
-    document.getElementById('h_lastName').value = v('lastName');
-    document.getElementById('h_email').value = v('email');
-    document.getElementById('h_phone').value = v('phone');
-    document.getElementById('h_contactMethod').value = r('entry.1289776342');
-    document.getElementById('h_coupleNames').value = v('coupleNames');
-    document.getElementById('h_eventName').value = v('eventName');
-    document.getElementById('h_venue').value = v('venue');
-    document.getElementById('h_venueAddress').value = v('venueAddress');
-    document.getElementById('h_indoorOutdoor').value = r('entry.1884292728');
-    document.getElementById('h_attendance').value = v('attendance');
-    document.getElementById('h_additionalDetails').value = v('additionalDetails');
   }
 
   function saveProgress() {
@@ -520,34 +747,33 @@ const SCRIPT = `
         firstName: v('firstName'), lastName: v('lastName'),
         email: v('email'), phone: v('phone'),
         contactMethod: r('entry.1289776342'),
-        coupleNames: v('coupleNames'), eventName: v('eventName'), eventTypes: Array.from(document.querySelectorAll('input[name="eventType"]:checked')).map(function(cb){return cb.value;}),
+        coupleNames: v('coupleNames'),
+        eventName: v('eventName'),
+        eventTypes: Array.from(document.querySelectorAll('input[name="eventType"]:checked')).map(function(cb){return cb.value;}),
         eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
         venue: v('venue'), venueAddress: v('venueAddress'),
         indoorOutdoor: r('entry.1884292728'),
-        attendance: v('attendance'), additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), otherHear: v('otherHear'),
+        attendance: v('attendance'), additionalDetails: v('additionalDetails'),
+        hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), otherHear: v('otherHear'),
+        weddingPackage: r('weddingPackage'), movieLocation: r('movieLocation'),
+        eventCategory: EVENT_TYPE,
       }));
     } catch(e) {}
   }
 
   function restoreProgress() {
     try {
-
-      // ── Auto-fill from account ─────────────────────────────
+      // Auto-fill from Supabase session
       (function() {
         try {
-          // Supabase stores session in localStorage as sb-*-auth-token
           var keys = Object.keys(localStorage);
           var sessionKey = keys.find(function(k) { return k.includes('auth-token') || k.includes('supabase'); });
           if (!sessionKey) return;
           var session = JSON.parse(localStorage.getItem(sessionKey));
           var user = session && (session.user || (session[0] && session[0].user));
           if (!user) return;
-
-          // Fill email
           var emailEl = document.getElementById('email');
           if (emailEl && !emailEl.value) emailEl.value = user.email || '';
-
-          // Fill name from user_metadata
           var meta = user.user_metadata || {};
           var fullName = meta.full_name || meta.name || '';
           if (fullName) {
@@ -559,36 +785,50 @@ const SCRIPT = `
           }
         } catch(e) {}
       })();
-      // ─────────────────────────────────────────────────────────
 
       var saved = localStorage.getItem('pescadero_inquiry');
       if (!saved) return;
       var d = JSON.parse(saved);
+      // Only restore if same event type
+      if (d.eventCategory && d.eventCategory !== EVENT_TYPE) return;
       var set = function(id, val) { var el = document.getElementById(id); if (el && val) el.value = val; };
       var setR = function(name, val) { if (!val) return; var el = document.querySelector('input[name="' + name + '"][value="' + val + '"]'); if (el) el.checked = true; };
       set('firstName', d.firstName); set('lastName', d.lastName);
       set('email', d.email); set('phone', d.phone);
       setR('entry.1289776342', d.contactMethod);
-      set('coupleNames', d.coupleNames); set('eventName', d.eventName); if(d.eventTypes){d.eventTypes.forEach(function(v){var cb=document.querySelector('input[name="eventType"][value="'+v+'"]');if(cb)cb.checked=true;});}
+      set('coupleNames', d.coupleNames);
+      set('eventName', d.eventName);
+      if (d.eventTypes) { d.eventTypes.forEach(function(val) { var cb = document.querySelector('input[name="eventType"][value="' + val + '"]'); if (cb) cb.checked = true; }); }
       set('eventDate', d.eventDate); set('startTime', d.startTime); set('endTime', d.endTime);
       set('venue', d.venue); set('venueAddress', d.venueAddress);
       setR('entry.1884292728', d.indoorOutdoor);
       set('attendance', d.attendance); set('additionalDetails', d.additionalDetails);
-      if(d.hearAbout){var el=document.querySelector('input[name="hearAbout"][value="'+d.hearAbout+'"]');if(el){el.checked=true;toggleReferralFields(d.hearAbout);}}
-      set('vendorName', d.vendorName); set('otherHear', d.otherHear); if(d.vendorType){var vt=document.getElementById('vendorType');if(vt)vt.value=d.vendorType;}
+      if (d.hearAbout) { var el = document.querySelector('input[name="hearAbout"][value="' + d.hearAbout + '"]'); if (el) { el.checked = true; toggleReferralFields(d.hearAbout); } }
+      set('vendorName', d.vendorName); set('otherHear', d.otherHear);
+      if (d.vendorType) { var vt = document.getElementById('vendorType'); if (vt) vt.value = d.vendorType; }
+      if (d.weddingPackage) { var wp = document.querySelector('input[name="weddingPackage"][value="' + d.weddingPackage + '"]'); if (wp) { wp.checked = true; highlightPackage(); } }
+      if (d.movieLocation) { var ml = document.querySelector('input[name="movieLocation"][value="' + d.movieLocation + '"]'); if (ml) ml.checked = true; }
     } catch(e) {}
   }
 
   function handleSubmit(e) {
+    var packageSel = r('weddingPackage') || (EVENT_TYPE === 'event' ? 'Dance DJ - $600' : '');
     var formData = {
       firstName: v('firstName'), lastName: v('lastName'),
       email: v('email'), phone: v('phone'),
       contactMethod: r('entry.1289776342'),
-      coupleNames: v('coupleNames'), eventName: v('eventName'), eventTypes: Array.from(document.querySelectorAll('input[name="eventType"]:checked')).map(function(cb){return cb.value;}),
+      coupleNames: v('coupleNames'),
+      eventName: v('eventName'),
+      eventTypes: Array.from(document.querySelectorAll('input[name="eventType"]:checked')).map(function(cb){return cb.value;}),
       eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
       venue: v('venue'), venueAddress: v('venueAddress'),
-      indoorOutdoor: r('entry.1884292728'), attendance: v('attendance'),
-      additionalDetails: v('additionalDetails'), hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), otherHear: v('otherHear'),
+      indoorOutdoor: r('entry.1884292728'),
+      attendance: v('attendance'),
+      additionalDetails: v('additionalDetails'),
+      hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), otherHear: v('otherHear'),
+      weddingPackage: packageSel,
+      movieLocation: r('movieLocation'),
+      eventCategory: EVENT_TYPE,
     };
     fetch('/api/inquiry/submit', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -603,7 +843,128 @@ const SCRIPT = `
     }, 600);
   }
 
+  // ── JS-enforced mobile layout (belt-and-suspenders alongside the CSS media query) ──
+  function applyResponsiveLayout() {
+    var mobile = window.innerWidth <= 700;
+
+    var root = document.getElementById('inquiry-root');
+    if (root) root.style.flexDirection = mobile ? 'column' : '';
+
+    var bg = document.getElementById('bgStage');
+    if (bg) {
+      bg.style.height = mobile ? '30vh' : '';
+      bg.style.minHeight = mobile ? '160px' : '';
+      bg.style.flex = mobile ? 'none' : '';
+      bg.style.width = mobile ? '100%' : '';
+    }
+
+    var panel = document.querySelector('.form-panel');
+    if (panel) {
+      panel.style.width = mobile ? '100%' : '';
+      panel.style.flex = mobile ? '1' : '';
+      panel.style.boxShadow = mobile ? 'none' : '';
+      panel.style.minHeight = mobile ? '0' : '';
+    }
+
+    var header = document.querySelector('.panel-header');
+    if (header) {
+      header.style.height = mobile ? '52px' : '';
+      header.style.padding = mobile ? '0 16px' : '';
+    }
+
+    var logo = document.querySelector('.panel-header-logo');
+    if (logo) {
+      logo.style.width = mobile ? '32px' : '';
+      logo.style.height = mobile ? '32px' : '';
+    }
+
+    var wrap = document.getElementById('sectionsWrap');
+    if (wrap) {
+      wrap.style.overflowY = mobile ? 'auto' : '';
+      wrap.style.webkitOverflowScrolling = mobile ? 'touch' : '';
+    }
+
+    document.querySelectorAll('.slide').forEach(function(s) {
+      if (mobile) {
+        s.style.position = 'relative';
+        s.style.opacity = '1';
+        s.style.pointerEvents = 'auto';
+        s.style.transform = 'none';
+        s.style.padding = '20px 16px 16px';
+        s.style.display = s.classList.contains('is-active') ? '' : 'none';
+      } else {
+        s.style.position = ''; s.style.opacity = ''; s.style.pointerEvents = '';
+        s.style.transform = ''; s.style.padding = ''; s.style.display = '';
+      }
+    });
+
+    document.querySelectorAll('.field-row').forEach(function(fr) {
+      fr.style.gridTemplateColumns = mobile ? '1fr' : '';
+    });
+
+    document.querySelectorAll('.slide-footer').forEach(function(f) {
+      f.style.flexDirection = mobile ? 'row' : '';
+      f.style.paddingTop = mobile ? '14px' : '';
+    });
+
+    document.querySelectorAll('.btn').forEach(function(b) {
+      b.style.padding = mobile ? '10px 18px' : '';
+      b.style.fontSize = mobile ? '0.78rem' : '';
+    });
+    document.querySelectorAll('.btn-next').forEach(function(b) { b.style.padding = mobile ? '10px 20px' : ''; });
+    document.querySelectorAll('.btn-submit').forEach(function(b) { b.style.padding = mobile ? '11px 24px' : ''; });
+    document.querySelectorAll('.slide-title').forEach(function(t) { t.style.fontSize = mobile ? '1.2rem' : ''; });
+  }
+
   showBg(1);
   restoreProgress();
-`
+  applyResponsiveLayout();
+  window.addEventListener('resize', applyResponsiveLayout);
+  window.addEventListener('orientationchange', applyResponsiveLayout);
 
+  // Set min date to today on the Slide 1 checker
+  try {
+    var checkDateEl0 = document.getElementById('checkDate');
+    if (checkDateEl0) checkDateEl0.min = new Date().toISOString().split('T')[0];
+  } catch(e) {}
+
+  // Pre-fill Slide 1 (type + date) from URL params, e.g. coming from the homepage checker
+  try {
+    var typeParam = urlParams.get('type');
+    if (typeParam && ['wedding','event','movie'].indexOf(typeParam) !== -1) {
+      var typeRadio = document.querySelector('input[name="inquiryType"][value="' + typeParam + '"]');
+      if (typeRadio) typeRadio.checked = true;
+    }
+    var dateParamSlide1 = urlParams.get('date');
+    var checkDateEl1 = document.getElementById('checkDate');
+    if (dateParamSlide1 && checkDateEl1) {
+      checkDateEl1.value = dateParamSlide1;
+    }
+  } catch(e) {}
+
+  // Pre-fill date from URL param (?date=YYYY-MM-DD) into Slide 3 as well
+  try {
+    var dateParam = urlParams.get('date');
+    if (dateParam) {
+      var dateEl = document.getElementById('eventDate');
+      if (dateEl && !dateEl.value) dateEl.value = dateParam;
+    }
+  } catch(e) {}
+
+  // Direct entry from the homepage checker (type + date already chosen there):
+  // skip the in-form availability check and jump straight to Contact.
+  try {
+    var directType = urlParams.get('type');
+    var directDate = urlParams.get('date');
+    if (directType && directDate && ['wedding','event','movie'].indexOf(directType) !== -1) {
+      document.getElementById('slide-1').classList.remove('is-active');
+      document.getElementById('slide-2').classList.add('is-active');
+      current = 2;
+      updateProgress(2);
+      showBg(2);
+      applyResponsiveLayout();
+    }
+  } catch(e) {}
+
+  window.saveProgress = saveProgress;
+`

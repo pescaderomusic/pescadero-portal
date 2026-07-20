@@ -38,10 +38,10 @@ export default function LoginPage() {
     <div>
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 8 }}>
-          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 40, width: 40, objectFit: 'contain' }} />
-          <span style={{ fontFamily: WORDMARK, fontSize: 18, letterSpacing: '4px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
+          <img className="auth-logo-img" src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 40, width: 40, objectFit: 'contain' }} />
+          <span className="auth-wordmark" style={{ fontFamily: WORDMARK, fontSize: 18, letterSpacing: '4px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
         </div>
-        <p style={{ marginTop: 12, fontSize: 13, color: 'rgba(245,239,224,0.5)', fontFamily: BODY }}>
+        <p className="auth-subtitle" style={{ marginTop: 12, fontSize: 13, color: 'rgba(245,239,224,0.5)', fontFamily: BODY }}>
           Client Portal
         </p>
         <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(245,239,224,0.3)', textDecoration: 'none', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', marginTop: 8 }}>
@@ -50,7 +50,7 @@ export default function LoginPage() {
       </div>
 
       <div className="pm-card" style={{ border: '1px solid rgba(68,190,199,0.15)' }}>
-        <h1 style={{ fontFamily: DISPLAY, fontSize: 24, fontWeight: 300, color: CREAM, marginBottom: 24 }}>
+        <h1 className="auth-heading" style={{ fontFamily: DISPLAY, fontSize: 24, fontWeight: 300, color: CREAM, marginBottom: 24 }}>
           Welcome back
         </h1>
 

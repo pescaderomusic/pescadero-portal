@@ -69,7 +69,7 @@ export default async function AdminPage() {
     admin.from('bookings').select('*').order('created_at', { ascending: false }),
     admin.from('profiles').select('id, full_name'),
     admin.auth.admin.listUsers(),
-    admin.from('inquiry_submissions').select('client_id, event_date, event_name, couple_names, phone, preferred_contact, submitted_at'),
+    admin.from('inquiry_submissions').select('*').order('submitted_at', { ascending: false }),
     admin.from('contracts').select('client_id, status, deposit_paid_at, event_type, event_date, deposit_amount, final_payment_amount, final_payment_due'),
   ])
 
@@ -115,6 +115,7 @@ export default async function AdminPage() {
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.96)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(68,190,199,0.15)', padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE }}>PESCADERO ADMIN</span>
+          <Link href="/admin/inquiries" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📥 Inquiries</Link>
           <Link href="/admin/availability" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📅 Availability</Link>
           
           <Link href="/admin/analytics" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📊 Analytics</Link>

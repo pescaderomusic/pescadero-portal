@@ -197,7 +197,7 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
                 <p style={{ margin: '0 0 6px', fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Services Requested</p>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {inquiry.services_requested.map((s: string) => (
-                    <span key={s} style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(79,185,175,0.1)', border: '1px solid rgba(79,185,175,0.25)', color: TEAL }}>{s}</span>
+                    <span key={s} style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(79,185,175,0.1)', border: '1px solid rgba(79,185,175,0.25)', color: "#4FB9AF" }}>{s}</span>
                   ))}
                 </div>
               </div>

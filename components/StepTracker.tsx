@@ -294,14 +294,22 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           .st-card-btn { width: 100% !important; text-align: center !important; }
           .st-links { flex-direction: column !important; }
           .st-links a { text-align: center !important; }
-          .st-step-label { font-size: 8px !important; letter-spacing: 0 !important; }
           .st-step-circle { width: 36px !important; height: 36px !important; }
           .st-step-circle-active { width: 40px !important; height: 40px !important; }
           .st-step-circle-sel { width: 44px !important; height: 44px !important; }
           .st-event-circle { width: 52px !important; height: 52px !important; }
           .st-event-circle-sel { width: 56px !important; height: 56px !important; }
           .st-review-circle { width: 36px !important; height: 36px !important; }
-          .st-tracker-padding { padding: '36px 16px 80px' !important; }
+          .st-tracker-padding { padding: 24px 16px 80px !important; }
+
+          /* Mobile polish: bigger, punchier feel */
+          .st-event-name { font-size: 26px !important; }
+          .st-countdown-num { font-size: 44px !important; }
+          .st-noBooking-h1 { font-size: 24px !important; }
+          .st-card-title { font-size: 19px !important; }
+          .st-card-body { font-size: 14.5px !important; line-height: 1.6 !important; }
+          .st-links a { padding: 13px 16px !important; font-size: 13px !important; }
+          .st-step-label { font-size: 8.5px !important; letter-spacing: 0.2px !important; }
         }
       `}</style>
 
@@ -331,12 +339,12 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
           <div className="st-event-card" style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 14, padding: '20px 20px', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)' }}>Your Event</p>
-              <p style={{ margin: '0 0 4px', fontFamily: DISPLAY, fontSize: 22, color: CREAM, fontWeight: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b?.couple_names || b?.event_name || b?.event_type || `${firstName}'s Event`}</p>
+              <p className="st-event-name" style={{ margin: '0 0 4px', fontFamily: DISPLAY, fontSize: 22, color: CREAM, fontWeight: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b?.couple_names || b?.event_name || b?.event_type || `${firstName}'s Event`}</p>
               {b?.event_date && <p style={{ margin: '2px 0 0', fontSize: 13, fontFamily: BODY, color: 'rgba(245,239,224,0.4)' }}>{fmtDate(b.event_date)}{b.venue_name ? ` · ${b.venue_name}` : ''}</p>}
             </div>
             {daysUntil !== null && daysUntil > 0 && (
               <div className="st-event-countdown" style={{ textAlign: 'right', flexShrink: 0 }}>
-                <p style={{ margin: 0, fontSize: 38, fontFamily: DISPLAY, fontWeight: 300, color: RED, lineHeight: 1 }}>{daysUntil}</p>
+                <p className="st-countdown-num" style={{ margin: 0, fontSize: 38, fontFamily: DISPLAY, fontWeight: 300, color: RED, lineHeight: 1 }}>{daysUntil}</p>
                 <p style={{ margin: '2px 0 0', fontSize: 10, fontFamily: UI_FONT, color: 'rgba(245,239,224,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>days away</p>
               </div>
             )}
@@ -346,7 +354,7 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
 
         {noBooking && (
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <h1 style={{ margin: '0 0 8px', fontFamily: DISPLAY, fontSize: 28, fontWeight: 300, color: CREAM }}>Let's Make Your Day Unforgettable</h1>
+            <h1 className="st-noBooking-h1" style={{ margin: '0 0 8px', fontFamily: DISPLAY, fontSize: 28, fontWeight: 300, color: CREAM }}>Let's Make Your Day Unforgettable</h1>
             <p style={{ margin: 0, fontSize: 14, fontFamily: BODY, color: 'rgba(245,239,224,0.4)' }}>Start by submitting your inquiry below.</p>
           </div>
         )}
@@ -412,8 +420,8 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
                     <p style={{ margin: 0, fontSize: 10, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: isLocked ? 'rgba(245,239,224,0.25)' : card.color, fontWeight: 500 }}>{card.eyebrow}</p>
                     {isLocked && <span style={{ fontSize: 11, color: 'rgba(245,239,224,0.2)' }}>🔒 Locked</span>}
                   </div>
-                  <p style={{ margin: '0 0 6px', fontSize: 17, fontFamily: DISPLAY, fontWeight: 300, color: isLocked ? 'rgba(245,239,224,0.35)' : CREAM }}>{card.title}</p>
-                  <p style={{ margin: 0, fontSize: 13, fontFamily: BODY, color: isLocked ? 'rgba(245,239,224,0.25)' : 'rgba(245,239,224,0.6)', lineHeight: 1.7 }}>{card.body}</p>
+                  <p className="st-card-title" style={{ margin: '0 0 6px', fontSize: 17, fontFamily: DISPLAY, fontWeight: 300, color: isLocked ? 'rgba(245,239,224,0.35)' : CREAM }}>{card.title}</p>
+                  <p className="st-card-body" style={{ margin: 0, fontSize: 13, fontFamily: BODY, color: isLocked ? 'rgba(245,239,224,0.25)' : 'rgba(245,239,224,0.6)', lineHeight: 1.7 }}>{card.body}</p>
                   {selectedStep && (
                     <button onClick={() => setSelectedStep(null)} style={{ marginTop: 12, background: 'none', border: 'none', color: 'rgba(245,239,224,0.25)', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1px', cursor: 'pointer', padding: 0 }}>
                       ← Back to your next step

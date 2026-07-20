@@ -1,432 +1,475 @@
 'use client'
-import Link from 'next/link'
+
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-const NAVY  = '#07111A'
-const BLUE  = '#44BEC7'
-const RED   = '#C8202A'
-const CREAM = '#F5EFE0'
+const ADMIN_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
-const DISPLAY  = "'freight-display-pro', Georgia, serif"
-const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
-const BODY     = "'inter', system-ui, sans-serif"
-const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
-const ACCENT   = "'cormorant-garamond', Georgia, serif"
+// ─── Hero Slides ─────────────────────────────────────────────────────────────
+const heroSlides = [
+  {
+    eyebrow: 'Wedding DJ & Sound',
+    headline: 'Sound as good\nas it looks.',
+    sub: 'Full-service wedding DJ with professional sound for ceremony, cocktail hour, and reception.',
+    cta: 'Book Your Date',
+    ctaHref: '#availability',
+    bg: 'https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/hero.jpg',
+  },
+  {
+    eyebrow: 'Outdoor Movie Nights',
+    headline: 'Bring the\nbig screen outside.',
+    sub: 'A complete outdoor cinema experience for private events. Inflatable screen, projector, and crystal-clear sound — no power hookup needed.',
+    cta: 'Check Availability',
+    ctaHref: '#availability',
+    bg: 'https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/hero.jpg', // swap when you have a movie night photo
+  },
+]
+
+// ─── Pricing ─────────────────────────────────────────────────────────────────
+const djPackages = [
+  {
+    name: 'Dance DJ',
+    price: '$600',
+    note: 'Travel fees additional',
+    description: 'One sound system. Up to 4 hours of DJ service — perfect for receptions, parties, grand openings, and corporate events.',
+    features: ['Up to 4 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'Wired MC mic'],
+  },
+  {
+    name: 'Full-Service Sound',
+    price: '$850',
+    note: 'Travel fees additional',
+    description: 'Two independent sound systems — one for ceremony or speeches, one for the dance floor. The complete wedding package.',
+    features: ['Up to 4 hours', 'Two independent sound systems', 'Ceremony & cocktail hour sound', 'Two wireless mics for vows, speeches & toasts', 'DJ-curated or custom playlist'],
+    featured: true,
+  },
+]
+
+const moviePackage = {
+  name: 'Outdoor Movie Night',
+  weekday: '$250',
+  weekend: '$350',
+  description: 'A private outdoor cinema for your backyard, neighborhood, or event space. Self-contained rig runs up to 3 hours without a power hookup.',
+  features: ['Up to 3 hours', 'Large inflatable screen', 'HD projector', 'Outdoor speaker system', 'No power hookup needed', 'Private events only'],
+  note: 'Mon–Thu $250 · Fri–Sat $350',
+  seasonal: 'Summer availability only',
+}
+
+// ─── Availability checker event types ────────────────────────────────────────
+const eventTypes = [
+  { id: 'wedding', label: 'Wedding', icon: '💍', inquiryPath: '/inquiry?type=wedding' },
+  { id: 'event', label: 'DJ / Party / Event', icon: '🎶', inquiryPath: '/inquiry?type=event' },
+  { id: 'movie', label: 'Outdoor Movie Night', icon: '🎬', inquiryPath: '/inquiry?type=movie' },
+]
 
 export default function HomePage() {
-  const [showModal, setShowModal]     = useState(false)
-  const [email, setEmail]             = useState('')
-  const [password, setPassword]       = useState('')
-  const [authError, setAuthError]     = useState('')
-  const [loading, setLoading]         = useState(false)
-  const [user, setUser]               = useState<any>(null)
-  const [scrolled, setScrolled]       = useState(false)
-  const [showUserMenu, setShowUserMenu] = useState(false)
-  const userMenuRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const supabase = createClient()
+  const [user, setUser] = useState<any>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  // Hero carousel
+  const [slide, setSlide] = useState(0)
+  const [fading, setFading] = useState(false)
+  const slideTimer = useRef<NodeJS.Timeout | null>(null)
+
+  // Availability checker
+  const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [busyDates, setBusyDates] = useState<string[]>([])
+  const [checkDate, setCheckDate] = useState('')
+  const [dateStatus, setDateStatus] = useState<'idle' | 'available' | 'busy'>('idle')
+
+  // ── Auth ──
   useEffect(() => {
-    const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
-    document.documentElement.style.scrollBehavior = 'smooth'
-
-    const onScroll = () => setScrolled(window.scrollY > 80)
-    window.addEventListener('scroll', onScroll)
-
-    const onClickOutside = (e: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
-        setShowUserMenu(false)
-      }
-    }
-    document.addEventListener('mousedown', onClickOutside)
-
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      document.removeEventListener('mousedown', onClickOutside)
-    }
-  }, [])
-
-  const handleAuth = async () => {
-    setLoading(true); setAuthError('')
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      if (error.message.toLowerCase().includes('email') && error.message.toLowerCase().includes('confirm')) {
-        setAuthError('Email not confirmed — please check your inbox and confirm your email before signing in.')
-      } else {
-        setAuthError(error.message)
-      }
-      setLoading(false); return
-    }
-    window.location.href = '/dashboard'
-  }
+  }, [supabase])
 
   const handleSignOut = async () => {
-    const supabase = createClient()
     await supabase.auth.signOut()
-    window.location.href = '/'
+    setUser(null)
+    setMenuOpen(false)
   }
 
-  const firstName = user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Account'
+  // ── Scroll nav ──
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', handler)
+    return () => window.removeEventListener('scroll', handler)
+  }, [])
+
+  // ── Hero auto-advance ──
+  const goToSlide = (idx: number) => {
+    setFading(true)
+    setTimeout(() => {
+      setSlide(idx)
+      setFading(false)
+    }, 400)
+  }
+
+  useEffect(() => {
+    slideTimer.current = setTimeout(() => {
+      goToSlide((slide + 1) % heroSlides.length)
+    }, 6000)
+    return () => { if (slideTimer.current) clearTimeout(slideTimer.current) }
+  }, [slide])
+
+  // ── Busy dates ──
+  useEffect(() => {
+    fetch('/api/busy-dates')
+      .then(r => r.json())
+      .then(d => setBusyDates(d.dates || []))
+      .catch(() => {})
+  }, [])
+
+  const handleDateCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    setCheckDate(val)
+    if (!val) { setDateStatus('idle'); return }
+    setDateStatus(busyDates.includes(val) ? 'busy' : 'available')
+  }
+
+  const handleInquiry = () => {
+    if (!selectedType) return
+    const et = eventTypes.find(t => t.id === selectedType)
+    if (!et) return
+    const dateParam = checkDate ? `&date=${checkDate}` : ''
+    router.push(`${et.inquiryPath}${dateParam}`)
+  }
+
+  const s = heroSlides[slide]
 
   return (
-    <div style={{ background: 'linear-gradient(160deg, #07111A 0%, #0D1E2B 100%)', minHeight: '100vh', fontFamily: BODY, color: CREAM }}>
+    <div style={{ fontFamily: 'inter, sans-serif', background: 'linear-gradient(160deg, #07111A 0%, #0D1E2B 100%)', minHeight: '100vh', color: '#F5EFE0' }}>
 
-      {/* ── NAV ─────────────────────────────────────────────────── */}
-      <style>{`
-        @media (max-width: 640px) {
-          .hp-wordmark { display: none !important; }
-          .hp-nav-links { display: none !important; }
-          .hp-nav-gap { gap: 8px !important; }
-          .hp-dashboard-label { display: none !important; }
-          .hp-dashboard-icon { display: inline !important; }
-        }
-        @media (min-width: 641px) {
-          .hp-dashboard-icon { display: none !important; }
-        }
-      `}</style>
-
-      <nav style={{
+      {/* ── NAV ── */}
+      <nav className="pm-nav" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: scrolled ? 'rgba(7,17,26,0.96)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(68,190,199,0.1)' : 'none',
-        padding: '0 20px', height: 64,
+        height: '64px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        transition: 'background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease',
+        background: scrolled ? 'rgba(7,17,26,0.95)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(12px)' : 'none',
+        borderBottom: scrolled ? '1px solid rgba(68,190,199,0.15)' : 'none',
+        transition: 'all 0.3s ease',
       }}>
-        {/* Left: logo + wordmark */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 32, width: 32, objectFit: 'contain' }} />
-          <span className="hp-wordmark" style={{ fontFamily: WORDMARK, fontSize: 16, letterSpacing: '4px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
-        </div>
+        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: '36px', width: 'auto', flexShrink: 0 }} />
+          <span style={{ fontFamily: 'RetroFloral, serif', fontSize: '15px', fontWeight: 300, color: '#F5EFE0', letterSpacing: '3px', textTransform: 'uppercase' as const, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Pescadero Music</span>
+        </a>
 
-        {/* Center: nav links — hidden on mobile */}
-        <div className="hp-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
-          {[['Services', '#services'], ['Pricing', '#pricing']].map(([label, href]) => (
-            <a key={label} href={href} style={{ fontSize: 13, color: 'rgba(245,239,224,0.6)', textDecoration: 'none', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: UI_FONT, fontWeight: 500, transition: 'color 0.2s' }}
-              onMouseEnter={e => (e.target as HTMLElement).style.color = CREAM}
-              onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(245,239,224,0.6)'}
-            >{label}</a>
-          ))}
-        </div>
-
-        {/* Right: auth */}
-        <div className="hp-nav-gap" style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+        {/* Desktop links */}
+        <div className="pm-nav-desktop-links">
+          <a href="#services" style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F5EFE0', textDecoration: 'none', opacity: 0.8 }}>Services</a>
+          <a href="#pricing" style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F5EFE0', textDecoration: 'none', opacity: 0.8 }}>Pricing</a>
+          <a href="#availability" style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F5EFE0', textDecoration: 'none', opacity: 0.8 }}>Book</a>
           {user ? (
-            <>
-              <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: BLUE, textDecoration: 'none', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: UI_FONT }}>
-                <span style={{ fontSize: 10 }}>◇</span>
-                <span className="hp-dashboard-label">My Dashboard</span>
-                <span className="hp-dashboard-icon" style={{ fontSize: 12 }}>Dashboard</span>
-              </Link>
-              <div ref={userMenuRef} style={{ position: 'relative' }}>
-                <button
-                  onClick={() => setShowUserMenu(v => !v)}
-                  style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid rgba(245,239,224,0.3)`, background: 'transparent', color: CREAM, fontSize: 13, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}
-                >
-                  {firstName} →
-                </button>
-                {showUserMenu && (
-                  <div style={{ position: 'absolute', top: 'calc(100% + 10px)', right: 0, background: '#0D1E2B', border: '1px solid rgba(68,190,199,0.15)', borderRadius: 10, padding: '8px', minWidth: 160, boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
-                    <Link href="/dashboard" onClick={() => setShowUserMenu(false)} style={{ display: 'block', padding: '9px 14px', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.6)', textDecoration: 'none', borderRadius: 6 }}>
-                      Dashboard
-                    </Link>
-                    <div style={{ height: 1, background: 'rgba(245,239,224,0.07)', margin: '4px 0' }} />
-                    <button
-                      onClick={handleSignOut}
-                      style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 14px', fontSize: 12, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.6)', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 6 }}
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <button onClick={() => setShowModal(true)} style={{ padding: '7px 18px', borderRadius: 8, border: '1px solid rgba(245,239,224,0.2)', background: 'transparent', color: 'rgba(245,239,224,0.65)', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>
-                Sign In
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: '#44BEC7', color: '#07111A', border: 'none', borderRadius: '4px', padding: '0.45rem 1rem', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 600 }}>
+                Dashboard ▾
               </button>
-              <Link href="#account" style={{ padding: '7px 20px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', boxShadow: '0 4px 16px rgba(200,32,42,0.35)' }}>
-                Book Now
-              </Link>
-            </>
+              {menuOpen && (
+                <div style={{ position: 'absolute', right: 0, top: '110%', background: '#0D1E2B', border: '1px solid rgba(68,190,199,0.2)', borderRadius: '6px', minWidth: '160px', overflow: 'hidden' }}>
+                  <button onClick={() => router.push('/dashboard')} style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#F5EFE0', cursor: 'pointer', fontFamily: 'inter, sans-serif', fontSize: '0.9rem' }}>My Dashboard</button>
+                  {user.id === ADMIN_ID && (
+                    <button onClick={() => router.push('/admin')} style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#44BEC7', cursor: 'pointer', fontFamily: 'inter, sans-serif', fontSize: '0.9rem' }}>Admin Panel</button>
+                  )}
+                  <button onClick={handleSignOut} style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#C8202A', cursor: 'pointer', fontFamily: 'inter, sans-serif', fontSize: '0.9rem' }}>Sign Out</button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button onClick={() => router.push('/auth/login')} style={{ background: 'transparent', color: '#44BEC7', border: '1px solid #44BEC7', borderRadius: '4px', padding: '0.45rem 1rem', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+              Client Login
+            </button>
           )}
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="pm-nav-hamburger"
+          onClick={() => setMobileMenuOpen(o => !o)}
+          aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? '✕' : '☰'}
+        </button>
       </nav>
 
-      {/* ── HERO ────────────────────────────────────────────────── */}
-      <section style={{ position: 'relative', height: '100vh', minHeight: 640, overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      {/* Mobile menu panel */}
+      <div className={`pm-nav-mobile-panel${mobileMenuOpen ? ' open' : ''}`}>
+        <a href="#services" className="pm-nav-mobile-link" onClick={() => setMobileMenuOpen(false)}>Services</a>
+        <a href="#pricing" className="pm-nav-mobile-link" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
+        <a href="#availability" className="pm-nav-mobile-link" onClick={() => setMobileMenuOpen(false)}>Book</a>
+        {user ? (
+          <>
+            <button className="pm-nav-mobile-link" onClick={() => { setMobileMenuOpen(false); router.push('/dashboard') }}>My Dashboard</button>
+            {user.id === ADMIN_ID && (
+              <button className="pm-nav-mobile-link" style={{ color: '#44BEC7' }} onClick={() => { setMobileMenuOpen(false); router.push('/admin') }}>Admin Panel</button>
+            )}
+            <button className="pm-nav-mobile-link" style={{ color: '#C8202A' }} onClick={() => { setMobileMenuOpen(false); handleSignOut() }}>Sign Out</button>
+          </>
+        ) : (
+          <button className="pm-nav-mobile-link" style={{ color: '#44BEC7' }} onClick={() => { setMobileMenuOpen(false); router.push('/auth/login') }}>Client Login</button>
+        )}
+      </div>
 
-        {/* Full bleed photo */}
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/hero.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center 30%' }} />
+      {/* ── HERO CAROUSEL ── */}
+      <section className="pm-hero-section" style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
+        {/* BG image */}
+        <div className="pm-hero-bg" style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${s.bg})`,
+          backgroundSize: 'cover',
+          transition: 'opacity 0.4s ease',
+          opacity: fading ? 0 : 1,
+        }} />
+        {/* Overlay */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(7,17,26,0.85) 0%, rgba(7,17,26,0.4) 60%, rgba(7,17,26,0.1) 100%)' }} />
 
-        {/* Gradient overlays — left darker for text, overall darkening */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(7,17,26,0.82) 0%, rgba(7,17,26,0.55) 45%, rgba(7,17,26,0.15) 100%)' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(7,17,26,0.3) 0%, transparent 30%, transparent 65%, rgba(7,17,26,0.85) 100%)' }} />
-
-        {/* Main content — left aligned, vertically centered */}
-        <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', padding: '68px 40px 0' }}>
-          <div style={{ maxWidth: 560 }}>
-
-            {/* Eyebrow */}
-            <p style={{ margin: '0 0 20px', fontSize: 11, letterSpacing: '4px', textTransform: 'uppercase', color: BLUE, fontFamily: UI_FONT, fontWeight: 500 }}>
-              Live Sound &nbsp;•&nbsp; Provo, Utah
+        {/* Content */}
+        <div className="pm-hero-content" style={{
+          position: 'relative', zIndex: 2,
+          height: '100%', display: 'flex', alignItems: 'center',
+          opacity: fading ? 0 : 1,
+          transition: 'opacity 0.4s ease',
+        }}>
+          <div>
+            <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#44BEC7', marginBottom: '1rem' }}>
+              {s.eyebrow}
             </p>
-
-            {/* Hero headline */}
-            <h1 style={{ margin: '0 0 24px', fontFamily: DISPLAY, fontSize: 'clamp(56px, 7vw, 90px)', fontWeight: 200, lineHeight: 1.05, letterSpacing: '-1px' }}>
-              <span style={{ display: 'block', color: CREAM }}>Your Day.</span>
-              <span style={{ display: 'block', color: BLUE }}>Your Music.</span>
-              <span style={{ display: 'block', color: CREAM }}>Our Sound.</span>
+            <h1 style={{ fontFamily: 'freight-display-pro, serif', fontSize: 'clamp(2.8rem, 6vw, 5rem)', fontWeight: 400, lineHeight: 1.1, color: '#F5EFE0', margin: '0 0 1.25rem', whiteSpace: 'pre-line' }}>
+              {s.headline}
             </h1>
-
-            {/* Diamond divider */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '0 0 24px' }}>
-              <div style={{ flex: 1, height: 1, background: `rgba(245,239,224,0.2)` }} />
-              <span style={{ color: BLUE, fontSize: 10 }}>◇</span>
-              <div style={{ flex: 1, maxWidth: 60, height: 1, background: `rgba(245,239,224,0.2)` }} />
-            </div>
-
-            {/* Subtext */}
-            <p style={{ margin: '0 0 36px', fontSize: 17, color: 'rgba(245,239,224,0.65)', lineHeight: 1.75, fontFamily: ACCENT, fontStyle: 'italic', maxWidth: 460 }}>
-              Professional live sound for weddings, receptions, and events across Utah. Every detail of your day deserves to sound as good as it looks.
+            <p style={{ fontSize: '1.05rem', lineHeight: 1.6, color: 'rgba(245,239,224,0.8)', maxWidth: '480px', marginBottom: '2rem' }}>
+              {s.sub}
             </p>
-
-            {/* Buttons */}
-            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              <Link href="#account" style={{ padding: '13px 32px', borderRadius: 8, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', boxShadow: '0 6px 24px rgba(200,32,42,0.4)' }}>
-                Book Your Date →
-              </Link>
-              <a href="#services" style={{ padding: '13px 28px', borderRadius: 8, border: `1px solid rgba(245,239,224,0.35)`, color: CREAM, textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase' }}>
-                View Services
+            <div className="pm-hero-ctas">
+              <a href={s.ctaHref} style={{ background: '#C8202A', color: '#F5EFE0', padding: '0.75rem 1.75rem', borderRadius: '4px', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.9rem', letterSpacing: '0.12em', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 600, boxSizing: 'border-box' as const }}>
+                {s.cta}
+              </a>
+              <a href="#services" style={{ background: 'transparent', color: '#F5EFE0', padding: '0.75rem 1.75rem', borderRadius: '4px', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.9rem', letterSpacing: '0.12em', textTransform: 'uppercase', textDecoration: 'none', border: '1px solid rgba(245,239,224,0.4)', boxSizing: 'border-box' as const }}>
+                See Services
               </a>
             </div>
           </div>
         </div>
 
-        {/* Stats bar — bottom of hero */}
-        <div style={{ position: 'relative', padding: '0 40px 32px', display: 'flex', gap: 48, alignItems: 'flex-end', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', gap: 48 }}>
-            {[
-              { label: 'Wedding & Events', sub: 'Specialist' },
-              { label: 'Indoor & Outdoor', sub: 'Coverage' },
-              { label: 'Provo, Utah', sub: 'Based' },
-            ].map(({ label, sub }) => (
-              <div key={label}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3 }}>
-                  <span style={{ color: BLUE, fontSize: 9 }}>◇</span>
-                  <span style={{ fontSize: 12, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: CREAM, fontWeight: 500 }}>{label}</span>
-                </div>
-                <span style={{ fontSize: 13, fontFamily: ACCENT, fontStyle: 'italic', color: 'rgba(245,239,224,0.5)', paddingLeft: 16 }}>{sub}</span>
-              </div>
-            ))}
+        {/* Slide dots */}
+        <div style={{ position: 'absolute', bottom: '2rem', left: '5vw', zIndex: 3, display: 'flex', gap: '0.5rem' }}>
+          {heroSlides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { if (slideTimer.current) clearTimeout(slideTimer.current); goToSlide(i) }}
+              style={{
+                width: i === slide ? '2rem' : '0.5rem',
+                height: '0.5rem',
+                borderRadius: '999px',
+                background: i === slide ? '#44BEC7' : 'rgba(245,239,224,0.35)',
+                border: 'none', cursor: 'pointer', padding: 0,
+                transition: 'all 0.3s ease',
+              }}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ── SERVICES ── */}
+      <section id="services" className="pm-section">
+        <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#44BEC7', marginBottom: '0.75rem' }}>What I Do</p>
+        <h2 className="pm-section-heading" style={{ fontFamily: 'freight-display-pro, serif', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#F5EFE0', margin: '0 0 3.5rem' }}>
+          Every event deserves<br />a great soundtrack.
+        </h2>
+
+        <div className="pm-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+          {/* DJ Card */}
+          <div style={{ background: 'rgba(245,239,224,0.04)', border: '1px solid rgba(68,190,199,0.15)', borderRadius: '8px', padding: '2rem' }}>
+            <div className="pm-card-icon" style={{ fontSize: '2rem', marginBottom: '1rem' }}>🎧</div>
+            <h3 className="pm-card-title" style={{ fontFamily: 'freight-display-pro, serif', fontSize: '1.5rem', fontWeight: 400, color: '#F5EFE0', margin: '0 0 0.75rem' }}>DJ & Sound</h3>
+            <p className="pm-card-body" style={{ color: 'rgba(245,239,224,0.7)', lineHeight: 1.6, fontSize: '0.95rem' }}>
+              Professional DJ service for weddings, receptions, corporate events, grand openings, and private parties. From dance-floor-only sets to full ceremony and reception sound.
+            </p>
           </div>
 
-          {/* Scroll indicator */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 10, fontFamily: UI_FONT, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE }}>Scroll</span>
-            <div style={{ width: 1, height: 40, background: `linear-gradient(to bottom, ${BLUE}, transparent)` }} />
+          {/* Movie Night Card */}
+          <div style={{ background: 'rgba(245,239,224,0.04)', border: '1px solid rgba(68,190,199,0.15)', borderRadius: '8px', padding: '2rem' }}>
+            <div className="pm-card-icon" style={{ fontSize: '2rem', marginBottom: '1rem' }}>🎬</div>
+            <h3 className="pm-card-title" style={{ fontFamily: 'freight-display-pro, serif', fontSize: '1.5rem', fontWeight: 400, color: '#F5EFE0', margin: '0 0 0.75rem' }}>Outdoor Movie Night</h3>
+            <p className="pm-card-body" style={{ color: 'rgba(245,239,224,0.7)', lineHeight: 1.6, fontSize: '0.95rem' }}>
+              A complete private outdoor cinema for your backyard, neighborhood, or venue. Inflatable screen, HD projector, and outdoor sound — self-contained for up to 3 hours with no power hookup required.
+            </p>
+            <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#44BEC7', marginTop: '1rem' }}>
+              Private events only · Summer availability
+            </p>
           </div>
         </div>
       </section>
 
-      {/* ── BRAND PHILOSOPHY ────────────────────────────────────── */}
-      <section style={{ padding: '80px 24px', maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ margin: '0 0 12px', fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontFamily: UI_FONT, fontWeight: 500 }}>Our Philosophy</p>
-        <h2 style={{ margin: '0 0 20px', fontFamily: DISPLAY, fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 300, color: CREAM, lineHeight: 1.2 }}>The All-Inclusive Premium Experience</h2>
-        <p style={{ margin: 0, fontSize: 16, color: 'rgba(245,239,224,0.55)', lineHeight: 1.8 }}>
-          We believe elite wedding entertainment shouldn't be hidden behind arbitrary silver and gold package tiers. Instead, we deliver a high-end production experience—complete with premium audio, professional lighting, and a polished presentation tailored to Utah venues—streamlined into one definitive offering. Everything essential for a flawless, beautifully integrated celebration is already included, giving you a luxury-tier service without the artificial premium.
+      {/* ── PRICING ── */}
+      <section id="pricing" className="pm-section" style={{ background: '#F5EFE0' }}>
+        <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C8202A', marginBottom: '0.75rem' }}>Pricing</p>
+        <h2 className="pm-section-heading" style={{ fontFamily: 'freight-display-pro, serif', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#07111A', margin: '0 0 3.5rem' }}>
+          Simple, transparent pricing.
+        </h2>
+
+        {/* DJ Packages */}
+        <div className="pm-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+          {djPackages.map(pkg => (
+            <div key={pkg.name} className="pm-pricing-card" style={{
+              background: pkg.featured ? '#07111A' : 'white',
+              border: pkg.featured ? 'none' : '1px solid rgba(7,17,26,0.12)',
+              borderRadius: '8px',
+              position: 'relative',
+            }}>
+              {pkg.featured && (
+                <div style={{ position: 'absolute', top: '-1px', left: '2rem', background: '#C8202A', color: 'white', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', padding: '0.25rem 0.75rem', borderRadius: '0 0 4px 4px' }}>
+                  Most Popular
+                </div>
+              )}
+              <h3 className="pm-card-title" style={{ fontFamily: 'freight-display-pro, serif', fontSize: '1.4rem', fontWeight: 400, color: pkg.featured ? '#F5EFE0' : '#07111A', margin: '0 0 0.5rem' }}>{pkg.name}</h3>
+              <div style={{ fontFamily: 'freight-display-pro, serif', fontSize: '2.5rem', color: pkg.featured ? '#44BEC7' : '#07111A', margin: '0.5rem 0' }}>{pkg.price}</div>
+              <p style={{ fontSize: '0.75rem', color: pkg.featured ? 'rgba(245,239,224,0.5)' : 'rgba(7,17,26,0.4)', marginBottom: '1rem', fontStyle: 'italic' }}>{pkg.note}</p>
+              <p className="pm-card-body" style={{ fontSize: '0.9rem', lineHeight: 1.6, color: pkg.featured ? 'rgba(245,239,224,0.75)' : 'rgba(7,17,26,0.7)', marginBottom: '1.5rem' }}>{pkg.description}</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {pkg.features.map(f => (
+                  <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.9rem', color: pkg.featured ? 'rgba(245,239,224,0.8)' : 'rgba(7,17,26,0.8)' }}>
+                    <span style={{ color: '#44BEC7', flexShrink: 0 }}>✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Movie Night Pricing */}
+        <div className="pm-movie-box" style={{ background: '#07111A', borderRadius: '8px', padding: '2rem 2.5rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '1.5rem' }}>🎬</span>
+              <h3 style={{ fontFamily: 'freight-display-pro, serif', fontSize: '1.4rem', fontWeight: 400, color: '#F5EFE0', margin: 0 }}>{moviePackage.name}</h3>
+            </div>
+            <p style={{ fontSize: '0.9rem', color: 'rgba(245,239,224,0.65)', maxWidth: '440px', lineHeight: 1.6, margin: '0 0 0.75rem' }}>{moviePackage.description}</p>
+            <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#44BEC7' }}>{moviePackage.seasonal} · Private events only</p>
+          </div>
+          <div className="pm-movie-price-col">
+            <div style={{ fontFamily: 'freight-display-pro, serif', fontSize: '2rem', color: '#F5EFE0' }}>
+              <span style={{ color: '#44BEC7' }}>{moviePackage.weekday}</span>
+              <span style={{ fontSize: '1rem', color: 'rgba(245,239,224,0.5)', margin: '0 0.5rem' }}>Mon–Thu</span>
+            </div>
+            <div style={{ fontFamily: 'freight-display-pro, serif', fontSize: '2rem', color: '#F5EFE0', marginTop: '0.25rem' }}>
+              <span style={{ color: '#F5EFE0' }}>{moviePackage.weekend}</span>
+              <span style={{ fontSize: '1rem', color: 'rgba(245,239,224,0.5)', margin: '0 0.5rem' }}>Fri–Sat</span>
+            </div>
+          </div>
+        </div>
+
+        <p style={{ marginTop: '1.5rem', fontSize: '0.85rem', color: 'rgba(7,17,26,0.5)', fontStyle: 'italic' }}>
+          All prices are starting rates. Travel fees may apply for events outside Utah County. Contact for a custom quote.
         </p>
       </section>
 
-      {/* ── SERVICES ────────────────────────────────────────────── */}
-      <section id="services" style={{ padding: '20px 24px 80px', scrollMarginTop: 68 }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <p style={{ margin: '0 0 10px', fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontFamily: UI_FONT, fontWeight: 500 }}>Services</p>
-            <h2 style={{ margin: 0, fontFamily: DISPLAY, fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 300, color: CREAM }}>Two Dedicated Systems. One Perfect Day.</h2>
-          </div>
+      {/* ── AVAILABILITY CHECKER ── */}
+      <section id="availability" className="pm-section">
+        <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#44BEC7', marginBottom: '0.75rem' }}>Book Your Date</p>
+        <h2 className="pm-section-heading" style={{ fontFamily: 'freight-display-pro, serif', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#F5EFE0', margin: '0 0 2.5rem' }}>
+          Check availability.
+        </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, marginBottom: 24 }}>
-            <div style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 16, overflow: 'hidden' }}>
-              <div style={{ height: 200, backgroundImage: `url('https://inquiries.pescaderomusic.com/images/bg2.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center 25%' }} />
-              <div style={{ padding: '28px 28px 32px' }}>
-                <p style={{ margin: '0 0 4px', fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE, fontFamily: UI_FONT, fontWeight: 500 }}>Part I</p>
-                <h3 style={{ margin: '0 0 16px', fontFamily: DISPLAY, fontSize: 22, fontWeight: 300, color: CREAM }}>The Curated Ceremony/Reception Atmosphere</h3>
-                <p style={{ margin: '0 0 20px', fontSize: 14, color: 'rgba(245,239,224,0.5)', lineHeight: 1.7 }}>We prioritize clarity, reliability, and an invisible technical presence for the most intimate and formal moments of your day.</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div style={{ borderLeft: `2px solid ${BLUE}`, paddingLeft: 14 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>The "Anywhere" Ceremony System</p>
-                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)', lineHeight: 1.6 }}>Our ceremony and dinner setup is completely battery-powered, allowing for high-fidelity audio in any location — from remote mountain overlooks to open meadows — without noisy generators or unsightly extension cords.</p>
-                  </div>
-                  <div style={{ borderLeft: `2px solid ${BLUE}`, paddingLeft: 14 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>Professional Wireless Microphones</p>
-                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)', lineHeight: 1.6 }}>We utilize world-class wireless systems with two dedicated channels for any combination of handheld or discreet lapel microphones. Our professional-grade signal remains rock-solid and interference-free, even in crowded environments.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 16, overflow: 'hidden' }}>
-              <div style={{ height: 200, backgroundImage: `url('https://inquiries.pescaderomusic.com/images/bg3.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center 20%' }} />
-              <div style={{ padding: '28px 28px 32px' }}>
-                <p style={{ margin: '0 0 4px', fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', color: RED, fontFamily: UI_FONT, fontWeight: 500 }}>Part II</p>
-                <h3 style={{ margin: '0 0 16px', fontFamily: DISPLAY, fontSize: 22, fontWeight: 300, color: CREAM }}>The High-Energy Celebration</h3>
-                <p style={{ margin: '0 0 20px', fontSize: 14, color: 'rgba(245,239,224,0.5)', lineHeight: 1.7 }}>When the celebration begins, we transition to a dedicated environment built specifically for the energy of the dance floor.</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div style={{ borderLeft: `2px solid ${RED}`, paddingLeft: 14 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>The Pro-Grade Dance Floor System</p>
-                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)', lineHeight: 1.6 }}>Our reception setup features a high-output sound system hardwired directly into a professional mixing console for 100% reliability — rich, punchy, and crystal-clear all night long.</p>
-                  </div>
-                  <div style={{ borderLeft: `2px solid ${RED}`, paddingLeft: 14 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>Tailored Dance Floor Lighting</p>
-                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)', lineHeight: 1.6 }}>We treat lighting as an essential part of the party experience. During our consultation, we collaborate to choose the perfect look — from a soft candle-lit glow for your first dance to vibrant custom colors that match your wedding palette.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 16, overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-              <div style={{ height: 280, backgroundImage: `url('https://inquiries.pescaderomusic.com/images/bg4.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center 35%' }} />
-              <div style={{ padding: '32px 32px' }}>
-                <p style={{ margin: '0 0 4px', fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.4)', fontFamily: UI_FONT, fontWeight: 500 }}>The Signature Aesthetic</p>
-                <h3 style={{ margin: '0 0 16px', fontFamily: DISPLAY, fontSize: 22, fontWeight: 300, color: CREAM }}>Equipment That Looks As Good As It Sounds</h3>
-                <p style={{ margin: '0 0 20px', fontSize: 14, color: 'rgba(245,239,224,0.5)', lineHeight: 1.7 }}>Our equipment is designed to complement the modern-organic aesthetic of Utah's premier venues.</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div>
-                    <p style={{ margin: '0 0 3px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>Handcrafted DJ Furniture</p>
-                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)' }}>A custom-built white DJ table topped with a light-brown hardwood counter — designed to match a clean, organic wedding aesthetic.</p>
-                  </div>
-                  <div>
-                    <p style={{ margin: '0 0 3px', fontSize: 13, fontFamily: DISPLAY, fontWeight: 400, color: CREAM }}>The "Slick" Look</p>
-                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,239,224,0.45)' }}>A minimalist footprint with meticulous cable management. All wiring is hidden, ensuring your photos stay focused on your celebration — not the gear.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ─────────────────────────────────────────────── */}
-      <section id="pricing" style={{ padding: '80px 24px', background: 'rgba(0,0,0,0.2)', scrollMarginTop: 68 }}>
-        <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ margin: '0 0 10px', fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontFamily: UI_FONT, fontWeight: 500 }}>Investment & Availability</p>
-          <h2 style={{ margin: '0 0 12px', fontFamily: DISPLAY, fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 300, color: CREAM }}>Simple, Transparent Pricing</h2>
-          <p style={{ margin: '0 0 40px', fontSize: 15, color: 'rgba(245,239,224,0.45)', lineHeight: 1.7 }}>We offer transparent, value-based pricing based on the day of your celebration.</p>
-
-          <div style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 16, overflow: 'hidden', marginBottom: 24 }}>
-            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid rgba(245,239,224,0.06)' }}>
-              <span style={{ fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.35)', textAlign: 'left' }}>Day of the Week</span>
-              <span style={{ fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.35)', textAlign: 'right' }}>Investment</span>
-            </div>
-            {[
-              { day: 'Saturdays (Prime Time)', price: '$1,500', highlight: true },
-              { day: 'Fridays & Thursdays',    price: '$1,400', highlight: false },
-              { day: 'Monday – Wednesday',      price: '$1,200', highlight: false },
-            ].map(({ day, price, highlight }, i) => (
-              <div key={day} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '16px 24px', background: highlight ? 'rgba(68,190,199,0.05)' : 'transparent', borderBottom: i < 2 ? '1px solid rgba(245,239,224,0.05)' : 'none' }}>
-                <span style={{ fontSize: 15, fontFamily: DISPLAY, color: 'rgba(245,239,224,0.75)', textAlign: 'left', fontWeight: highlight ? 600 : 400 }}>{day}</span>
-                <span style={{ fontSize: 20, fontFamily: DISPLAY, fontWeight: 300, color: highlight ? BLUE : CREAM, textAlign: 'right' }}>{price}</span>
-              </div>
+        <div style={{ maxWidth: '560px' }}>
+          {/* Step 1: Event Type */}
+          <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(245,239,224,0.5)', marginBottom: '0.75rem' }}>
+            1 — What kind of event?
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
+            {eventTypes.map(et => (
+              <button
+                key={et.id}
+                onClick={() => setSelectedType(et.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '1rem',
+                  padding: '1rem 1.25rem',
+                  background: selectedType === et.id ? 'rgba(68,190,199,0.12)' : 'rgba(245,239,224,0.04)',
+                  border: selectedType === et.id ? '1px solid #44BEC7' : '1px solid rgba(245,239,224,0.12)',
+                  borderRadius: '6px', cursor: 'pointer',
+                  color: '#F5EFE0', textAlign: 'left',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <span style={{ fontSize: '1.25rem' }}>{et.icon}</span>
+                <span style={{ fontFamily: 'inter, sans-serif', fontSize: '0.95rem' }}>{et.label}</span>
+                {selectedType === et.id && <span style={{ marginLeft: 'auto', color: '#44BEC7', fontSize: '0.85rem' }}>✓</span>}
+              </button>
             ))}
           </div>
 
-          <div style={{ background: 'rgba(245,239,224,0.03)', border: '1px solid rgba(245,239,224,0.07)', borderRadius: 16, padding: '28px', textAlign: 'left', marginBottom: 36 }}>
-            <p style={{ margin: '0 0 16px', fontSize: 11, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.4)', fontFamily: UI_FONT, fontWeight: 500 }}>What's Included in Every Booking</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px 24px' }}>
-              {[
-                'Full Event Coverage — Professional audio for your ceremony, dinner, speeches, and high-energy celebration',
-                'Design Consultations — Personalized planning for custom event music and tailored lighting',
-                'Dual Sound Systems — Two independent, high-fidelity audio setups to seamlessly cover multiple spaces',
-                'Professional Microphones — Dual-channel wireless systems featuring robust, high-performance handheld mics.',
-                'Professional MC Service — Polished, engaging management of entrances, announcements, and timeline flow.',
-                'Curated Aesthetic — Clean handcrafted wood-and-white setups designed to look like an extension of your venue.',
-              ].map(item => (
-                <div key={item} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ color: BLUE, flexShrink: 0, marginTop: 2, fontSize: 10 }}>◇</span>
-                  <span style={{ fontSize: 13, color: 'rgba(245,239,224,0.55)', lineHeight: 1.5 }}>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="#account" style={{ padding: '14px 36px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', boxShadow: '0 6px 28px rgba(200,32,42,0.35)' }}>
-              Book Your Date →
-            </Link>
-            <Link href="/policy" style={{ padding: '14px 28px', borderRadius: 10, border: '1px solid rgba(245,239,224,0.15)', color: 'rgba(245,239,224,0.55)', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-              Service Policy
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── ACCOUNT SECTION ─────────────────────────────────── */}
-      <section id="account" style={{ padding: '80px 24px', scrollMarginTop: 68, background: 'rgba(0,0,0,0.15)' }}>
-        <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ margin: '0 0 10px', fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontFamily: UI_FONT, fontWeight: 500 }}>Your Booking Portal</p>
-          <h2 style={{ margin: '0 0 16px', fontFamily: DISPLAY, fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 300, color: CREAM, lineHeight: 1.2 }}>
-            Everything in One Place
-          </h2>
-          <p style={{ fontSize: 16, color: 'rgba(245,239,224,0.5)', lineHeight: 1.75, maxWidth: 480, margin: '0 auto 36px' }}>
-            Create a free account to manage your entire booking from start to finish — submit your inquiry, sign your contract, fill out your planning form, make payments, and track every step of the process in real time.
+          {/* Step 2: Date */}
+          <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(245,239,224,0.5)', marginBottom: '0.75rem' }}>
+            2 — Pick a date
           </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={() => setShowModal(true)} style={{ padding: '13px 32px', borderRadius: 10, border: '1px solid rgba(245,239,224,0.2)', background: 'transparent', color: 'rgba(245,239,224,0.7)', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer' }}>
-              Sign In
-            </button>
-            <a href="/auth/signup" style={{ padding: '13px 32px', borderRadius: 10, background: RED, color: 'white', textDecoration: 'none', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', boxShadow: '0 4px 20px rgba(200,32,42,0.35)' }}>
-              Create Account →
-            </a>
-          </div>
+          <input
+            type="date"
+            value={checkDate}
+            onChange={handleDateCheck}
+            min={new Date().toISOString().split('T')[0]}
+            style={{
+              width: '100%', padding: '0.85rem 1rem',
+              background: 'rgba(245,239,224,0.06)',
+              border: '1px solid rgba(245,239,224,0.15)',
+              borderRadius: '6px', color: '#F5EFE0',
+              fontFamily: 'inter, sans-serif', fontSize: '1rem',
+              boxSizing: 'border-box', marginBottom: '0.75rem',
+            }}
+          />
+
+          {/* Date status */}
+          {dateStatus === 'available' && (
+            <div style={{ background: 'rgba(68,190,199,0.1)', border: '1px solid rgba(68,190,199,0.3)', borderRadius: '6px', padding: '0.75rem 1rem', color: '#44BEC7', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              ✓ That date looks open — send an inquiry to lock it in.
+            </div>
+          )}
+          {dateStatus === 'busy' && (
+            <div style={{ background: 'rgba(200,32,42,0.1)', border: '1px solid rgba(200,32,42,0.3)', borderRadius: '6px', padding: '0.75rem 1rem', color: '#C8202A', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              ✗ That date is already booked. Try another date or reach out to ask.
+            </div>
+          )}
+
+          {/* CTA */}
+          <button
+            onClick={handleInquiry}
+            disabled={!selectedType || !checkDate || dateStatus === 'busy'}
+            style={{
+              width: '100%', padding: '0.9rem',
+              background: (!selectedType || !checkDate || dateStatus === 'busy') ? 'rgba(200,32,42,0.35)' : '#C8202A',
+              color: '#F5EFE0', border: 'none', borderRadius: '6px',
+              fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.95rem',
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              cursor: (!selectedType || !checkDate || dateStatus === 'busy') ? 'not-allowed' : 'pointer',
+              transition: 'background 0.2s ease',
+            }}
+          >
+            Send Inquiry
+          </button>
+          {!selectedType && (
+            <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', marginTop: '0.5rem' }}>
+              Select an event type above to continue
+            </p>
+          )}
         </div>
       </section>
 
-      {/* ── FOOTER ──────────────────────────────────────────────── */}
-      <footer style={{ padding: '48px 24px', textAlign: 'center', borderTop: '1px solid rgba(245,239,224,0.06)' }}>
-        <p style={{ margin: '0 0 4px', fontFamily: WORDMARK, fontSize: 16, letterSpacing: '4px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
-        <p style={{ margin: '0 0 16px', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.25)' }}>Professional Wedding Sound · Utah</p>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
-          <a href="mailto:garrett@pescaderomusic.com" style={{ fontSize: 12, color: BLUE, textDecoration: 'none' }}>garrett@pescaderomusic.com</a>
-          <span style={{ color: 'rgba(245,239,224,0.15)', fontSize: 12 }}>·</span>
-          <a href="tel:2107279328" style={{ fontSize: 12, color: BLUE, textDecoration: 'none' }}>(210) 727-9328</a>
+      {/* ── FOOTER ── */}
+      <footer className="pm-footer" style={{ borderTop: '1px solid rgba(245,239,224,0.08)' }}>
+        <div>
+          <span style={{ fontFamily: 'RetroFloral, serif', fontSize: '15px', fontWeight: 300, color: '#F5EFE0', letterSpacing: '3px', textTransform: 'uppercase' as const }}>Pescadero Music</span>
+          <p style={{ fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', margin: '0.25rem 0 0' }}>Provo, Utah · DJ Garrett</p>
         </div>
-        <Link href="/policy" style={{ fontSize: 11, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(245,239,224,0.25)', textDecoration: 'none' }}>Service Policy</Link>
+        <div style={{ display: 'flex', gap: '1.5rem' }}>
+          <a href="/policy" style={{ fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', textDecoration: 'none' }}>Policy</a>
+          <a href="https://www.instagram.com/djgarrett_ut" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', textDecoration: 'none' }}>@djgarrett_ut</a>
+          <a href="/auth/login" style={{ fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', textDecoration: 'none' }}>Client Login</a>
+        </div>
       </footer>
 
-      {/* ── Auth Modal ─────────────────────────────────────── */}
-      {showModal && (
-        <div onClick={() => setShowModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 24 }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#07111A', border: '1px solid rgba(68,190,199,0.2)', borderRadius: 16, padding: '36px 32px', width: '100%', maxWidth: 400, position: 'relative' }}>
-            <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'rgba(245,239,224,0.3)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
-            <p style={{ margin: '0 0 2px', fontFamily: WORDMARK, fontSize: 15, letterSpacing: '3px', textTransform: 'uppercase', color: CREAM }}>Pescadero Music</p>
-            <p style={{ margin: '0 0 24px', fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: BLUE, fontFamily: UI_FONT }}>Welcome Back</p>
-            <div style={{ marginBottom: 12 }}>
-              <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAuth()}
-                style={{ width: '100%', padding: '11px 14px', borderRadius: 8, border: '1.5px solid rgba(68,190,199,0.15)', background: 'rgba(245,239,224,0.05)', color: CREAM, fontSize: 14, fontFamily: 'inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const }} />
-            </div>
-            <div style={{ marginBottom: authError ? 12 : 20 }}>
-              <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAuth()}
-                style={{ width: '100%', padding: '11px 14px', borderRadius: 8, border: '1.5px solid rgba(68,190,199,0.15)', background: 'rgba(245,239,224,0.05)', color: CREAM, fontSize: 14, fontFamily: 'inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const }} />
-            </div>
-            {authError && <p style={{ margin: '0 0 12px', fontSize: 12, color: '#ff6b6b' }}>{authError}</p>}
-            <button onClick={handleAuth} disabled={loading} style={{ width: '100%', padding: '13px', borderRadius: 10, border: 'none', background: loading ? 'rgba(200,32,42,0.5)' : RED, color: 'white', fontSize: 13, fontFamily: UI_FONT, fontWeight: 500, letterSpacing: '1.5px', textTransform: 'uppercase', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 20px rgba(200,32,42,0.35)' }}>
-              {loading ? 'Signing in…' : 'Sign In →'}
-            </button>
-            <p style={{ margin: '16px 0 0', textAlign: 'center', fontSize: 13, color: 'rgba(245,239,224,0.35)' }}>
-              New here?{' '}<a href="/auth/signup" style={{ color: 'rgba(245,239,224,0.6)', textDecoration: 'underline', textUnderlineOffset: 3 }}>Create an account</a>
-            </p>
-            <p style={{ margin: '10px 0 0', textAlign: 'center', fontSize: 11, color: 'rgba(245,239,224,0.2)' }}>
-              Questions? <a href="mailto:garrett@pescaderomusic.com" style={{ color: BLUE, textDecoration: 'none' }}>garrett@pescaderomusic.com</a>
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
