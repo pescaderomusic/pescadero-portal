@@ -14,7 +14,7 @@ export default async function PaymentSuccessPage({ searchParams }: { searchParam
   // Fallback: update steps in case webhook hasn't fired yet
   if (contractId && isDeposit) {
     await admin.from('contracts').update({ status: 'deposit_paid', deposit_paid_at: new Date().toISOString() }).eq('id', contractId)
-    await admin.from('bookings').update({ step_deposit: 'paid', step_planning: 'pending' }).eq('client_id', user.id)
+    await admin.from('bookings').update({ step_deposit: 'paid', step_contract: 'signed', step_planning: 'pending' }).eq('client_id', user.id)
   } else if (contractId && !isDeposit) {
     await admin.from('contracts').update({ status: 'complete' }).eq('id', contractId)
     await admin.from('bookings').update({ step_final_payment: 'paid', step_event: 'pending' }).eq('client_id', user.id)

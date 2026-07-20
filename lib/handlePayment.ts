@@ -20,7 +20,7 @@ export async function handlePayment(contract_id: string, client_id: string, paym
 
     const { error: bErr } = await admin
       .from('bookings')
-      .update({ step_deposit: 'paid', step_planning: 'pending' })
+      .update({ step_deposit: 'paid', step_contract: 'signed', step_planning: 'pending' })
       .eq('client_id', client_id)
     if (bErr) throw new Error(`bookings update error: ${bErr.message}`)
 
