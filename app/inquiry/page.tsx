@@ -245,7 +245,7 @@ const BODY = `<div id="inquiry-root">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Facebook" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Facebook</label>
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Word of Mouth" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Word of Mouth</label>
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Friend of Garrett's" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Friend of Garrett's</label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;" id="vendorReferralLabel"><input type="radio" name="hearAbout" value="Another Wedding Vendor" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Another Vendor / Referral</label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;" id="vendorReferralLabel"><input type="radio" name="hearAbout" value="Another Vendor / Referral" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Another Vendor / Referral</label>
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Wedding Wire / The Knot" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Wedding Wire / The Knot</label>
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.88rem;color:#1A2D3F;padding:8px 12px;border-radius:8px;border:1.5px solid #DDD3BC;background:#fff;"><input type="radio" name="hearAbout" value="Other" style="accent-color:#C8202A;" onchange="toggleReferralFields(this.value)"> Other</label>
           </div>
@@ -299,6 +299,12 @@ const BODY = `<div id="inquiry-root">
             <label class="choice-item"><input type="checkbox" name="eventType" value="Dinner" /> Dinner</label>
             <label class="choice-item"><input type="checkbox" name="eventType" value="Dancing" /> Dancing</label>
           </div>
+        </div>
+
+        <!-- Event: second date, for multi-night bookings -->
+        <div class="field-group" id="secondDateGroup" style="display:none;">
+          <div class="field-label">Second Date <span style="font-size:11px;color:#8A9EAA;font-weight:400;">(only if this is a multi-night booking)</span></div>
+          <input type="date" id="secondDate" />
         </div>
 
         <!-- Movie: location type -->
@@ -425,6 +431,10 @@ const SCRIPT = `
     // Movie location type — movie only
     var mlGroup = document.getElementById('movieLocationGroup');
     if (mlGroup) mlGroup.style.display = EVENT_TYPE === 'movie' ? '' : 'none';
+
+    // Second date (multi-night bookings) — event only
+    var sdGroup = document.getElementById('secondDateGroup');
+    if (sdGroup) sdGroup.style.display = EVENT_TYPE === 'event' ? '' : 'none';
 
     // Event name placeholder
     var enPlaceholders = { wedding: 'e.g. Smith Wedding Reception', event: 'e.g. Johnson House Party / Grand Opening', movie: 'e.g. Martinez Backyard Movie Night' };
@@ -611,7 +621,7 @@ const SCRIPT = `
   }
 
   function toggleReferralFields(val) {
-    document.getElementById('vendorNameGroup').style.display = val === 'Another Wedding Vendor' ? 'block' : 'none';
+    document.getElementById('vendorNameGroup').style.display = val === 'Another Vendor / Referral' ? 'block' : 'none';
     document.getElementById('otherHearGroup').style.display = val === 'Other' ? 'block' : 'none';
   }
 
@@ -641,7 +651,7 @@ const SCRIPT = `
       if (!r('entry.1289776342')) { showError(2, 'Please select a preferred contact method.'); return false; }
       if (EVENT_TYPE === 'wedding' && !v('coupleNames')) { showError(2, 'Please enter the names of the bride & groom.'); return false; }
       if (!r('hearAbout')) { showError(2, 'Please tell us how you heard about us.'); return false; }
-      if (r('hearAbout') === 'Another Wedding Vendor' && !v('vendorName')) { showError(2, 'Please enter the vendor name.'); return false; }
+      if (r('hearAbout') === 'Another Vendor / Referral' && !v('vendorName')) { showError(2, 'Please enter the vendor name.'); return false; }
     }
     if (slide === 3) {
       if (!v('eventName'))    { showError(3, 'Event name is required.'); return false; }
@@ -729,6 +739,7 @@ const SCRIPT = `
     );
     if (EVENT_TYPE === 'wedding' && eventTypesChecked) rows.push(['Coverage', eventTypesChecked]);
     if (EVENT_TYPE === 'movie') rows.push(['Location Type', movieLoc]);
+    if (EVENT_TYPE === 'event' && v('secondDate')) rows.push(['Second Date', v('secondDate')]);
     if (packageVal) rows.push(['Package', packageVal]);
     rows.push(
       ['Heard About Us', r('hearAbout') || '\u2014'],
@@ -751,6 +762,7 @@ const SCRIPT = `
         eventName: v('eventName'),
         eventTypes: Array.from(document.querySelectorAll('input[name="eventType"]:checked')).map(function(cb){return cb.value;}),
         eventDate: v('eventDate'), startTime: v('startTime'), endTime: v('endTime'),
+        secondDate: v('secondDate'),
         venue: v('venue'), venueAddress: v('venueAddress'),
         indoorOutdoor: r('entry.1884292728'),
         attendance: v('attendance'), additionalDetails: v('additionalDetails'),
@@ -800,6 +812,7 @@ const SCRIPT = `
       set('eventName', d.eventName);
       if (d.eventTypes) { d.eventTypes.forEach(function(val) { var cb = document.querySelector('input[name="eventType"][value="' + val + '"]'); if (cb) cb.checked = true; }); }
       set('eventDate', d.eventDate); set('startTime', d.startTime); set('endTime', d.endTime);
+      set('secondDate', d.secondDate);
       set('venue', d.venue); set('venueAddress', d.venueAddress);
       setR('entry.1884292728', d.indoorOutdoor);
       set('attendance', d.attendance); set('additionalDetails', d.additionalDetails);
@@ -813,6 +826,11 @@ const SCRIPT = `
 
   function handleSubmit(e) {
     var packageSel = r('weddingPackage') || (EVENT_TYPE === 'event' ? 'Dance DJ - $600' : '');
+    var notes = v('additionalDetails');
+    var secondDateVal = v('secondDate');
+    if (EVENT_TYPE === 'event' && secondDateVal) {
+      notes = 'Multi-night booking \u2014 second date requested: ' + secondDateVal + (notes ? '. ' + notes : '.');
+    }
     var formData = {
       firstName: v('firstName'), lastName: v('lastName'),
       email: v('email'), phone: v('phone'),
@@ -824,7 +842,7 @@ const SCRIPT = `
       venue: v('venue'), venueAddress: v('venueAddress'),
       indoorOutdoor: r('entry.1884292728'),
       attendance: v('attendance'),
-      additionalDetails: v('additionalDetails'),
+      additionalDetails: notes,
       hearAbout: r('hearAbout'), vendorName: v('vendorName'), vendorType: v('vendorType'), otherHear: v('otherHear'),
       weddingPackage: packageSel,
       movieLocation: r('movieLocation'),
