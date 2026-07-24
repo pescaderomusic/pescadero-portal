@@ -337,6 +337,9 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
+              <p style={{ fontSize: '0.8rem', color: pkg.featured ? 'rgba(245,239,224,0.5)' : 'rgba(7,17,26,0.5)', marginTop: '1.25rem', marginBottom: 0 }}>
+                Pricing is flat-rate for events under 4 hours and does not change based on event length.
+              </p>
             </div>
           ))}
         </div>
