@@ -1,15 +1,35 @@
 // app/api/admin/notify-contract-sent/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
 
 const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
+
+function getAdmin() {
+  return createAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
 
 export async function POST(req: NextRequest) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.id !== GARRETT_ID) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { clientName, email } = await req.json()
+  const { clientId } = await req.json()
+  if (!clientId) return NextResponse.json({ error: 'clientId is required' }, { status: 400 })
+
+  const admin = getAdmin()
+  const { data: userData } = await admin.auth.admin.getUserById(clientId)
+  const { data: profile } = await admin.from('profiles').select('full_name').eq('id', clientId).single()
+  const { data: inquiry } = await admin.from('inquiry_submissions').select('email').eq('client_id', clientId).single()
+
+  const email = inquiry?.email || userData?.user?.email
+  if (!email) return NextResponse.json({ error: 'No email on file for this client' }, { status: 400 })
+
+  const clientName = profile?.full_name || ''
   const firstName = clientName?.split(' ')[0] || 'there'
 
   try {
@@ -46,7 +66,10 @@ export async function POST(req: NextRequest) {
         </div>
       `,
     })
-  } catch (e) { console.error('Contract notification email error:', e) }
+  } catch (e) {
+    console.error('Contract notification email error:', e)
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+  }
 
   return NextResponse.json({ ok: true })
 }

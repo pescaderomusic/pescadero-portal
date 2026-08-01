@@ -109,14 +109,24 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
   const sendToClient = async () => {
     await save()
     setSending(true)
+    setError('')
     const supabase = createClient()
     await supabase.from('contracts').update({ status: 'sent' }).eq('client_id', params.clientId)
     await supabase.from('bookings').update({ step_contract: 'sent' }).eq('client_id', params.clientId)
-    await fetch('/api/admin/notify-contract-sent', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clientId: params.clientId }),
-    }).catch(() => {})
-    setSending(false); setSent(true)
+    try {
+      const res = await fetch('/api/admin/notify-contract-sent', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: params.clientId }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || `Request failed: ${res.status}`)
+      }
+      setSent(true)
+    } catch (e: any) {
+      setError('Contract saved, but the notification email failed to send: ' + (e?.message || 'unknown error') + '. Text or email the client directly.')
+    }
+    setSending(false)
   }
 
   if (loading) return (
