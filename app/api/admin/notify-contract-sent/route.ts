@@ -31,9 +31,13 @@ export async function POST(req: NextRequest) {
               Garrett has prepared your Pescadero Music Service Agreement. Please take a moment to review the details and sign to move forward with your booking.
             </p>
             <a href="https://pescaderomusic.com/contract"
-               style="display:inline-block;background:#D62828;color:white;text-decoration:none;padding:13px 28px;border-radius:8px;font-weight:700;font-size:14px;margin-bottom:20px;">
+               style="display:inline-block;background:#D62828;color:white;text-decoration:none;padding:13px 28px;border-radius:8px;font-weight:700;font-size:14px;margin-bottom:16px;">
               Review & Sign Your Contract →
             </a>
+            <p style="color:#555;font-size:13px;line-height:1.7;margin:0 0 20px;">
+              First time signing in? Your account was created automatically when you submitted your inquiry, so you'll need to set a password before you can view the contract —
+              <a href="https://pescaderomusic.com/auth/forgot-password" style="color:#44BEC7;font-weight:600;">set your password here</a>, then come back to the link above.
+            </p>
             <p style="color:#777;font-size:13px;line-height:1.6;margin:0;">
               Questions before signing? Just reply to this email or reach out directly at <a href="mailto:garrett@pescaderomusic.com" style="color:#44BEC7;">garrett@pescaderomusic.com</a> or (210) 727-9328.
             </p>
