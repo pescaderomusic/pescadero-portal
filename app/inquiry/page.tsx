@@ -366,10 +366,11 @@ const BODY = `<div id="inquiry-root">
         <div class="slide-sub">Confirm everything looks correct.</div>
       </div>
       <div class="review-list" id="reviewList"></div>
+      <div id="error-5" class="form-error"></div>
       <div id="gform">
         <div class="slide-footer slide-footer-split">
           <button type="button" class="btn btn-back" onclick="goTo(4,'back')">&#x2190; Edit</button>
-          <button type="button" class="btn btn-submit" onclick="handleSubmit(event)">Submit Inquiry &#x2192;</button>
+          <button type="button" class="btn btn-submit" id="submitBtn" onclick="handleSubmit(event)">Submit Inquiry &#x2192;</button>
         </div>
       </div>
     </div>
@@ -848,17 +849,25 @@ const SCRIPT = `
       movieLocation: r('movieLocation'),
       eventCategory: EVENT_TYPE,
     };
+    var btn = document.getElementById('submitBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
     fetch('/api/inquiry/submit', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       credentials: 'include', body: JSON.stringify(formData),
-    }).catch(function(err) { console.error('Save error:', err); });
-    setTimeout(function() {
+    }).then(function(res) {
+      if (!res.ok) return res.json().catch(function(){ return {}; }).then(function(body) {
+        throw new Error(body.error || ('Request failed: ' + res.status));
+      });
       try { localStorage.removeItem('pescadero_inquiry'); } catch(e) {}
       document.getElementById('progressBar').style.display = 'none';
       document.querySelectorAll('.slide').forEach(function(s) { s.classList.remove('is-active'); s.style.display = 'none'; });
       document.getElementById('successSlide').classList.add('visible');
       showBg(1);
-    }, 600);
+    }).catch(function(err) {
+      console.error('Save error:', err);
+      showError(5, 'Something went wrong submitting your inquiry. Please try again, or email garrett@pescaderomusic.com directly.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Submit Inquiry →'; }
+    });
   }
 
   // ── JS-enforced mobile layout (belt-and-suspenders alongside the CSS media query) ──

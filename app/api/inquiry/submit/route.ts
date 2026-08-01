@@ -51,6 +51,12 @@ export async function POST(req: NextRequest) {
       ? body.eventTypes
       : (body.services ? body.services : [])
 
+    // ── Fold fields with no dedicated column into additional_notes ─────────────
+    const hearAboutNote = body.hearAbout
+      ? `Heard about us via: ${body.hearAbout}${body.vendorName ? ` — ${body.vendorName}` : ''}${body.vendorType ? ` (${body.vendorType})` : ''}${body.otherHear ? ` — ${body.otherHear}` : ''}`
+      : null
+    const combinedNotes = [body.additionalDetails, hearAboutNote].filter(Boolean).join('\n\n') || null
+
     // ── Insert inquiry_submission ─────────────────────────────────────────────
     const inquiryPayload: any = {
       client_id: userId,
@@ -68,16 +74,12 @@ export async function POST(req: NextRequest) {
       venue_name: body.venue || null,
       venue_address: body.venueAddress || null,
       indoor_outdoor: body.indoorOutdoor || null,
-      attendance: body.attendance ? parseInt(body.attendance) : null,
-      additional_notes: body.additionalDetails || null,
-      hear_about_us: body.hearAbout || null,
-      vendor_name: body.vendorName || null,
-      vendor_type: body.vendorType || null,
-      other_hear: body.otherHear || null,
-      // New fields
+      attendance: body.attendance || null,
+      additional_notes: combinedNotes,
       event_category: body.eventCategory || 'wedding',
       wedding_package: body.weddingPackage || null,
       movie_location: body.movieLocation || null,
+      status: 'new',
       submitted_at: new Date().toISOString(),
     }
 
@@ -85,12 +87,10 @@ export async function POST(req: NextRequest) {
       .from('inquiry_submissions')
       .insert(inquiryPayload)
 
-    if (inquiryErr) {
-      console.error('Inquiry insert error:', inquiryErr)
-      // Don't fail the whole request — still try to create booking row
-    }
+    if (inquiryErr) console.error('Inquiry insert error:', inquiryErr)
 
     // ── Create or update booking row ──────────────────────────────────────────
+    let bookingErr: any = null
     if (userId) {
       const { data: existingBooking } = await supabase
         .from('bookings')
@@ -99,16 +99,32 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (!existingBooking) {
-        await supabase.from('bookings').insert({
+        const eventTypeLabel = body.eventCategory === 'wedding' ? 'Wedding' : body.eventCategory === 'movie' ? 'Movie Night' : 'Event'
+        const { error } = await supabase.from('bookings').insert({
           client_id: userId,
-          client_name: body.coupleNames || `${body.firstName || ''} ${body.lastName || ''}`.trim(),
           event_date: body.eventDate || null,
-          venue: body.venue || null,
-          step: 1,
+          venue_name: body.venue || null,
+          venue_address: body.venueAddress || null,
+          event_type: eventTypeLabel,
+          package: body.weddingPackage || null,
+          status: 'active',
+          step_inquiry: 'complete',
+          step_consultation: 'pending',
+          step_contract: 'locked',
+          step_deposit: 'locked',
+          step_planning: 'locked',
+          step_final_payment: 'locked',
+          step_event: 'locked',
           event_category: body.eventCategory || 'wedding',
         })
+        bookingErr = error
+        if (bookingErr) console.error('Booking insert error:', bookingErr)
       }
     }
+
+    // If the write to Supabase failed, tell the client so it doesn't show a
+    // false success — and still flag Garrett so no lead gets lost silently.
+    const saveFailed = !!inquiryErr || !!bookingErr
 
     // ── Notification email to Garrett ─────────────────────────────────────────
     const categoryLabel: Record<string, string> = {
@@ -122,9 +138,12 @@ export async function POST(req: NextRequest) {
       await resend.emails.send({
         from: 'Pescadero Music <noreply@pescaderomusic.com>',
         to: 'garrett@pescaderomusic.com',
-        subject: `New Inquiry: ${body.eventName || email} [${catLabel}]`,
+        subject: saveFailed
+          ? `⚠️ Inquiry FAILED to save: ${body.eventName || email} [${catLabel}]`
+          : `New Inquiry: ${body.eventName || email} [${catLabel}]`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1A2D3F;">
+            ${saveFailed ? `<div style="background:#C8202A;color:#fff;padding:14px 24px;font-size:13px;font-weight:bold;">⚠️ This inquiry did NOT save to the admin panel (${inquiryErr ? 'inquiry' : 'booking'} write failed). The details below are from the raw submission — you'll need to add this client manually.</div>` : ''}
             <div style="background:#07111A;padding:20px 24px;border-bottom:3px solid #C8202A;">
               <h1 style="color:#F5EFE0;font-size:18px;margin:0;">New Inquiry — ${catLabel}</h1>
             </div>
@@ -157,6 +176,10 @@ export async function POST(req: NextRequest) {
       })
     } catch (emailErr) {
       console.error('Email error:', emailErr)
+    }
+
+    if (saveFailed) {
+      return NextResponse.json({ error: 'We had trouble saving your inquiry. Garrett has been notified directly — you can also reach him at garrett@pescaderomusic.com.' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, userId })
