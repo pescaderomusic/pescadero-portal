@@ -253,6 +253,12 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       eyebrow: '\ud83c\udf89 Signed & Deposited', title: 'Your Day Is Locked In!',
       body: 'Signed and deposited. Your day is locked in!', action: null, color: GREEN,
     }
+    // Final payment is checked ahead of planning so a pending balance is never hidden behind an unfinished planning form \u2014 planning completion should not gate final payment.
+    if (b.step_final_payment === 'pending') return {
+      eyebrow: 'Action Required', title: 'Final Payment Due',
+      body: 'Your final balance is due. Complete this secure Stripe payment and your entire sound experience is fully secured.',
+      action: { label: 'Pay Final Balance \u2192', href: '/contract/final-payment' }, color: RED,
+    }
     if (b.step_planning === 'pending') return {
       eyebrow: 'Action Required', title: 'Planning Form Ready',
       body: 'Your planning form is ready. Fill it out so Garrett has everything he needs to prep for your day.',
@@ -262,11 +268,6 @@ export default function StepTracker({ booking, clientName, justPaid, paymentType
       eyebrow: 'Planning Submitted \u2713', title: 'Garrett Is On It',
       body: 'Planning submitted. Garrett is diving into your details and actively preparing for your celebration.',
       action: null, color: BLUE,
-    }
-    if (b.step_final_payment === 'pending') return {
-      eyebrow: 'Action Required', title: 'Final Payment Due',
-      body: 'Your final balance is due. Complete this secure Stripe payment and your entire sound experience is fully secured.',
-      action: { label: 'Pay Final Balance \u2192', href: '/contract/final-payment' }, color: RED,
     }
     if (b.step_final_payment === 'paid' && !eventDone) return {
       eyebrow: '\u2713 Fully Confirmed', title: 'Cleared for Launch \ud83c\udfb5',

@@ -43,6 +43,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid payment amount' }, { status: 400 })
     }
 
+    const depositAlreadyPaid = contract.status === 'deposit_paid' || contract.status === 'fully_paid' || !!contract.deposit_paid_at
+    const finalAlreadyPaid = contract.status === 'fully_paid'
+
+    if (isDeposit && depositAlreadyPaid) {
+      return NextResponse.json({ error: 'This deposit has already been paid.', alreadyPaid: true }, { status: 409 })
+    }
+    if (!isDeposit && finalAlreadyPaid) {
+      return NextResponse.json({ error: 'This final payment has already been paid.', alreadyPaid: true }, { status: 409 })
+    }
+
     const label = isDeposit ? 'Deposit (Non-Refundable)' : 'Final Payment'
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'https://pescaderomusic.com'
 

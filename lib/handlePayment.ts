@@ -11,6 +11,19 @@ export async function handlePayment(contract_id: string, client_id: string, paym
   console.log('[handlePayment] start', { contract_id, client_id, payment_type })
   const admin = getAdmin()
 
+  // This can be invoked twice for the same successful payment (the Stripe webhook and the
+  // client-side verify-session call can both race to report the same session as paid). Guard
+  // against re-running the update/emails so a client never gets a duplicate receipt.
+  const { data: current } = await admin.from('contracts').select('status').eq('id', contract_id).single()
+  if (payment_type === 'deposit' && (current?.status === 'deposit_paid' || current?.status === 'fully_paid')) {
+    console.log('[handlePayment] deposit already recorded, skipping')
+    return
+  }
+  if (payment_type === 'final' && current?.status === 'fully_paid') {
+    console.log('[handlePayment] final payment already recorded, skipping')
+    return
+  }
+
   if (payment_type === 'deposit') {
     const { error: cErr } = await admin
       .from('contracts')

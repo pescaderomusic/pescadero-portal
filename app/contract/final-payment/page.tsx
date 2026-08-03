@@ -36,7 +36,20 @@ export default function FinalPaymentPage() {
         body: JSON.stringify({ contractId: contract.id, type: 'final' }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed')
+      if (!res.ok) {
+        if (data.alreadyPaid) {
+          // Already paid (likely just hadn't refreshed) — resync instead of letting them retry
+          const supabase = createClient()
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            const { data: fresh } = await supabase.from('contracts').select('*').eq('client_id', user.id).order('created_at', { ascending: false }).limit(1).single()
+            if (fresh) setContract(fresh)
+          }
+          setPaying(false)
+          return
+        }
+        throw new Error(data.error || 'Failed')
+      }
       if (data.url) window.location.href = data.url
     } catch (err: any) {
       setError(err.message)

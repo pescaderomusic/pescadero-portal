@@ -23,17 +23,19 @@ function PaymentContent() {
   const [paying, setPaying]     = useState(false)
   const [error, setError]       = useState('')
   const [userId, setUserId]     = useState<string | null>(null)
+  const [verifying, setVerifying] = useState(false)
   const cancelled = searchParams.get('cancelled')
 
   useEffect(() => {
     const supabase = createClient()
     let pollInterval: ReturnType<typeof setInterval> | null = null
+    let cancelledEffect = false
 
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { router.push('/auth/login'); return }
       setUserId(user.id)
 
-      const fetchContract = async () => {
+      const refetchContract = async () => {
         const { data } = await supabase
           .from('contracts')
           .select('*')
@@ -41,37 +43,64 @@ function PaymentContent() {
           .order('created_at', { ascending: false })
           .limit(1)
           .single()
+        return data
+      }
+
+      const fetchContract = async () => {
+        const data = await refetchContract()
         setContract(data)
         setLoading(false)
 
-        // If returning from Stripe success but webhook hasn't fired yet, poll until DB updates
         const returning = new URLSearchParams(window.location.search).get('returning')
+        const sessionId = new URLSearchParams(window.location.search).get('session_id')
         if (returning && data && !['deposit_paid','fully_paid'].includes(data.status)) {
-          let attempts = 0
-          pollInterval = setInterval(async () => {
-            attempts++
-            const { data: fresh } = await supabase
-              .from('contracts')
-              .select('*')
-              .eq('client_id', user.id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .single()
-            if (fresh && ['deposit_paid','fully_paid'].includes(fresh.status)) {
-              setContract(fresh)
-              if (pollInterval) clearInterval(pollInterval)
+          setVerifying(true)
+
+          // Verify directly against Stripe rather than waiting on the webhook —
+          // this is what actually updates the DB, so the success state doesn't
+          // depend on webhook timing (and the client can't be misled into paying again).
+          if (sessionId) {
+            try {
+              await fetch('/api/stripe/verify-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId }),
+              })
+            } catch (e) {
+              console.error('verify-session call failed:', e)
             }
-            if (attempts >= 10) {
-              if (pollInterval) clearInterval(pollInterval) // give up after ~30s
-            }
-          }, 3000)
+          }
+
+          const verified = await refetchContract()
+          if (!cancelledEffect && verified) setContract(verified)
+
+          // Fallback poll only covers the case where verify-session itself failed
+          // (e.g. transient network error) and we're waiting on the webhook instead.
+          if (verified && !['deposit_paid','fully_paid'].includes(verified.status)) {
+            let attempts = 0
+            pollInterval = setInterval(async () => {
+              attempts++
+              const fresh = await refetchContract()
+              if (fresh && ['deposit_paid','fully_paid'].includes(fresh.status)) {
+                if (!cancelledEffect) setContract(fresh)
+                if (pollInterval) clearInterval(pollInterval)
+                if (!cancelledEffect) setVerifying(false)
+              }
+              if (attempts >= 10) {
+                if (pollInterval) clearInterval(pollInterval) // give up after ~30s
+                if (!cancelledEffect) setVerifying(false)
+              }
+            }, 3000)
+          } else {
+            setVerifying(false)
+          }
         }
       }
 
       fetchContract()
     })
 
-    return () => { if (pollInterval) clearInterval(pollInterval) }
+    return () => { cancelledEffect = true; if (pollInterval) clearInterval(pollInterval) }
   }, [router])
 
   const handlePay = async (type: 'deposit' | 'final') => {
@@ -85,7 +114,26 @@ function PaymentContent() {
         body: JSON.stringify({ contractId: contract.id, type }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to start checkout')
+      if (!res.ok) {
+        if (data.alreadyPaid) {
+          // Already paid (likely just hadn't refreshed) — resync instead of letting them retry
+          const supabase = createClient()
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            const { data: fresh } = await supabase
+              .from('contracts')
+              .select('*')
+              .eq('client_id', user.id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .single()
+            if (fresh) setContract(fresh)
+          }
+          setPaying(false)
+          return
+        }
+        throw new Error(data.error || 'Failed to start checkout')
+      }
       if (data.url) window.location.href = data.url
     } catch (err: any) {
       setError(err.message)
@@ -139,7 +187,9 @@ function PaymentContent() {
 
         {searchParams.get('returning') && !depositPaid && (
           <div style={{ background: 'rgba(68,190,199,0.08)', border: '1px solid rgba(68,190,199,0.25)', borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 13, fontFamily: BODY, textAlign: 'center', color: BLUE }}>
-            ⏳ Verifying your payment… this usually takes a few seconds. If your payment went through, this page will update automatically. You can also safely try again below if needed.
+            {verifying
+              ? '⏳ Verifying your payment… this usually takes a few seconds. Please don’t close this page or pay again — it will update automatically.'
+              : '⏳ Still confirming your payment with Stripe. Please don’t submit another payment — if this doesn’t update within a minute or two, email garrett@pescaderomusic.com before trying again so you’re not charged twice.'}
           </div>
         )}
 
@@ -188,10 +238,10 @@ function PaymentContent() {
           ) : (
             <button
               onClick={() => handlePay('deposit')}
-              disabled={paying}
-              style={{ width: '100%', padding: '13px', borderRadius: 8, border: 'none', background: paying ? 'rgba(200,32,42,0.4)' : RED, color: 'white', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: paying ? 'not-allowed' : 'pointer', boxShadow: paying ? 'none' : '0 4px 20px rgba(200,32,42,0.4)', transition: 'all 0.2s' }}
+              disabled={paying || verifying}
+              style={{ width: '100%', padding: '13px', borderRadius: 8, border: 'none', background: (paying || verifying) ? 'rgba(200,32,42,0.4)' : RED, color: 'white', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: (paying || verifying) ? 'not-allowed' : 'pointer', boxShadow: (paying || verifying) ? 'none' : '0 4px 20px rgba(200,32,42,0.4)', transition: 'all 0.2s' }}
             >
-              {paying ? 'Redirecting to Stripe…' : `Pay $${depositAmount} Deposit →`}
+              {verifying ? 'Confirming payment…' : paying ? 'Redirecting to Stripe…' : `Pay $${depositAmount} Deposit →`}
             </button>
           )}
         </div>
@@ -220,10 +270,10 @@ function PaymentContent() {
             ) : depositPaid ? (
               <button
                 onClick={() => handlePay('final')}
-                disabled={paying}
-                style={{ width: '100%', padding: '13px', borderRadius: 8, border: 'none', background: paying ? 'rgba(200,32,42,0.4)' : RED, color: 'white', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: paying ? 'not-allowed' : 'pointer', boxShadow: paying ? 'none' : '0 4px 20px rgba(200,32,42,0.4)', transition: 'all 0.2s' }}
+                disabled={paying || verifying}
+                style={{ width: '100%', padding: '13px', borderRadius: 8, border: 'none', background: (paying || verifying) ? 'rgba(200,32,42,0.4)' : RED, color: 'white', fontSize: 13, fontFamily: UI_FONT, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 500, cursor: (paying || verifying) ? 'not-allowed' : 'pointer', boxShadow: (paying || verifying) ? 'none' : '0 4px 20px rgba(200,32,42,0.4)', transition: 'all 0.2s' }}
               >
-                {paying ? 'Redirecting to Stripe…' : `Pay $${finalAmount} Final Balance →`}
+                {verifying ? 'Confirming payment…' : paying ? 'Redirecting to Stripe…' : `Pay $${finalAmount} Final Balance →`}
               </button>
             ) : (
               <p style={{ fontSize: 12, color: 'rgba(245,239,224,0.3)', margin: 0, fontFamily: BODY }}>
