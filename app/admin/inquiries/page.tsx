@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import InquiryStatusActions from '@/components/admin/InquiryStatusActions'
 
 export const dynamic = 'force-dynamic'
 
@@ -149,11 +150,14 @@ export default async function AdminInquiriesPage() {
                       {fmtDateTime(inq.submitted_at)} · {inq.email || '—'}
                     </p>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
                     {inq.client_id && (
                       <Link href={`/admin/client/${inq.client_id}`} style={{ fontSize: 10, color: BLUE, textDecoration: 'none', border: `1px solid ${BLUE}30`, borderRadius: 5, padding: '4px 10px' }}>
                         Client →
                       </Link>
+                    )}
+                    {inq.status !== 'converted' && (
+                      <InquiryStatusActions inquiryId={inq.id} status={inq.status || 'new'} />
                     )}
                   </div>
                 </div>

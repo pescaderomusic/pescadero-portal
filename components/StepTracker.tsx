@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 const NAVY     = '#07111A'
 const BLUE     = '#44BEC7'
@@ -175,7 +176,24 @@ function getCopyForStep(stepKey: string, booking: Booking | null) {
 
 export default function StepTracker({ booking, clientName, justPaid, paymentType, userId }: Props) {
   const [selectedStep, setSelectedStep] = useState<string | null>(null)
-  const b = booking
+  const [liveBooking, setLiveBooking] = useState<Booking | null>(booking)
+
+  // Keep in sync with a fresh server-fetched prop (e.g. on navigation)
+  useEffect(() => { setLiveBooking(booking) }, [booking])
+
+  // Live-update when admin changes a step while this dashboard is already open
+  useEffect(() => {
+    if (!userId) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`booking-${userId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings', filter: `client_id=eq.${userId}` },
+        (payload) => setLiveBooking(payload.new as Booking))
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [userId])
+
+  const b = liveBooking
   const noBooking = !b
   const firstName = clientName?.split(' ')[0] || 'there'
   const isGarrett = userId === GARRETT_ID

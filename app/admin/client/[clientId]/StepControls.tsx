@@ -93,43 +93,55 @@ export default function StepControls({ clientId, booking, email, firstName, cons
     setSaving(stepKey)
     setMsg('')
 
-    // Special case: marking event complete fires the review notification API
-    if (stepKey === 'step_event' && value === 'complete') {
-      try {
-        await fetch('/api/admin/event-complete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clientId }),
-        })
-      } catch (e) { console.error('Event complete API error:', e) }
-    }
-
-    // Mark consultation complete also unlocks contract (pending)
-    if (stepKey === 'step_consultation' && value === 'complete') {
-      await fetch('/api/admin/update-step', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientId, stepKey: 'step_contract', value: 'pending' }),
-      })
-      setLocal((p: any) => ({ ...p, step_contract: 'pending' }))
-    }
-
     const res = await fetch('/api/admin/update-step', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ clientId, stepKey, value }),
     })
 
-    if (res.ok) {
-      setLocal((p: any) => ({ ...p, [stepKey]: value }))
-      const label = STEP_CONFIG[stepKey]?.label
-      setMsg(stepKey === 'step_event' && value === 'complete'
-        ? `✓ Event marked complete — review link sent to ${firstName}!`
-        : `✓ ${label} → ${value}`)
-      setExpanded(null)
-    } else {
+    if (!res.ok) {
       setMsg('❌ Update failed — try again')
+      setSaving(null)
+      setTimeout(() => setMsg(''), 4000)
+      return
     }
+
+    setLocal((p: any) => ({ ...p, [stepKey]: value }))
+    let msg = `✓ ${STEP_CONFIG[stepKey]?.label} → ${value}`
+
+    // Special case: marking event complete fires the review notification API
+    if (stepKey === 'step_event' && value === 'complete') {
+      try {
+        const notifyRes = await fetch('/api/admin/event-complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId }),
+        })
+        msg = notifyRes.ok
+          ? `✓ Event marked complete — review link sent to ${firstName}!`
+          : `✓ Event marked complete, but the review email failed to send — send it manually.`
+      } catch (e) {
+        console.error('Event complete API error:', e)
+        msg = `✓ Event marked complete, but the review email failed to send — send it manually.`
+      }
+    }
+
+    // Mark consultation complete also unlocks contract (pending)
+    if (stepKey === 'step_consultation' && value === 'complete') {
+      const cascadeRes = await fetch('/api/admin/update-step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, stepKey: 'step_contract', value: 'pending' }),
+      })
+      if (cascadeRes.ok) {
+        setLocal((p: any) => ({ ...p, step_contract: 'pending' }))
+      } else {
+        msg = `✓ Consultation marked complete, but unlocking the contract step failed — set it manually.`
+      }
+    }
+
+    setMsg(msg)
+    setExpanded(null)
     setSaving(null)
     setTimeout(() => setMsg(''), 4000)
   }
@@ -142,10 +154,19 @@ export default function StepControls({ clientId, booking, email, firstName, cons
       step_contract: 'locked', step_deposit: 'locked',
       step_planning: 'locked', step_final_payment: 'locked', step_event: 'locked',
     }
+    const applied: Record<string, string> = {}
     for (const [k, v] of Object.entries(defaults)) {
-      await fetch('/api/admin/update-step', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, stepKey: k, value: v }) })
+      const res = await fetch('/api/admin/update-step', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, stepKey: k, value: v }) })
+      if (!res.ok) {
+        setLocal((p: any) => ({ ...p, ...applied }))
+        setMsg(`❌ Reset failed at step "${STEP_CONFIG[k]?.label}" — earlier steps were reset, try again to finish`)
+        setSaving(null)
+        setTimeout(() => setMsg(''), 5000)
+        return
+      }
+      applied[k] = v
     }
-    setLocal(defaults)
+    setLocal((p: any) => ({ ...p, ...applied }))
     setMsg('✓ Reset to fresh state')
     setSaving(null)
     setTimeout(() => setMsg(''), 3000)

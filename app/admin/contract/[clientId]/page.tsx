@@ -82,8 +82,8 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
     })
   }, [params.clientId, router])
 
-  const save = async () => {
-    if (!packagePrice) { setError('Package price is required.'); return }
+  const save = async (): Promise<boolean> => {
+    if (!packagePrice) { setError('Package price is required.'); return false }
     setSaving(true); setError('')
     const supabase = createClient()
     const { error: err } = await supabase.from('contracts').upsert({
@@ -101,18 +101,31 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
       garrett_message:      garrettMessage,
       status:               'draft',
     }, { onConflict: 'client_id' })
-    if (err) { setError('Save failed: ' + err.message); setSaving(false); return }
+    if (err) { setError('Save failed: ' + err.message); setSaving(false); return false }
     setSaved(true); setSaving(false)
     setTimeout(() => setSaved(false), 3000)
+    return true
   }
 
   const sendToClient = async () => {
-    await save()
+    const saveOk = await save()
+    if (!saveOk) return
+
     setSending(true)
     setError('')
     const supabase = createClient()
-    await supabase.from('contracts').update({ status: 'sent' }).eq('client_id', params.clientId)
-    await supabase.from('bookings').update({ step_contract: 'sent' }).eq('client_id', params.clientId)
+
+    const { error: contractErr } = await supabase.from('contracts').update({ status: 'sent' }).eq('client_id', params.clientId)
+    if (contractErr) { setError('Failed to mark contract as sent: ' + contractErr.message); setSending(false); return }
+
+    const { error: bookingErr } = await supabase.from('bookings').update({ step_contract: 'sent' }).eq('client_id', params.clientId)
+    if (bookingErr) { setError('Contract marked sent, but the booking step failed to update: ' + bookingErr.message); setSending(false); return }
+
+    // Best-effort — an inquiry row may not exist for every client, and this shouldn't block the send.
+    if (inquiry?.id) {
+      await supabase.from('inquiry_submissions').update({ status: 'converted', contract_sent: true }).eq('id', inquiry.id)
+    }
+
     try {
       const res = await fetch('/api/admin/notify-contract-sent', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },

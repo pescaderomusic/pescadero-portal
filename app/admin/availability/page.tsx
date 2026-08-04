@@ -23,6 +23,7 @@ export default function AvailabilityPage() {
   const [slots, setSlots]   = useState<Slot[]>(defaultSlots)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved]   = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -50,16 +51,24 @@ export default function AvailabilityPage() {
 
   const handleSave = async () => {
     setSaving(true)
+    setSaveError('')
     const supabase = createClient()
+    const failedDays: string[] = []
     for (const slot of slots) {
       if (slot.id) {
-        await supabase.from('availability').update({ start_hour: slot.start_hour, end_hour: slot.end_hour, active: slot.active }).eq('id', slot.id)
+        const { error } = await supabase.from('availability').update({ start_hour: slot.start_hour, end_hour: slot.end_hour, active: slot.active }).eq('id', slot.id)
+        if (error) failedDays.push(DAYS[slot.day])
       } else {
-        const { data } = await supabase.from('availability').insert({ day: slot.day, start_hour: slot.start_hour, end_hour: slot.end_hour, active: slot.active }).select().single()
+        const { data, error } = await supabase.from('availability').insert({ day: slot.day, start_hour: slot.start_hour, end_hour: slot.end_hour, active: slot.active }).select().single()
+        if (error) { failedDays.push(DAYS[slot.day]); continue }
         if (data) slot.id = data.id
       }
     }
     setSaving(false)
+    if (failedDays.length > 0) {
+      setSaveError(`Failed to save: ${failedDays.join(', ')} — try again`)
+      return
+    }
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
@@ -90,6 +99,12 @@ export default function AvailabilityPage() {
             Clients will see these time slots when requesting a consultation call. Toggle days on/off and set your available hours.
           </p>
         </div>
+
+        {saveError && (
+          <div style={{ background: 'rgba(214,40,40,0.1)', border: '1px solid rgba(214,40,40,0.3)', borderRadius: 8, padding: '10px 14px', marginBottom: 16, color: '#FF8A80', fontSize: 12 }}>
+            {saveError}
+          </div>
+        )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {slots.map(slot => (
