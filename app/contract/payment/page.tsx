@@ -165,6 +165,10 @@ function PaymentContent() {
     }}>
       <div style={{ maxWidth: 500, width: '100%' }}>
 
+        <Link href="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(245,239,224,0.35)', textDecoration: 'none', fontSize: 11, marginBottom: 28, letterSpacing: '1px', fontFamily: BODY }}>
+          ← Dashboard
+        </Link>
+
         {/* Logo + header */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
