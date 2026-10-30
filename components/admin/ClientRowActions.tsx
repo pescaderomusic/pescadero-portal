@@ -2,9 +2,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-const RED  = '#D62828'
-const BLUE = '#44BEC7'
-
 export default function ClientRowActions({ clientId, isArchived }: { clientId: string; isArchived: boolean }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
@@ -41,19 +38,25 @@ export default function ClientRowActions({ clientId, isArchived }: { clientId: s
     router.refresh()
   }
 
-  const btnStyle: React.CSSProperties = {
-    fontSize: 9, fontWeight: 700, padding: '4px 10px', borderRadius: 6,
-    border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)',
-    color: 'rgba(255,255,255,0.5)', cursor: busy ? 'not-allowed' : 'pointer',
-    textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap',
-  }
+  const btnClass =
+    'font-label-sm text-[9px] font-bold uppercase tracking-wide px-2.5 py-1 whitespace-nowrap disabled:cursor-not-allowed bg-transparent'
 
   return (
-    <div style={{ display: 'flex', gap: 6 }}>
-      <button onClick={toggleArchive} disabled={busy} style={{ ...btnStyle, color: BLUE, borderColor: 'rgba(68,190,199,0.25)', background: 'rgba(68,190,199,0.08)' }}>
+    <div className="flex gap-1.5">
+      <button
+        onClick={toggleArchive}
+        disabled={busy}
+        className={btnClass}
+        style={{ color: '#44BEC7', border: '1px solid rgba(68,190,199,0.3)', background: 'rgba(68,190,199,0.08)' }}
+      >
         {isArchived ? 'Unarchive' : 'Archive'}
       </button>
-      <button onClick={deleteClient} disabled={busy} style={{ ...btnStyle, color: RED, borderColor: 'rgba(214,40,40,0.3)', background: 'rgba(214,40,40,0.08)' }}>
+      <button
+        onClick={deleteClient}
+        disabled={busy}
+        className={btnClass}
+        style={{ color: '#C8202A', border: '1px solid rgba(200,32,42,0.3)', background: 'rgba(200,32,42,0.08)' }}
+      >
         Delete
       </button>
     </div>

@@ -6,12 +6,9 @@ import ClientRowActions from '@/components/admin/ClientRowActions'
 
 export const dynamic = 'force-dynamic'
 
-const NAVY   = '#0D1B2A'
-const NAVY2  = '#152032'
-const BLUE   = '#44BEC7'
-const RED    = '#D62828'
-const GOLD   = '#F5A623'
-const GREEN  = '#4CAF50'
+const GREEN = '#4CAF50'
+const GOLD = '#F5A623'
+const LOCKED = '#9CA3A8'
 const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
 function getAdmin() {
@@ -33,18 +30,13 @@ const STEPS = [
 ]
 
 function stepColor(val: string) {
-  if (['complete','signed','paid','submitted'].includes(val)) return GREEN
-  if (['pending','sent'].includes(val)) return GOLD
-  return 'rgba(255,255,255,0.15)'
-}
-function stepTextColor(val: string) {
-  if (['complete','signed','paid','submitted'].includes(val)) return GREEN
-  if (['pending','sent'].includes(val)) return GOLD
-  return 'rgba(255,255,255,0.25)'
+  if (['complete', 'signed', 'paid', 'submitted'].includes(val)) return GREEN
+  if (['pending', 'sent'].includes(val)) return GOLD
+  return LOCKED
 }
 function stepSymbol(val: string) {
-  if (['complete','signed','paid','submitted'].includes(val)) return '✓'
-  if (['pending','sent'].includes(val)) return '●'
+  if (['complete', 'signed', 'paid', 'submitted'].includes(val)) return '✓'
+  if (['pending', 'sent'].includes(val)) return '●'
   return '○'
 }
 
@@ -115,263 +107,326 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
-
-      {/* Nav */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.96)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(68,190,199,0.15)', padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
-          <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE }}>PESCADERO ADMIN</span>
-          <Link href="/admin/inquiries" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📥 Inquiries</Link>
-          <Link href="/admin/availability" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📅 Availability</Link>
-          
-          <Link href="/admin/analytics" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📊 Analytics</Link>
-          <Link href="/admin/reviews" style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>⭐ Reviews</Link>
+    <div className="min-h-screen bg-background font-body-md text-on-surface">
+      {/* Sub-nav bar (real links — the global DashboardNav above this is untouched) */}
+      <div className="bg-primary text-on-primary">
+        <div className="max-w-[1280px] mx-auto px-6 lg:px-space-xl h-14 flex items-center justify-between">
+          <div className="flex items-center gap-space-lg overflow-x-auto">
+            <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed shrink-0">
+              Pescadero Admin
+            </span>
+            <Link href="/admin/inquiries" className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container hover:text-on-primary transition-colors shrink-0">
+              Inquiries
+            </Link>
+            <Link href="/admin/availability" className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container hover:text-on-primary transition-colors shrink-0">
+              Availability
+            </Link>
+            <Link href="/admin/analytics" className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container hover:text-on-primary transition-colors shrink-0">
+              Analytics
+            </Link>
+            <Link href="/admin/reviews" className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container hover:text-on-primary transition-colors shrink-0">
+              Reviews
+            </Link>
+          </div>
+          <Link
+            href="/dashboard?client=true"
+            className="font-label-sm text-label-sm uppercase tracking-wider text-secondary-fixed hover:text-on-primary border border-on-primary/20 px-space-sm py-1 whitespace-nowrap transition-colors"
+          >
+            Switch to Client View →
+          </Link>
         </div>
-        <Link href="/dashboard?client=true" style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '5px 12px' }}>
-          Switch to Client View →
-        </Link>
-      </nav>
+      </div>
 
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '28px 24px 80px' }}>
-
-        {/* Header */}
-        <div style={{ marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-            </p>
-            <h1 style={{ margin: 0, fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 26, color: 'white' }}>
-              Client Dashboard
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-space-xl py-space-xl">
+        {/* Header banner */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md border-b-2 border-primary pb-space-md mb-space-xl">
+          <div className="flex flex-col gap-1">
+            <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary">
+              {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            </span>
+            <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight">
+              Client Pipeline
             </h1>
           </div>
+          <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant">
+            Curated by Garrett
+          </span>
         </div>
 
         {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-xl">
           {[
-            { label: 'Total Clients',      value: total,          color: BLUE,  icon: '👥' },
-            { label: 'Consult Needed',     value: consultPending, color: GOLD,  icon: '📞' },
-            { label: 'Deposits Paid',      value: depositPaid,    color: GREEN, icon: '💵' },
-            { label: 'Events in 30 Days',  value: upcoming30,     color: RED,   icon: '🎵' },
-          ].map(s => (
-            <div key={s.label} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ fontSize: 22 }}>{s.icon}</span>
-              <div>
-                <p style={{ margin: '0 0 3px', fontSize: 24, fontWeight: 700, color: s.color }}>{s.value}</p>
-                <p style={{ margin: 0, fontSize: 10, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</p>
-              </div>
+            { num: '01', label: 'Total Clients', value: total },
+            { num: '02', label: 'Consult Needed', value: consultPending },
+            { num: '03', label: 'Deposits Paid', value: depositPaid },
+            { num: '04', label: 'Events in 30 Days', value: upcoming30, highlight: true },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className={`p-space-md shadow-[3px_3px_0px_0px_#07111A] flex flex-col justify-between ${
+                s.highlight ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface'
+              }`}
+            >
+              <span
+                className={`font-label-sm text-label-sm uppercase tracking-widest ${
+                  s.highlight ? 'text-secondary-fixed' : 'text-on-surface-variant'
+                }`}
+              >
+                {s.num} / {s.label}
+              </span>
+              <span className={`font-display-xl text-display-xl leading-none mt-space-sm ${s.highlight ? 'text-on-primary' : 'text-primary'}`}>
+                {s.value}
+              </span>
             </div>
           ))}
-        </div>
+        </section>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20 }}>
-
-          {/* Main table */}
-          <div>
-            {/* Needs action */}
-            {needsAction.length > 0 && (
-              <div style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 10, padding: '14px 18px', marginBottom: 18 }}>
-                <p style={{ margin: '0 0 10px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: GOLD }}>⚡ Needs Your Action ({needsAction.length})</p>
-                {needsAction.map(b => {
-                  const profile = profileMap[b.client_id]
-                  const email   = emailMap[b.client_id]
-                  const action  = b.step_consultation === 'pending'
+        {/* Needs action */}
+        {needsAction.length > 0 && (
+          <section className="bg-surface-container-low p-space-md lg:p-space-lg shadow-[4px_4px_0px_0px_#07111A] mb-space-xl">
+            <div className="flex items-center justify-between border-b-2 border-primary pb-space-sm mb-space-md">
+              <div>
+                <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary block">
+                  Live Desk Bench
+                </span>
+                <h2 className="font-headline-sm text-headline-sm text-primary">Needs Your Action</h2>
+              </div>
+              <span className="font-label-md text-label-md bg-primary text-on-primary px-2 py-1 uppercase">
+                {needsAction.length} Active
+              </span>
+            </div>
+            <div className="space-y-space-sm">
+              {needsAction.map((b) => {
+                const profile = profileMap[b.client_id]
+                const email = emailMap[b.client_id]
+                const action =
+                  b.step_consultation === 'pending'
                     ? 'Consultation call needed'
                     : b.step_consultation === 'complete' && b.step_contract === 'locked'
                     ? 'Ready to send contract'
                     : 'Contract signed — unlock deposit'
-                  return (
-                    <div key={b.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(245,166,35,0.1)' }}>
-                      <div>
-                        <span style={{ fontSize: 12, color: 'white', fontWeight: 600 }}>{profile?.full_name || email}</span>
-                        <span style={{ fontSize: 11, color: GOLD, marginLeft: 10 }}>— {action}</span>
-                      </div>
-                      <Link
-                        href={
-                          b.step_consultation === 'pending'
-                            ? `/admin/client/${b.client_id}`
-                            : `/admin/client/${b.client_id}`
-                        }
-                        style={{ fontSize: 10, color: GOLD, textDecoration: 'none', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 5, padding: '3px 10px' }}
-                      >
-                        {b.step_consultation === 'pending' ? 'View Request →' : 'Take Action →'}
-                      </Link>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-
-            {/* Client table */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
-
-              {/* Table header */}
-              <div style={{ padding: '12px 18px', background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr auto', gap: 16, alignItems: 'center', flex: 1 }}>
-                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Client</p>
-                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Progress</p>
-                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Actions</p>
-                </div>
-                <Link href={showArchived ? '/admin' : '/admin?view=archived'} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: BLUE, textDecoration: 'none', whiteSpace: 'nowrap', marginLeft: 16 }}>
-                  {showArchived ? '← Active Clients' : `Archived (${archivedBookings.length})`}
-                </Link>
-              </div>
-
-              {visibleBookings.length === 0 && (
-                <p style={{ padding: 40, textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: 13, margin: 0 }}>
-                  {showArchived ? 'No archived clients.' : 'No clients yet.'}
-                </p>
-              )}
-
-              {visibleBookings.map((booking, i) => {
-                const profile  = profileMap[booking.client_id]
-                const email    = emailMap[booking.client_id]
-                const inquiry  = inquiryMap[booking.client_id]
-                const contract = contractMap[booking.client_id]
-                const eventDate = contract?.event_date || inquiry?.event_date
-                const daysAway  = eventDate ? Math.ceil((new Date(eventDate + 'T12:00:00').getTime() - now.getTime()) / 86400000) : null
-
                 return (
-                  <div key={booking.id} style={{
-                    padding: '14px 18px',
-                    borderBottom: i < (visibleBookings.length - 1) ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                    background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
-                    display: 'grid', gridTemplateColumns: '180px 1fr auto', gap: 16, alignItems: 'center',
-                  }}>
-
-                    {/* Client info */}
+                  <div key={b.id} className="bg-surface p-space-sm flex items-center justify-between gap-space-sm shadow-[2px_2px_0px_0px_#07111A]">
                     <div>
-                      <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {profile?.full_name || 'Unknown'}
-                      </p>
-                      <p style={{ margin: '0 0 3px', fontSize: 10, color: 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {email}
-                      </p>
-                      {eventDate && (
-                        <p style={{ margin: 0, fontSize: 10, color: daysAway !== null && daysAway <= 14 ? RED : daysAway !== null && daysAway <= 30 ? GOLD : 'rgba(255,255,255,0.3)' }}>
-                          {fmtDate(eventDate)}{daysAway !== null ? ` · ${daysAway}d` : ''}
-                        </p>
-                      )}
+                      <span className="font-label-lg text-label-lg uppercase text-primary">{profile?.full_name || email}</span>
+                      <span className="font-body-sm text-body-sm text-secondary block">{action}</span>
                     </div>
-
-                    {/* Labeled step progress */}
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {STEPS.map(({ key, short }) => {
-                        const val = booking[key] || 'locked'
-                        const color = stepColor(val)
-                        const textColor = stepTextColor(val)
-                        const sym = stepSymbol(val)
-                        return (
-                          <div key={key} title={`${short}: ${val}`} style={{
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                            padding: '4px 6px', borderRadius: 6,
-                            background: ['complete','signed','paid','submitted'].includes(val) ? 'rgba(76,175,80,0.1)' : ['pending','sent'].includes(val) ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.03)',
-                            border: `1px solid ${color}22`,
-                            minWidth: 44,
-                          }}>
-                            <span style={{ fontSize: 12, color, lineHeight: 1 }}>{sym}</span>
-                            <span style={{ fontSize: 8, color: textColor, fontWeight: 600, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{short}</span>
-                          </div>
-                        )
-                      })}
-                    </div>
-
-                    {/* Actions */}
-                    <div style={{ display: 'flex', gap: 8, flexDirection: 'column', alignItems: 'flex-end' }}>
-                      <Link href={`/admin/client/${booking.client_id}`} style={{
-                        fontSize: 11, fontWeight: 700, padding: '6px 14px', borderRadius: 7,
-                        background: 'rgba(68,190,199,0.1)', border: '1px solid rgba(68,190,199,0.25)',
-                        color: BLUE, textDecoration: 'none', whiteSpace: 'nowrap',
-                      }}>
-                        Manage →
-                      </Link>
-                      {contract?.status && (
-                        <span style={{
-                          fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
-                          background: ['deposit_paid','fully_paid'].includes(contract.status) ? 'rgba(76,175,80,0.12)' : 'rgba(255,255,255,0.05)',
-                          border: `1px solid ${['deposit_paid','fully_paid'].includes(contract.status) ? 'rgba(76,175,80,0.25)' : 'rgba(255,255,255,0.1)'}`,
-                          color: ['deposit_paid','fully_paid'].includes(contract.status) ? GREEN : 'rgba(255,255,255,0.3)',
-                          textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap',
-                        }}>
-                          {contract.status.replace('_', ' ')}
-                        </span>
-                      )}
-                      <ClientRowActions clientId={booking.client_id} isArchived={!!booking.archived_at} />
-                    </div>
-
+                    <Link
+                      href={`/admin/client/${b.client_id}`}
+                      className="font-label-sm text-label-sm uppercase bg-surface-container px-space-sm py-1 hover:bg-primary hover:text-on-primary transition-colors whitespace-nowrap"
+                    >
+                      {b.step_consultation === 'pending' ? 'View Request →' : 'Take Action →'}
+                    </Link>
                   </div>
                 )
               })}
             </div>
+          </section>
+        )}
+
+        {/* Client table */}
+        <section className="bg-surface-container-lowest p-space-md lg:p-space-lg shadow-[4px_4px_0px_0px_#07111A] mb-space-xl">
+          <div className="flex items-center justify-between border-b border-primary/20 pb-space-md mb-space-sm">
+            <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
+              {showArchived ? `Archived Clients (${archivedBookings.length})` : `Active Clients (${activeBookings.length})`}
+            </span>
+            <Link
+              href={showArchived ? '/admin' : '/admin?view=archived'}
+              className="font-label-sm text-label-sm uppercase tracking-wider text-secondary hover:text-primary transition-colors whitespace-nowrap"
+            >
+              {showArchived ? '← Active Clients' : `Archived (${archivedBookings.length})`}
+            </Link>
           </div>
 
-          {/* Sidebar */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {visibleBookings.length === 0 && (
+            <p className="py-space-xl text-center font-body-md text-body-md text-on-surface-variant">
+              {showArchived ? 'No archived clients.' : 'No clients yet.'}
+            </p>
+          )}
 
-            {/* Upcoming events */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '16px 18px' }}>
-              <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>
-                📅 Upcoming Events
-              </p>
-              {upcomingEvents.length === 0 && (
-                <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>No events in next 90 days.</p>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left">
+              {visibleBookings.length > 0 && (
+                <thead>
+                  <tr className="bg-primary text-on-primary font-label-md text-label-md uppercase tracking-widest">
+                    <th className="py-2.5 px-3">Client</th>
+                    <th className="py-2.5 px-3">Event</th>
+                    <th className="py-2.5 px-3">Progress</th>
+                    <th className="py-2.5 px-3">Contract</th>
+                    <th className="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
               )}
-              {upcomingEvents.map(e => (
-                <div key={e.id} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 600, color: 'white' }}>
-                    {e.profile?.full_name || emailMap[e.client_id] || 'Client'}
-                  </p>
-                  <p style={{ margin: '0 0 2px', fontSize: 11, color: 'rgba(232,224,213,0.5)' }}>
-                    {e.contract?.event_type || e.inquiry?.event_name || 'Event'}
-                  </p>
-                  <p style={{ margin: 0, fontSize: 10, color: e.daysAway !== null && e.daysAway! <= 7 ? RED : GOLD, fontWeight: 600 }}>
-                    {fmtDate(e.eventDate || null)} · {e.daysAway}d away
-                  </p>
+              <tbody className="font-body-md text-body-md divide-y divide-primary/10">
+                {visibleBookings.map((booking, i) => {
+                  const profile = profileMap[booking.client_id]
+                  const email = emailMap[booking.client_id]
+                  const inquiry = inquiryMap[booking.client_id]
+                  const contract = contractMap[booking.client_id]
+                  const eventDate = contract?.event_date || inquiry?.event_date
+                  const daysAway = eventDate ? Math.ceil((new Date(eventDate + 'T12:00:00').getTime() - now.getTime()) / 86400000) : null
+
+                  return (
+                    <tr key={booking.id} className={i % 2 === 0 ? 'bg-surface' : 'bg-surface-container-lowest'}>
+                      <td className="py-3 px-3 align-top">
+                        <div className="font-title-editorial text-title-editorial font-medium text-primary">
+                          {profile?.full_name || 'Unknown'}
+                        </div>
+                        <div className="font-body-sm text-body-sm text-on-surface-variant">{email}</div>
+                      </td>
+                      <td className="py-3 px-3 align-top">
+                        {eventDate ? (
+                          <>
+                            <div className="font-label-md text-label-md text-primary">{fmtDate(eventDate)}</div>
+                            <span
+                              className="inline-block mt-1 px-1.5 py-0.5 font-label-sm text-label-sm uppercase text-on-primary"
+                              style={{ background: daysAway !== null && daysAway <= 14 ? '#C8202A' : daysAway !== null && daysAway <= 30 ? GOLD : '#9CA3A8' }}
+                            >
+                              {daysAway !== null ? `T-${daysAway}d` : ''}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="font-body-sm text-body-sm text-on-surface-variant">No date set</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 align-top">
+                        <div className="flex gap-1 flex-wrap">
+                          {STEPS.map(({ key, short }) => {
+                            const val = booking[key] || 'locked'
+                            const color = stepColor(val)
+                            const sym = stepSymbol(val)
+                            return (
+                              <div
+                                key={key}
+                                title={`${short}: ${val}`}
+                                className="flex flex-col items-center gap-0.5 px-1.5 py-1 min-w-[40px] bg-surface-container"
+                                style={{ borderBottom: `2px solid ${color}` }}
+                              >
+                                <span className="text-xs leading-none" style={{ color }}>{sym}</span>
+                                <span className="font-label-sm text-[8px] uppercase tracking-wide whitespace-nowrap" style={{ color }}>{short}</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 align-top">
+                        {contract?.status ? (
+                          <span
+                            className={`font-label-sm text-label-sm px-2 py-0.5 uppercase tracking-wide inline-block ${
+                              ['deposit_paid', 'fully_paid'].includes(contract.status)
+                                ? 'bg-secondary-fixed text-on-secondary-fixed font-bold'
+                                : 'bg-surface-container text-on-surface-variant'
+                            }`}
+                          >
+                            {contract.status.replace('_', ' ')}
+                          </span>
+                        ) : (
+                          <span className="font-body-sm text-body-sm text-on-surface-variant">—</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 align-top">
+                        <div className="flex flex-col items-end gap-1.5">
+                          <Link
+                            href={`/admin/client/${booking.client_id}`}
+                            className="font-label-sm text-label-sm uppercase bg-primary text-on-primary px-2 py-1 hover:bg-secondary transition-colors whitespace-nowrap"
+                          >
+                            Manage →
+                          </Link>
+                          <ClientRowActions clientId={booking.client_id} isArchived={!!booking.archived_at} />
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Bottom panels */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
+          {/* Upcoming events */}
+          <section className="lg:col-span-5 bg-surface-container-low p-space-md lg:p-space-lg shadow-[4px_4px_0px_0px_#07111A]">
+            <div className="border-b-2 border-primary pb-space-sm mb-space-md">
+              <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary block">Score &amp; Running Order</span>
+              <h2 className="font-headline-sm text-headline-sm text-primary">Upcoming Events</h2>
+            </div>
+            {upcomingEvents.length === 0 && (
+              <p className="font-body-sm text-body-sm text-on-surface-variant">No events in the next 90 days.</p>
+            )}
+            <div className="space-y-space-sm">
+              {upcomingEvents.map((e) => (
+                <div key={e.id} className="bg-surface p-space-sm shadow-[2px_2px_0px_0px_#07111A] flex items-center justify-between gap-space-sm">
+                  <div>
+                    <div className="font-label-lg text-label-lg uppercase text-primary">
+                      {e.profile?.full_name || emailMap[e.client_id] || 'Client'}
+                    </div>
+                    <div className="font-body-sm text-body-sm text-on-surface-variant italic">
+                      {e.contract?.event_type || e.inquiry?.event_name || 'Event'}
+                    </div>
+                  </div>
+                  <span
+                    className="font-label-sm text-label-sm uppercase font-bold whitespace-nowrap"
+                    style={{ color: e.daysAway !== null && e.daysAway! <= 7 ? '#C8202A' : GOLD }}
+                  >
+                    {fmtDate(e.eventDate || null)} · {e.daysAway}d
+                  </span>
                 </div>
               ))}
             </div>
+          </section>
 
-            {/* Quick links */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '16px 18px' }}>
-              <p style={{ margin: '0 0 12px', fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>
-                Quick Links
-              </p>
+          {/* Quick links */}
+          <section className="lg:col-span-4 bg-surface-container-low p-space-md lg:p-space-lg shadow-[4px_4px_0px_0px_#07111A]">
+            <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary block border-b-2 border-primary pb-space-sm mb-space-md">
+              Quick Links
+            </span>
+            <div className="flex flex-col">
               {[
-                { href: '/', label: '🏠 Homepage' },
-                { href: '/dashboard?client=true', label: '📊 Client Dashboard' },
-                { href: '/inquiry', label: '📝 Inquiry Form' },
-                { href: '/contract', label: '📄 Contract Viewer' },
-                { href: '/contract/payment', label: '💳 Payment Page' },
-                { href: '/planning', label: '📋 Planning Form' },
-                { href: '/review', label: '⭐ Review Page' },
-                { href: '/admin/availability', label: '📅 Set Availability' },
-                { href: 'mailto:garrett@pescaderomusic.com', label: '✉️ Compose Email' },
-                { href: 'https://dashboard.stripe.com', label: '💳 Stripe Dashboard', ext: true },
-                { href: 'https://resend.com', label: '📬 Resend Logs', ext: true },
-                { href: 'https://supabase.com/dashboard', label: '🗄️ Supabase', ext: true },
-              ].map(link => (
-                <a key={link.href} href={link.href} target={link.ext ? '_blank' : undefined} rel={link.ext ? 'noopener noreferrer' : undefined} style={{ display: 'block', fontSize: 12, color: 'rgba(232,224,213,0.55)', textDecoration: 'none', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                { href: '/', label: 'Homepage' },
+                { href: '/dashboard?client=true', label: 'Client Dashboard' },
+                { href: '/inquiry', label: 'Inquiry Form' },
+                { href: '/contract', label: 'Contract Viewer' },
+                { href: '/contract/payment', label: 'Payment Page' },
+                { href: '/planning', label: 'Planning Form' },
+                { href: '/review', label: 'Review Page' },
+                { href: '/admin/availability', label: 'Set Availability' },
+                { href: 'mailto:garrett@pescaderomusic.com', label: 'Compose Email' },
+                { href: 'https://dashboard.stripe.com', label: 'Stripe Dashboard', ext: true },
+                { href: 'https://resend.com', label: 'Resend Logs', ext: true },
+                { href: 'https://supabase.com/dashboard', label: 'Supabase', ext: true },
+              ].map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target={link.ext ? '_blank' : undefined}
+                  rel={link.ext ? 'noopener noreferrer' : undefined}
+                  className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary py-1.5 border-b border-primary/10 transition-colors"
+                >
                   {link.label}
                 </a>
               ))}
             </div>
+          </section>
 
-            {/* Legend */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 10, padding: '14px 16px' }}>
-              <p style={{ margin: '0 0 10px', fontSize: 9, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)' }}>Legend</p>
+          {/* Legend */}
+          <section className="lg:col-span-3 bg-primary text-on-primary p-space-md lg:p-space-lg shadow-[4px_4px_0px_0px_#07111A]">
+            <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed block border-b border-primary-container pb-space-sm mb-space-md">
+              Legend
+            </span>
+            <div className="flex flex-col gap-space-sm">
               {[
                 { sym: '✓', color: GREEN, label: 'Complete / Paid' },
-                { sym: '●', color: GOLD,  label: 'Pending / Sent' },
-                { sym: '○', color: 'rgba(255,255,255,0.2)', label: 'Locked / Not started' },
-              ].map(l => (
-                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, color: l.color, width: 16 }}>{l.sym}</span>
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>{l.label}</span>
+                { sym: '●', color: GOLD, label: 'Pending / Sent' },
+                { sym: '○', color: '#9CA3A8', label: 'Locked / Not started' },
+              ].map((l) => (
+                <div key={l.label} className="flex items-center gap-space-sm">
+                  <span className="text-base w-4" style={{ color: l.color }}>{l.sym}</span>
+                  <span className="font-body-sm text-body-sm text-on-primary-container">{l.label}</span>
                 </div>
               ))}
             </div>
-
-          </div>
+          </section>
         </div>
       </div>
     </div>

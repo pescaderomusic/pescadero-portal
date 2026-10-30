@@ -4,19 +4,12 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
-const BLUE     = '#44BEC7'
-const RED      = '#C8202A'
-const CREAM    = '#F5EFE0'
-const DISPLAY  = "'freight-display-pro', Georgia, serif"
-const UI_FONT  = "'futura-pt-condensed', 'Barlow Condensed', sans-serif"
-const BODY     = "'inter', system-ui, sans-serif"
-const WORDMARK = "'RetroFloral', 'Barlow Condensed', sans-serif"
-
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
 
@@ -35,55 +28,78 @@ export default function LoginPage() {
   }
 
   return (
-    <div>
-      <div style={{ textAlign: 'center', marginBottom: 36 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 8 }}>
-          <img className="auth-logo-img" src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: 40, width: 40, objectFit: 'contain' }} />
-          <span className="auth-wordmark" style={{ fontFamily: WORDMARK, fontSize: 18, letterSpacing: '4px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
+    <div className="space-y-space-md">
+      <form onSubmit={handleLogin} className="space-y-space-md">
+        <div>
+          <label htmlFor="login-email" className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface font-bold mb-1 block">
+            Email
+          </label>
+          <div className="relative bg-surface-container-lowest p-space-xs flex items-center border-b-2 border-primary/20 focus-within:border-secondary transition-colors">
+            <span className="material-symbols-outlined text-on-surface-variant ml-space-xs mr-space-sm text-lg">mail</span>
+            <input
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              className="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none"
+            />
+          </div>
         </div>
-        <p className="auth-subtitle" style={{ marginTop: 12, fontSize: 13, color: 'rgba(245,239,224,0.5)', fontFamily: BODY }}>
-          Client Portal
-        </p>
-        <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(245,239,224,0.3)', textDecoration: 'none', fontSize: 11, fontFamily: UI_FONT, letterSpacing: '1.5px', textTransform: 'uppercase', marginTop: 8 }}>
-          ← Back to Home
-        </a>
-      </div>
 
-      <div className="pm-card" style={{ border: '1px solid rgba(68,190,199,0.15)' }}>
-        <h1 className="auth-heading" style={{ fontFamily: DISPLAY, fontSize: 24, fontWeight: 300, color: CREAM, marginBottom: 24 }}>
-          Welcome back
-        </h1>
-
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div>
-            <label className="pm-label">Email</label>
-            <input className="pm-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <label htmlFor="login-password" className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface font-bold">
+              Password
+            </label>
+            <Link href="/auth/forgot-password" className="font-label-sm text-label-sm text-secondary uppercase no-underline hover:underline">
+              Forgot?
+            </Link>
           </div>
-          <div>
-            <label className="pm-label">Password</label>
-            <input className="pm-input" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
-            <div style={{ textAlign: 'right', marginTop: 6 }}>
-              <a href="/auth/forgot-password" style={{ fontSize: 11, color: `rgba(68,190,199,0.7)`, textDecoration: 'none', fontFamily: UI_FONT, letterSpacing: '1px' }}>
-                Forgot your password?
-              </a>
-            </div>
+          <div className="relative bg-surface-container-lowest p-space-xs flex items-center border-b-2 border-primary/20 focus-within:border-secondary transition-colors">
+            <span className="material-symbols-outlined text-on-surface-variant ml-space-xs mr-space-sm text-lg">key</span>
+            <input
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              className="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              className="text-on-surface-variant hover:text-on-surface mr-space-xs flex items-center justify-center p-1"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              <span className="material-symbols-outlined text-base">{showPassword ? 'visibility_off' : 'visibility'}</span>
+            </button>
           </div>
+        </div>
 
-          {error && <div className="pm-error">{error}</div>}
+        {error && (
+          <div className="bg-secondary/10 border border-secondary/30 p-space-sm font-body-sm text-body-sm text-secondary">
+            {error}
+          </div>
+        )}
 
-          <button className="btn-primary" type="submit" disabled={loading} style={{ width: '100%', marginTop: 4 }}>
-            {loading ? 'Signing in…' : 'Sign In →'}
-          </button>
-        </form>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-space-md px-space-lg bg-secondary text-on-secondary font-label-lg text-label-lg tracking-widest uppercase text-center flex items-center justify-center gap-space-sm hover:brightness-110 active:translate-y-0.5 transition-all shadow-[3px_3px_0px_0px_#07111A] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span>{loading ? 'Signing In…' : 'Sign In'}</span>
+          {!loading && <span className="material-symbols-outlined text-lg">arrow_forward</span>}
+        </button>
+      </form>
 
-        <p style={{ marginTop: 20, textAlign: 'center', fontSize: 13, color: 'rgba(245,239,224,0.45)', fontFamily: BODY }}>
-          New client?{' '}
-          <Link href="/auth/signup" style={{ color: BLUE, textDecoration: 'none', fontWeight: 500 }}>Create your account</Link>
-        </p>
-      </div>
-
-      <p style={{ marginTop: 24, textAlign: 'center', fontSize: 11, color: 'rgba(245,239,224,0.25)', fontFamily: BODY }}>
-        garrett@pescaderomusic.com · (210) 727-9328
+      <p className="text-center font-body-sm text-body-sm text-on-surface-variant">
+        New client?{' '}
+        <Link href="/auth/signup" className="text-secondary no-underline hover:underline font-semibold">
+          Create your account
+        </Link>
       </p>
     </div>
   )

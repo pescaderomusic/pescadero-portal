@@ -1,89 +1,70 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 const ADMIN_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
-// ─── Hero Slides ─────────────────────────────────────────────────────────────
-const heroSlides = [
-  {
-    eyebrow: 'Wedding DJ & Sound',
-    headline: 'Sound as good\nas it looks.',
-    sub: 'Full-service wedding DJ with professional sound for ceremony, cocktail hour, and reception.',
-    cta: 'Book Your Date',
-    ctaHref: '#availability',
-    bg: 'https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/hero.jpg',
-  },
-  {
-    eyebrow: 'Outdoor Movie Nights',
-    headline: 'Bring the\nbig screen outside.',
-    sub: 'A complete outdoor cinema experience for private events. Inflatable screen, projector, and crystal-clear sound — no power hookup needed.',
-    cta: 'Check Availability',
-    ctaHref: '#availability',
-    bg: 'https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/hero.jpg', // swap when you have a movie night photo
-  },
-]
-
-// ─── Pricing ─────────────────────────────────────────────────────────────────
-const djPackages = [
-  {
-    name: 'Dance DJ',
-    price: '$600',
-    note: 'Travel fees additional',
-    description: 'One sound system. Up to 4 hours of DJ service — perfect for receptions, parties, grand openings, and corporate events.',
-    features: ['Up to 4 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'Wired MC mic'],
-  },
-  {
-    name: 'Full-Service Sound',
-    price: '$850',
-    note: 'Travel fees additional',
-    description: 'Two independent sound systems — one for ceremony or speeches, one for the dance floor. The complete wedding package.',
-    features: ['Up to 4 hours', 'Two independent sound systems', 'Ceremony & cocktail hour sound', 'Two wireless mics for vows, speeches & toasts', 'DJ-curated or custom playlist'],
-    featured: true,
-  },
-]
-
-const moviePackage = {
-  name: 'Outdoor Movie Night',
-  weekday: '$250',
-  weekend: '$350',
-  description: 'A private outdoor cinema for your backyard, neighborhood, or event space. Self-contained rig runs up to 3 hours without a power hookup.',
-  features: ['Up to 3 hours', 'Large inflatable screen', 'HD projector', 'Outdoor speaker system', 'No power hookup needed', 'Private events only'],
-  note: 'Mon–Thu $250 · Fri–Sat $350',
-  seasonal: 'Summer availability only',
-}
-
-// ─── Availability checker event types ────────────────────────────────────────
 const eventTypes = [
-  { id: 'wedding', label: 'Wedding', icon: '💍', inquiryPath: '/inquiry?type=wedding' },
-  { id: 'event', label: 'DJ / Party / Event', icon: '🎶', inquiryPath: '/inquiry?type=event' },
-  { id: 'movie', label: 'Outdoor Movie Night', icon: '🎬', inquiryPath: '/inquiry?type=movie' },
-]
+  { id: 'wedding', label: 'Wedding Sound' },
+  { id: 'event', label: 'DJ / Party / Event' },
+  { id: 'movie', label: 'Outdoor Movie Night' },
+] as const
+
+type EventTypeId = (typeof eventTypes)[number]['id']
+
+const heroContent: Record<
+  'wedding' | 'cinema',
+  { kicker: string; headlineLead: string; headlineEmphasis: string; headlineTail: string; description: string; image: string; alt: string; badge: string; badgeTitle: string; badgeBody: string }
+> = {
+  wedding: {
+    kicker: 'CATALOG NO. PM-8812 — HIGH-FIDELITY LIVE RECEPTION',
+    headlineLead: 'Boutique Sound for',
+    headlineEmphasis: 'Unforgettable',
+    headlineTail: 'Evenings.',
+    description:
+      'Handcrafted playlists, warm full-range sound, and seamless event flow across Utah Valley, Park City peaks, and mountain destinations. Powered by professional sound systems and careful live mixing.',
+    image: '/images/site/hero-wedding.jpg',
+    alt: 'Pescadero Music DJ booth set up at a wedding reception with string lights',
+    badge: 'FOLIO MASTER 01 • REAL UTAH WEDDINGS',
+    badgeTitle: 'Clean, Powerful Sound — Zero Hassle.',
+    badgeBody: 'Set up and dialed in for the room, every time — ceremony, cocktail hour, and reception.',
+  },
+  cinema: {
+    kicker: 'CATALOG NO. PM-4090 — OUTDOOR CANVAS',
+    headlineLead: 'Outdoor Movie',
+    headlineEmphasis: 'Nights',
+    headlineTail: 'Under Alpine Stars.',
+    description:
+      'A complete private outdoor cinema for your backyard, neighborhood, or event space. Inflatable screen, HD projector, and crystal-clear sound — self-contained for up to 3 hours, no power hookup needed.',
+    image: 'https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/hero.jpg',
+    alt: 'Pescadero Music outdoor movie night setup',
+    badge: 'FOLIO MASTER 02 • PRIVATE EVENTS ONLY',
+    badgeTitle: 'A Big Screen, Anywhere Outside.',
+    badgeBody: 'Large inflatable screen and HD projection for backyard gatherings and private venues. Summer availability only.',
+  },
+}
 
 export default function HomePage() {
   const router = useRouter()
   const supabase = createClient()
   const [user, setUser] = useState<any>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Hero carousel
-  const [slide, setSlide] = useState(0)
-  const [fading, setFading] = useState(false)
-  const slideTimer = useRef<NodeJS.Timeout | null>(null)
+  const [heroSlide, setHeroSlide] = useState<'wedding' | 'cinema'>('wedding')
 
-  // Availability checker
-  const [selectedType, setSelectedType] = useState<string | null>(null)
-  const [busyDates, setBusyDates] = useState<string[]>([])
+  const [selectedType, setSelectedType] = useState<EventTypeId>('wedding')
   const [checkDate, setCheckDate] = useState('')
-  const [dateStatus, setDateStatus] = useState<'idle' | 'available' | 'busy'>('idle')
+  const [dateStatus, setDateStatus] = useState<'idle' | 'checking' | 'available' | 'busy'>('idle')
 
-  // ── Auth ──
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+      setIsAdmin(data.user?.id === ADMIN_ID)
+    })
   }, [supabase])
 
   const handleSignOut = async () => {
@@ -92,387 +73,780 @@ export default function HomePage() {
     setMenuOpen(false)
   }
 
-  // ── Scroll nav ──
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', handler)
-    return () => window.removeEventListener('scroll', handler)
-  }, [])
-
-  // ── Hero auto-advance ──
-  const goToSlide = (idx: number) => {
-    setFading(true)
-    setTimeout(() => {
-      setSlide(idx)
-      setFading(false)
-    }, 400)
-  }
-
-  useEffect(() => {
-    slideTimer.current = setTimeout(() => {
-      goToSlide((slide + 1) % heroSlides.length)
-    }, 6000)
-    return () => { if (slideTimer.current) clearTimeout(slideTimer.current) }
-  }, [slide])
-
-  // ── Busy dates ──
-  useEffect(() => {
-    fetch('/api/busy-dates')
-      .then(r => r.json())
-      .then(d => setBusyDates(d.dates || []))
-      .catch(() => {})
-  }, [])
-
-  const handleDateCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateCheck = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
     setCheckDate(val)
-    if (!val) { setDateStatus('idle'); return }
-    setDateStatus(busyDates.includes(val) ? 'busy' : 'available')
+    if (!val) {
+      setDateStatus('idle')
+      return
+    }
+    setDateStatus('checking')
+    try {
+      const res = await fetch(`/api/check-availability?date=${val}`)
+      const data = await res.json()
+      setDateStatus(data.status === 'booked' ? 'busy' : 'available')
+    } catch {
+      // Fail open — don't block an inquiry over a flaky calendar check
+      setDateStatus('available')
+    }
   }
 
   const handleInquiry = () => {
-    if (!selectedType) return
-    const et = eventTypes.find(t => t.id === selectedType)
-    if (!et) return
-    const dateParam = checkDate ? `&date=${checkDate}` : ''
-    router.push(`${et.inquiryPath}${dateParam}`)
+    if (!checkDate || dateStatus === 'busy') return
+    router.push(`/inquiry?type=${selectedType}&date=${checkDate}`)
   }
 
-  const s = heroSlides[slide]
+  const scrollTo = (id: string) => {
+    setMobileMenuOpen(false)
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const h = heroContent[heroSlide]
+
+  const navBtn =
+    'font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors'
 
   return (
-    <div style={{ fontFamily: 'inter, sans-serif', background: 'linear-gradient(160deg, #07111A 0%, #0D1E2B 100%)', minHeight: '100vh', color: '#F5EFE0' }}>
+    <div className="bg-background font-body-md text-on-surface antialiased selection:bg-secondary selection:text-on-secondary">
+      {/* HEADER */}
+      <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+        <div className="h-20 w-full px-6 md:px-margin flex items-center justify-between">
+          <div className="flex items-center gap-space-lg min-w-0">
+            <a className="flex items-center gap-space-md group min-w-0" href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/' }}>
+              <div className="bg-primary text-on-primary font-label-md text-label-md px-space-sm py-space-xs uppercase tracking-widest shrink-0">
+                PM
+              </div>
+              <div className="hidden sm:flex flex-col min-w-0">
+                <span className="font-label-lg text-label-lg uppercase tracking-widest text-primary truncate">
+                  Pescadero Music
+                </span>
+                <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant truncate">
+                  DJ &amp; Sound • Provo, Utah
+                </span>
+              </div>
+            </a>
+          </div>
 
-      {/* ── NAV ── */}
-      <nav className="pm-nav" style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        height: '64px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: scrolled ? 'rgba(7,17,26,0.95)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(68,190,199,0.15)' : 'none',
-        transition: 'all 0.3s ease',
-      }}>
-        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
-          <img src="https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/logo.png" alt="Pescadero Music" style={{ height: '36px', width: 'auto', flexShrink: 0 }} />
-          <span style={{ fontFamily: 'RetroFloral, serif', fontSize: '15px', fontWeight: 300, color: '#F5EFE0', letterSpacing: '3px', textTransform: 'uppercase' as const, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Pescadero Music</span>
-        </a>
-
-        {/* Desktop links */}
-        <div className="pm-nav-desktop-links">
-          <a href="#services" style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F5EFE0', textDecoration: 'none', opacity: 0.8 }}>Services</a>
-          <a href="#pricing" style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F5EFE0', textDecoration: 'none', opacity: 0.8 }}>Pricing</a>
-          <a href="#availability" style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F5EFE0', textDecoration: 'none', opacity: 0.8 }}>Book</a>
-          {user ? (
-            <div style={{ position: 'relative' }}>
-              <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: '#44BEC7', color: '#07111A', border: 'none', borderRadius: '4px', padding: '0.45rem 1rem', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 600 }}>
-                Dashboard ▾
-              </button>
-              {menuOpen && (
-                <div style={{ position: 'absolute', right: 0, top: '110%', background: '#0D1E2B', border: '1px solid rgba(68,190,199,0.2)', borderRadius: '6px', minWidth: '160px', overflow: 'hidden' }}>
-                  <button onClick={() => router.push('/dashboard')} style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#F5EFE0', cursor: 'pointer', fontFamily: 'inter, sans-serif', fontSize: '0.9rem' }}>My Dashboard</button>
-                  {user.id === ADMIN_ID && (
-                    <button onClick={() => router.push('/admin')} style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#44BEC7', cursor: 'pointer', fontFamily: 'inter, sans-serif', fontSize: '0.9rem' }}>Admin Panel</button>
-                  )}
-                  <button onClick={handleSignOut} style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#C8202A', cursor: 'pointer', fontFamily: 'inter, sans-serif', fontSize: '0.9rem' }}>Sign Out</button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <button onClick={() => router.push('/auth/login')} style={{ background: 'transparent', color: '#44BEC7', border: '1px solid #44BEC7', borderRadius: '4px', padding: '0.45rem 1rem', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.85rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
-              Client Login
+          <nav className="hidden lg:flex items-center gap-space-lg">
+            <button className={navBtn} onClick={() => scrollTo('services')}>
+              Services
             </button>
-          )}
-        </div>
+            <button className={navBtn} onClick={() => scrollTo('pricing-tiers')}>
+              Pricing
+            </button>
+            <button className={navBtn} onClick={() => scrollTo('checker-widget')}>
+              Check Dates
+            </button>
+          </nav>
 
-        {/* Mobile hamburger */}
-        <button
-          className="pm-nav-hamburger"
-          onClick={() => setMobileMenuOpen(o => !o)}
-          aria-label="Toggle menu"
-          aria-expanded={mobileMenuOpen}
-        >
-          {mobileMenuOpen ? '✕' : '☰'}
-        </button>
-      </nav>
-
-      {/* Mobile menu panel */}
-      <div className={`pm-nav-mobile-panel${mobileMenuOpen ? ' open' : ''}`}>
-        <a href="#services" className="pm-nav-mobile-link" onClick={() => setMobileMenuOpen(false)}>Services</a>
-        <a href="#pricing" className="pm-nav-mobile-link" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
-        <a href="#availability" className="pm-nav-mobile-link" onClick={() => setMobileMenuOpen(false)}>Book</a>
-        {user ? (
-          <>
-            <button className="pm-nav-mobile-link" onClick={() => { setMobileMenuOpen(false); router.push('/dashboard') }}>My Dashboard</button>
-            {user.id === ADMIN_ID && (
-              <button className="pm-nav-mobile-link" style={{ color: '#44BEC7' }} onClick={() => { setMobileMenuOpen(false); router.push('/admin') }}>Admin Panel</button>
-            )}
-            <button className="pm-nav-mobile-link" style={{ color: '#C8202A' }} onClick={() => { setMobileMenuOpen(false); handleSignOut() }}>Sign Out</button>
-          </>
-        ) : (
-          <button className="pm-nav-mobile-link" style={{ color: '#44BEC7' }} onClick={() => { setMobileMenuOpen(false); router.push('/auth/login') }}>Client Login</button>
-        )}
-      </div>
-
-      {/* ── HERO CAROUSEL ── */}
-      <section className="pm-hero-section" style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
-        {/* BG image */}
-        <div className="pm-hero-bg" style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: `url(${s.bg})`,
-          backgroundSize: 'cover',
-          transition: 'opacity 0.4s ease',
-          opacity: fading ? 0 : 1,
-        }} />
-        {/* Overlay */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(7,17,26,0.85) 0%, rgba(7,17,26,0.4) 60%, rgba(7,17,26,0.1) 100%)' }} />
-
-        {/* Content */}
-        <div className="pm-hero-content" style={{
-          position: 'relative', zIndex: 2,
-          height: '100%', display: 'flex', alignItems: 'center',
-          opacity: fading ? 0 : 1,
-          transition: 'opacity 0.4s ease',
-        }}>
-          <div>
-            <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#44BEC7', marginBottom: '1rem' }}>
-              {s.eyebrow}
-            </p>
-            <h1 style={{ fontFamily: 'freight-display-pro, serif', fontSize: 'clamp(2.8rem, 6vw, 5rem)', fontWeight: 400, lineHeight: 1.1, color: '#F5EFE0', margin: '0 0 1.25rem', whiteSpace: 'pre-line' }}>
-              {s.headline}
-            </h1>
-            <p style={{ fontSize: '1.05rem', lineHeight: 1.6, color: 'rgba(245,239,224,0.8)', maxWidth: '480px', marginBottom: '2rem' }}>
-              {s.sub}
-            </p>
-            <div className="pm-hero-ctas">
-              <a href={s.ctaHref} style={{ background: '#C8202A', color: '#F5EFE0', padding: '0.75rem 1.75rem', borderRadius: '4px', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.9rem', letterSpacing: '0.12em', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 600, boxSizing: 'border-box' as const }}>
-                {s.cta}
-              </a>
-              <a href="#services" style={{ background: 'transparent', color: '#F5EFE0', padding: '0.75rem 1.75rem', borderRadius: '4px', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.9rem', letterSpacing: '0.12em', textTransform: 'uppercase', textDecoration: 'none', border: '1px solid rgba(245,239,224,0.4)', boxSizing: 'border-box' as const }}>
-                See Services
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Slide dots */}
-        <div style={{ position: 'absolute', bottom: '2rem', left: '5vw', zIndex: 3, display: 'flex', gap: '0.5rem' }}>
-          {heroSlides.map((_, i) => (
+          <div className="flex items-center gap-space-md">
             <button
-              key={i}
-              onClick={() => { if (slideTimer.current) clearTimeout(slideTimer.current); goToSlide(i) }}
-              style={{
-                width: i === slide ? '2rem' : '0.5rem',
-                height: '0.5rem',
-                borderRadius: '999px',
-                background: i === slide ? '#44BEC7' : 'rgba(245,239,224,0.35)',
-                border: 'none', cursor: 'pointer', padding: 0,
-                transition: 'all 0.3s ease',
-              }}
-            />
-          ))}
-        </div>
-      </section>
+              className="hidden sm:inline-flex items-center justify-center bg-secondary hover:bg-secondary-container text-on-secondary font-label-md text-label-md uppercase px-space-md py-space-sm shadow-[4px_4px_0px_0px_#07111A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#07111A] transition-all"
+              onClick={() => scrollTo('checker-widget')}
+            >
+              Check Your Date
+            </button>
 
-      {/* ── SERVICES ── */}
-      <section id="services" className="pm-section">
-        <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#44BEC7', marginBottom: '0.75rem' }}>What I Do</p>
-        <h2 className="pm-section-heading" style={{ fontFamily: 'freight-display-pro, serif', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#F5EFE0', margin: '0 0 3.5rem' }}>
-          Every event deserves<br />a great soundtrack.
-        </h2>
+            {user ? (
+              <div className="relative">
+                <button
+                  className="w-8 h-8 rounded-full bg-primary flex items-center justify-center"
+                  onClick={() => setMenuOpen((o) => !o)}
+                  aria-label="Account menu"
+                >
+                  <span className="material-symbols-outlined text-on-primary text-[18px]">person</span>
+                </button>
+                {menuOpen && (
+                  <div className="absolute right-0 top-[120%] w-48 bg-surface border border-primary/15 shadow-[4px_4px_0px_0px_#07111A]">
+                    <button
+                      className="w-full text-left px-space-md py-space-sm font-label-sm text-label-sm uppercase tracking-wider text-on-surface hover:bg-surface-container"
+                      onClick={() => router.push('/dashboard')}
+                    >
+                      My Dashboard
+                    </button>
+                    {isAdmin && (
+                      <button
+                        className="w-full text-left px-space-md py-space-sm font-label-sm text-label-sm uppercase tracking-wider text-tertiary hover:bg-surface-container"
+                        onClick={() => router.push('/admin')}
+                      >
+                        Admin Panel
+                      </button>
+                    )}
+                    <button
+                      className="w-full text-left px-space-md py-space-sm font-label-sm text-label-sm uppercase tracking-wider text-secondary hover:bg-surface-container"
+                      onClick={handleSignOut}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                className="hidden sm:inline-flex items-center justify-center bg-transparent border border-primary text-primary font-label-md text-label-md uppercase px-space-md py-space-sm hover:bg-primary hover:text-on-primary transition-all"
+                onClick={() => router.push('/auth/login')}
+              >
+                Client Login
+              </button>
+            )}
 
-        <div className="pm-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
-          {/* DJ Card */}
-          <div style={{ background: 'rgba(245,239,224,0.04)', border: '1px solid rgba(68,190,199,0.15)', borderRadius: '8px', padding: '2rem' }}>
-            <div className="pm-card-icon" style={{ fontSize: '2rem', marginBottom: '1rem' }}>🎧</div>
-            <h3 className="pm-card-title" style={{ fontFamily: 'freight-display-pro, serif', fontSize: '1.5rem', fontWeight: 400, color: '#F5EFE0', margin: '0 0 0.75rem' }}>DJ & Sound</h3>
-            <p className="pm-card-body" style={{ color: 'rgba(245,239,224,0.7)', lineHeight: 1.6, fontSize: '0.95rem' }}>
-              Professional DJ service for weddings, receptions, corporate events, grand openings, and private parties. From dance-floor-only sets to full ceremony and reception sound.
-            </p>
+            <button
+              className="lg:hidden w-9 h-9 flex items-center justify-center border border-primary/20"
+              onClick={() => setMobileMenuOpen((o) => !o)}
+              aria-label="Toggle menu"
+            >
+              <span className="material-symbols-outlined text-primary text-[20px]">
+                {mobileMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
           </div>
-
-          {/* Movie Night Card */}
-          <div style={{ background: 'rgba(245,239,224,0.04)', border: '1px solid rgba(68,190,199,0.15)', borderRadius: '8px', padding: '2rem' }}>
-            <div className="pm-card-icon" style={{ fontSize: '2rem', marginBottom: '1rem' }}>🎬</div>
-            <h3 className="pm-card-title" style={{ fontFamily: 'freight-display-pro, serif', fontSize: '1.5rem', fontWeight: 400, color: '#F5EFE0', margin: '0 0 0.75rem' }}>Outdoor Movie Night</h3>
-            <p className="pm-card-body" style={{ color: 'rgba(245,239,224,0.7)', lineHeight: 1.6, fontSize: '0.95rem' }}>
-              A complete private outdoor cinema for your backyard, neighborhood, or venue. Inflatable screen, HD projector, and outdoor sound — self-contained for up to 3 hours with no power hookup required.
-            </p>
-            <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#44BEC7', marginTop: '1rem' }}>
-              Private events only · Summer availability
-            </p>
-          </div>
         </div>
-      </section>
 
-      {/* ── PRICING ── */}
-      <section id="pricing" className="pm-section" style={{ background: '#F5EFE0' }}>
-        <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C8202A', marginBottom: '0.75rem' }}>Pricing</p>
-        <h2 className="pm-section-heading" style={{ fontFamily: 'freight-display-pro, serif', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#07111A', margin: '0 0 3.5rem' }}>
-          Simple, transparent pricing.
-        </h2>
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-surface border-t border-primary/10 px-6 py-space-md flex flex-col gap-1">
+            <button className="text-left py-space-sm font-label-md text-label-md uppercase tracking-wider text-on-surface" onClick={() => scrollTo('services')}>
+              Services
+            </button>
+            <button className="text-left py-space-sm font-label-md text-label-md uppercase tracking-wider text-on-surface" onClick={() => scrollTo('pricing-tiers')}>
+              Pricing
+            </button>
+            <button className="text-left py-space-sm font-label-md text-label-md uppercase tracking-wider text-on-surface" onClick={() => scrollTo('checker-widget')}>
+              Check Dates
+            </button>
+            {!user && (
+              <button className="text-left py-space-sm font-label-md text-label-md uppercase tracking-wider text-secondary" onClick={() => router.push('/auth/login')}>
+                Client Login
+              </button>
+            )}
+          </div>
+        )}
+      </header>
 
-        {/* DJ Packages */}
-        <div className="pm-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-          {djPackages.map(pkg => (
-            <div key={pkg.name} className="pm-pricing-card" style={{
-              background: pkg.featured ? '#07111A' : 'white',
-              border: pkg.featured ? 'none' : '1px solid rgba(7,17,26,0.12)',
-              borderRadius: '8px',
-              position: 'relative',
-            }}>
-              {pkg.featured && (
-                <div style={{ position: 'absolute', top: '-1px', left: '2rem', background: '#C8202A', color: 'white', fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', padding: '0.25rem 0.75rem', borderRadius: '0 0 4px 4px' }}>
-                  Most Popular
+      <main className="w-full pt-20 bg-background">
+        <div className="flex flex-col w-full text-on-surface">
+          {/* 1. HERO */}
+          <section className="relative w-full bg-background overflow-hidden px-6 md:px-margin py-space-xl">
+            <div className="flex items-center justify-between bg-primary text-on-primary px-space-md py-space-sm mb-space-lg">
+              <div className="flex items-center gap-space-md">
+                <span className="bg-secondary text-on-secondary font-label-sm text-label-sm px-space-xs py-0.5 uppercase tracking-widest">
+                  PESCADERO MUSIC
+                </span>
+                <span className="hidden md:inline font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container">
+                  WEDDING &amp; EVENT DJ
+                </span>
+              </div>
+              <div className="flex items-center gap-space-sm font-label-sm text-label-sm uppercase text-secondary-fixed">
+                <span className="inline-block w-2 h-2 rounded-full bg-secondary animate-pulse" />
+                <span>PROVO • UTAH VALLEY</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-12 gap-gutter items-stretch">
+              <div className="col-span-12 lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-space-md">
+                <div className="flex flex-col">
+                  <div className="inline-flex bg-surface-container p-1 gap-1 mb-space-md w-fit">
+                    <button
+                      className={`px-space-md py-space-xs font-label-md text-label-md uppercase tracking-wider transition-all ${
+                        heroSlide === 'wedding' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
+                      }`}
+                      onClick={() => setHeroSlide('wedding')}
+                    >
+                      01 • Wedding DJ &amp; Sound
+                    </button>
+                    <button
+                      className={`px-space-md py-space-xs font-label-md text-label-md uppercase tracking-wider transition-all ${
+                        heroSlide === 'cinema' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
+                      }`}
+                      onClick={() => setHeroSlide('cinema')}
+                    >
+                      02 • Outdoor Movie Nights
+                    </button>
+                  </div>
+
+                  <div className="font-label-lg text-label-lg uppercase tracking-widest text-secondary mb-space-xs">
+                    {h.kicker}
+                  </div>
+                  <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight leading-[1.05] mb-space-md">
+                    {h.headlineLead} <span className="italic font-display-xl text-secondary">{h.headlineEmphasis}</span> {h.headlineTail}
+                  </h1>
+                  <p className="font-body-lg text-body-lg text-on-surface-variant mb-space-lg leading-relaxed">
+                    {h.description}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-space-md mb-space-lg">
+                    <button
+                      className="inline-flex items-center justify-center bg-secondary hover:bg-secondary-container text-on-secondary font-label-lg text-label-lg uppercase px-space-lg py-space-sm shadow-[4px_4px_0px_0px_#07111A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#07111A] transition-all"
+                      onClick={() => scrollTo('checker-widget')}
+                    >
+                      Check Your Date →
+                    </button>
+                    <button
+                      className="inline-flex items-center justify-center bg-surface-container hover:bg-surface-variant text-primary font-label-lg text-label-lg uppercase px-space-lg py-space-sm shadow-[4px_4px_0px_0px_#07111A] transition-all"
+                      onClick={() => scrollTo('pricing-tiers')}
+                    >
+                      Explore Pricing
+                    </button>
+                  </div>
                 </div>
-              )}
-              <h3 className="pm-card-title" style={{ fontFamily: 'freight-display-pro, serif', fontSize: '1.4rem', fontWeight: 400, color: pkg.featured ? '#F5EFE0' : '#07111A', margin: '0 0 0.5rem' }}>{pkg.name}</h3>
-              <div style={{ fontFamily: 'freight-display-pro, serif', fontSize: '2.5rem', color: pkg.featured ? '#44BEC7' : '#07111A', margin: '0.5rem 0' }}>{pkg.price}</div>
-              <p style={{ fontSize: '0.75rem', color: pkg.featured ? 'rgba(245,239,224,0.5)' : 'rgba(7,17,26,0.4)', marginBottom: '1rem', fontStyle: 'italic' }}>{pkg.note}</p>
-              <p className="pm-card-body" style={{ fontSize: '0.9rem', lineHeight: 1.6, color: pkg.featured ? 'rgba(245,239,224,0.75)' : 'rgba(7,17,26,0.7)', marginBottom: '1.5rem' }}>{pkg.description}</p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {pkg.features.map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.9rem', color: pkg.featured ? 'rgba(245,239,224,0.8)' : 'rgba(7,17,26,0.8)' }}>
-                    <span style={{ color: '#44BEC7', flexShrink: 0 }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <p style={{ fontSize: '0.8rem', color: pkg.featured ? 'rgba(245,239,224,0.5)' : 'rgba(7,17,26,0.5)', marginTop: '1.25rem', marginBottom: 0 }}>
-                Pricing is flat-rate for events under 4 hours and does not change based on event length.
+
+                <div className="bg-surface-container p-space-md mt-space-md">
+                  <div className="grid grid-cols-3 gap-space-sm text-center">
+                    <div className="flex flex-col items-center">
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Sound Rig</span>
+                      <span className="font-headline-sm text-headline-sm text-primary">JBL • Pioneer</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Service Area</span>
+                      <span className="font-headline-sm text-headline-sm text-primary">Utah County</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Booking</span>
+                      <span className="font-headline-sm text-headline-sm text-secondary">1 Event / Date</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-span-12 lg:col-span-7 relative">
+                <div className="relative w-full h-[420px] md:h-[580px] bg-primary overflow-hidden shadow-[8px_8px_0px_0px_#07111A]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    alt={h.alt}
+                    className="absolute inset-0 w-full h-full object-cover object-center filter contrast-125 saturate-90 brightness-95"
+                    src={h.image}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/30 to-transparent mix-blend-multiply" />
+                  <div className="relative z-20 p-space-lg md:p-space-xl text-on-primary">
+                    <div className="inline-block bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-widest px-space-sm py-1 mb-space-xs">
+                      {h.badge}
+                    </div>
+                    <div className="font-headline-md text-headline-md tracking-tight text-surface">{h.badgeTitle}</div>
+                    <p className="font-body-sm text-body-sm text-surface-container max-w-md mt-1">{h.badgeBody}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 2. DATE AVAILABILITY CHECKER */}
+          <section className="w-full bg-surface-container-high px-6 md:px-margin py-space-xl" id="checker-widget">
+            <div className="w-full bg-surface p-space-lg shadow-[6px_6px_0px_0px_#07111A]">
+              <div className="flex flex-col md:flex-row md:items-center justify-between pb-space-md mb-space-lg gap-space-sm">
+                <div>
+                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary block">
+                    BOOK YOUR DATE
+                  </span>
+                  <h2 className="font-headline-md text-headline-md text-primary mt-1">Check Availability</h2>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
+                <div className="lg:col-span-5 bg-surface-container p-space-md flex items-center gap-space-md">
+                  <div
+                    className={`p-space-sm text-center min-w-[90px] flex flex-col justify-center ${
+                      dateStatus === 'available'
+                        ? 'bg-primary text-on-primary'
+                        : dateStatus === 'busy'
+                        ? 'bg-secondary text-on-secondary'
+                        : 'bg-surface-container-highest text-on-surface-variant'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[28px]">
+                      {dateStatus === 'available'
+                        ? 'lock_open'
+                        : dateStatus === 'busy'
+                        ? 'event_busy'
+                        : dateStatus === 'checking'
+                        ? 'hourglass_top'
+                        : 'calendar_month'}
+                    </span>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    {dateStatus === 'available' && (
+                      <>
+                        <div className="font-label-md text-label-md uppercase tracking-wider text-primary mb-1">
+                          ✓ Date Open
+                        </div>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                          That date looks open — send an inquiry to lock it in.
+                        </p>
+                      </>
+                    )}
+                    {dateStatus === 'busy' && (
+                      <>
+                        <div className="font-label-md text-label-md uppercase tracking-wider text-secondary mb-1">
+                          ✕ Already Booked
+                        </div>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                          That date is taken. Try another date or reach out to ask.
+                        </p>
+                      </>
+                    )}
+                    {dateStatus === 'checking' && (
+                      <div className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant mb-1">
+                        Checking calendar…
+                      </div>
+                    )}
+                    {dateStatus === 'idle' && (
+                      <>
+                        <div className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant mb-1">
+                          Pick a date →
+                        </div>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                          Earlier inquiries get priority — your date isn’t secured until contract + deposit.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="lg:col-span-7 flex flex-col md:flex-row items-center gap-space-md">
+                  <div className="w-full flex-1">
+                    <label className="block font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-space-xs">
+                      What kind of event?
+                    </label>
+                    <select
+                      className="w-full bg-surface-container-lowest text-primary font-label-md text-label-md uppercase font-bold p-space-sm outline-none focus:bg-surface-bright focus:border-secondary appearance-none cursor-pointer border-b-2 border-primary/20 transition-colors"
+                      value={selectedType}
+                      onChange={(e) => setSelectedType(e.target.value as EventTypeId)}
+                    >
+                      {eventTypes.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="w-full flex-1">
+                    <label className="block font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-space-xs">
+                      Event Date
+                    </label>
+                    <input
+                      className="w-full bg-surface-container-lowest text-primary font-body-md text-body-md p-space-sm outline-none border-b-2 border-primary/20 focus:border-secondary focus:bg-surface-bright transition-colors"
+                      type="date"
+                      min={new Date().toISOString().split('T')[0]}
+                      value={checkDate}
+                      onChange={handleDateCheck}
+                    />
+                  </div>
+                  <div className="w-full md:w-auto self-end pt-space-xs">
+                    <button
+                      className="w-full md:w-auto bg-primary hover:bg-on-background text-on-primary font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-sm shadow-[3px_3px_0px_0px_#C8202A] active:translate-x-[1px] active:translate-y-[1px] transition-all whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
+                      onClick={handleInquiry}
+                      disabled={!checkDate || dateStatus === 'busy' || dateStatus === 'checking'}
+                    >
+                      Send Inquiry →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 3. SERVICES */}
+          <section className="w-full bg-background px-6 md:px-margin py-space-xl" id="services">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-space-xl">
+              <div>
+                <span className="font-label-md text-label-md uppercase tracking-widest text-secondary block">
+                  WHAT I DO
+                </span>
+                <h2 className="font-headline-lg text-headline-lg text-primary mt-1">Curated Dual Disciplines</h2>
+              </div>
+              <p className="font-body-md text-body-md text-on-surface-variant max-w-md mt-space-sm md:mt-0">
+                I specialize strictly in two kinds of events: wedding &amp; event sound, and outdoor movie nights.
               </p>
             </div>
-          ))}
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
+              <div className="col-span-12 lg:col-span-7 bg-surface-container flex flex-col justify-between p-space-lg md:p-space-xl relative overflow-hidden shadow-[6px_6px_0px_0px_#07111A]">
+                <div className="flex items-center justify-between pb-space-md">
+                  <span className="bg-primary text-on-primary font-label-sm text-label-sm uppercase tracking-widest px-space-sm py-1">
+                    DJ &amp; SOUND
+                  </span>
+                  <span className="font-label-md text-label-md uppercase tracking-wider text-secondary font-bold">
+                    CEREMONY • COCKTAIL • DANCE
+                  </span>
+                </div>
+                <div className="my-space-lg">
+                  <span className="font-display-xl text-display-xl leading-none text-primary block tracking-tighter">
+                    Bespoke Wedding
+                  </span>
+                  <span className="font-display-xl text-display-xl leading-none text-secondary italic block tracking-tight -mt-2">
+                    Soundscapes.
+                  </span>
+                  <p className="font-body-lg text-body-lg text-on-surface-variant mt-space-md max-w-xl">
+                    Professional DJ service for weddings, receptions, corporate events, grand openings, and private
+                    parties. From dance-floor-only sets to full ceremony and reception sound.
+                  </p>
+                </div>
+                <div className="bg-surface p-space-md">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+                    {[
+                      { icon: 'graphic_eq', title: 'DJ-Curated or Custom', body: 'Your playlist, or let Garrett curate the night.' },
+                      { icon: 'music_note', title: 'Full Reception Coverage', body: 'Ceremony, cocktail hour, and dancing — one or all.' },
+                      { icon: 'mic', title: 'Wireless Mics', body: 'Clear, dignified announcements and toasts.' },
+                      { icon: 'straighten', title: 'Custom DJ Booth', body: 'A clean, custom-built white booth with a warm wood top.' },
+                    ].map((f) => (
+                      <div className="flex items-start gap-space-sm" key={f.title}>
+                        <span className="material-symbols-outlined text-secondary text-[20px] mt-0.5">{f.icon}</span>
+                        <div>
+                          <span className="font-label-md text-label-md uppercase text-primary block">{f.title}</span>
+                          <span className="font-body-sm text-body-sm text-on-surface-variant">{f.body}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-span-12 lg:col-span-5 bg-primary text-on-primary flex flex-col justify-between p-space-lg md:p-space-xl relative overflow-hidden shadow-[6px_6px_0px_0px_#07111A]">
+                <div className="flex items-center justify-between pb-space-md">
+                  <span className="bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-widest px-space-sm py-1">
+                    OUTDOOR CINEMA
+                  </span>
+                  <span className="font-label-md text-label-md uppercase tracking-wider text-surface-variant">
+                    PRIVATE EVENTS ONLY
+                  </span>
+                </div>
+                <div className="my-space-lg">
+                  <span className="font-display-xl text-display-xl leading-none text-surface block tracking-tight">
+                    Open Sky
+                  </span>
+                  <span className="font-display-xl text-display-xl leading-none text-secondary-fixed italic block tracking-tight -mt-2">
+                    Cinema Nights.
+                  </span>
+                  <p className="font-body-md text-body-md text-on-surface-variant mt-space-md">
+                    A complete private outdoor cinema for your backyard, neighborhood, or venue. Self-contained for
+                    up to 3 hours with no power hookup required.
+                  </p>
+                </div>
+                <div className="bg-primary-container p-space-md">
+                  <div className="flex flex-col gap-space-sm">
+                    {[
+                      ['Screen', 'Large Inflatable Screen'],
+                      ['Projector', 'HD Projection'],
+                      ['Audio', 'Outdoor Speaker System'],
+                      ['Power', 'No Hookup Needed'],
+                    ].map(([k, v]) => (
+                      <div className="flex items-center justify-between pb-space-xs" key={k}>
+                        <span className="font-label-md text-label-md uppercase text-surface">{k}</span>
+                        <span className="font-body-sm text-body-sm text-surface-variant">{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-space-md pt-space-sm">
+                  <button
+                    className="font-label-md text-label-md uppercase tracking-wider text-secondary-fixed hover:text-on-secondary transition-colors inline-flex items-center gap-space-xs"
+                    onClick={() => scrollTo('pricing-tiers')}
+                  >
+                    See Movie Night Pricing →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 4. PRICING */}
+          <section className="w-full bg-surface-container px-6 md:px-margin py-space-xl" id="pricing-tiers">
+            <div className="max-w-4xl mx-auto text-center mb-space-xl">
+              <div className="inline-block bg-primary text-on-primary font-label-sm text-label-sm uppercase tracking-widest px-space-md py-space-xs mb-space-sm">
+                FLAT-RATE PRICING • NO SURPRISES
+              </div>
+              <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight">Simple, Transparent Pricing</h2>
+              <p className="font-body-lg text-body-lg text-on-surface-variant mt-space-xs">
+                All prices are starting rates. Travel fees may apply outside Utah County.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter items-stretch">
+              {/* Tier 1 */}
+              <div className="bg-surface p-space-lg flex flex-col justify-between shadow-[4px_4px_0px_0px_#07111A] relative">
+                <div>
+                  <div className="flex justify-between items-start pb-space-sm mb-space-md">
+                    <div>
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">TIER 01</span>
+                      <h3 className="font-headline-sm text-headline-sm text-primary">Dance DJ</h3>
+                    </div>
+                    <span className="font-label-sm text-label-sm uppercase bg-surface-container px-space-xs py-1">RECEPTION</span>
+                  </div>
+                  <div className="mb-space-lg">
+                    <span className="font-display-xl text-display-xl text-primary font-bold leading-none">$600</span>
+                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mt-1">
+                      FLAT FEE • UP TO 4 HOURS
+                    </span>
+                  </div>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                    One sound system. Up to 4 hours of DJ service — perfect for receptions, parties, grand openings, and
+                    corporate events.
+                  </p>
+                  <ul className="space-y-space-sm font-body-sm text-body-sm text-on-surface mb-space-lg">
+                    {['Up to 4 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'Wired MC mic'].map((f) => (
+                      <li className="flex items-center gap-space-xs" key={f}>
+                        <span className="material-symbols-outlined text-secondary text-[18px]">check</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  className="w-full text-center bg-surface-container hover:bg-surface-variant text-primary font-label-md text-label-md uppercase tracking-wider py-space-sm transition-all shadow-[2px_2px_0px_0px_#07111A]"
+                  onClick={() => scrollTo('checker-widget')}
+                >
+                  Reserve $600 Tier
+                </button>
+              </div>
+
+              {/* Tier 2 — featured */}
+              <div className="bg-primary text-on-primary p-space-lg flex flex-col justify-between shadow-[8px_8px_0px_0px_#C8202A] relative md:-mt-4">
+                <div className="absolute -top-3 right-4 bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-widest px-space-md py-1 shadow-[2px_2px_0px_0px_#07111A]">
+                  MOST POPULAR
+                </div>
+                <div>
+                  <div className="flex justify-between items-start pb-space-sm mb-space-md">
+                    <div>
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed">TIER 02</span>
+                      <h3 className="font-headline-sm text-headline-sm text-surface">Full-Service Sound</h3>
+                    </div>
+                  </div>
+                  <div className="mb-space-lg">
+                    <span className="font-display-xl text-display-xl text-surface font-bold leading-none">$850</span>
+                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-surface-variant block mt-1">
+                      FLAT FEE • UP TO 4 HOURS
+                    </span>
+                  </div>
+                  <p className="font-body-sm text-body-sm text-surface-container max-w-sm mb-space-md">
+                    Two independent sound systems — one for ceremony or speeches, one for the dance floor. The complete
+                    wedding package.
+                  </p>
+                  <ul className="space-y-space-sm font-body-sm text-body-sm text-surface mb-space-lg">
+                    {[
+                      'Up to 4 hours',
+                      'Two independent sound systems',
+                      'Ceremony & cocktail hour sound',
+                      'Two wireless mics for vows, speeches & toasts',
+                      'DJ-curated or custom playlist',
+                    ].map((f) => (
+                      <li className="flex items-center gap-space-xs" key={f}>
+                        <span className="material-symbols-outlined text-secondary-fixed text-[18px]">verified</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  className="w-full text-center bg-secondary hover:bg-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider py-space-sm shadow-[4px_4px_0px_0px_#07111A] active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                  onClick={() => scrollTo('checker-widget')}
+                >
+                  Book Signature Package →
+                </button>
+              </div>
+
+              {/* Tier 3 — movie night */}
+              <div className="bg-surface p-space-lg flex flex-col justify-between shadow-[4px_4px_0px_0px_#07111A] relative">
+                <div>
+                  <div className="flex justify-between items-start pb-space-sm mb-space-md">
+                    <div>
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">TIER 03</span>
+                      <h3 className="font-headline-sm text-headline-sm text-primary">Outdoor Movie Night</h3>
+                    </div>
+                    <span className="font-label-sm text-label-sm uppercase bg-surface-container px-space-xs py-1">CINEMA</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-space-xs bg-surface-container p-space-sm mb-space-md text-center">
+                    <div>
+                      <span className="font-label-sm text-label-sm uppercase text-on-surface-variant block">Mon–Thu</span>
+                      <span className="font-headline-sm text-headline-sm text-primary font-bold">$250</span>
+                    </div>
+                    <div>
+                      <span className="font-label-sm text-label-sm uppercase text-secondary block">Fri–Sat</span>
+                      <span className="font-headline-sm text-headline-sm text-secondary font-bold">$350</span>
+                    </div>
+                  </div>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                    A private outdoor cinema for your backyard, neighborhood, or event space. Runs up to 3 hours without
+                    a power hookup. Private events only — summer availability.
+                  </p>
+                  <ul className="space-y-space-sm font-body-sm text-body-sm text-on-surface mb-space-lg">
+                    {['Up to 3 hours', 'Large inflatable screen', 'HD projector', 'Outdoor speaker system', 'No power hookup needed'].map((f) => (
+                      <li className="flex items-center gap-space-xs" key={f}>
+                        <span className="material-symbols-outlined text-secondary text-[18px]">check</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  className="w-full text-center bg-surface-container hover:bg-surface-variant text-primary font-label-md text-label-md uppercase tracking-wider py-space-sm transition-all shadow-[2px_2px_0px_0px_#07111A]"
+                  onClick={() => scrollTo('checker-widget')}
+                >
+                  Reserve Movie Night
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-space-lg text-center font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
+              • Travel fees may apply for events outside Utah County •
+            </div>
+          </section>
+
+          {/* 5. 7-STEP ROADMAP */}
+          <section className="w-full bg-primary text-on-primary px-6 md:px-margin py-space-xl">
+            <div className="flex flex-col md:flex-row md:items-end justify-between pb-space-md mb-space-xl">
+              <div>
+                <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed block">
+                  HOW IT WORKS
+                </span>
+                <h2 className="font-headline-lg text-headline-lg text-surface mt-1">The 7-Step Booking Roadmap</h2>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-space-sm">
+              {[
+                ['01', 'Inquiry', 'Submit your date and details — takes about 3 minutes.'],
+                ['02', 'Consultation', 'A quick call to talk through your vision and vibe.'],
+                ['03', 'Contract', 'Review, sign, and pay your deposit — your date is locked in.'],
+                ['04', 'Planning', 'Submit your music and day-of timeline.'],
+                ['05', 'Final Payment', 'Remaining balance due one week before your event.'],
+                ['06', 'Event Day', 'Garrett arrives 1.5 hours early to set up and sound-check.'],
+                ['07', 'Keepsake', 'A playlist archive of your night to keep forever.'],
+              ].map(([num, title, body], i) => (
+                <div
+                  key={num}
+                  className={`p-space-md flex flex-col justify-between shadow-[3px_3px_0px_0px_rgba(245,239,224,0.15)] ${
+                    i === 5 ? 'bg-secondary text-on-secondary' : 'bg-surface-bright text-on-surface'
+                  }`}
+                >
+                  <div>
+                    <span className={`font-label-md text-label-md uppercase font-bold block mb-space-xs ${i === 5 ? 'text-secondary-fixed' : 'text-secondary'}`}>
+                      {num}
+                    </span>
+                    <h4 className={`font-headline-sm text-headline-sm leading-tight mb-2 ${i === 5 ? 'text-on-secondary' : 'text-primary'}`}>
+                      {title}
+                    </h4>
+                    <p className={`font-body-sm text-body-sm ${i === 5 ? 'text-on-secondary/80' : 'text-on-surface-variant'}`}>
+                      {body}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* 6. PERSONAL NOTE */}
+          <section className="w-full bg-background px-6 md:px-margin py-space-xl">
+            <div className="max-w-4xl mx-auto bg-primary text-on-primary p-space-lg md:p-space-xl shadow-[8px_8px_0px_0px_#C8202A] relative">
+              <div className="flex items-center justify-between pb-space-md mb-space-lg">
+                <div className="flex items-center gap-space-sm">
+                  <div className="w-3 h-3 bg-secondary" />
+                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-surface font-bold">
+                    A NOTE FROM GARRETT
+                  </span>
+                </div>
+                <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container">
+                  PROVO • UTAH
+                </span>
+              </div>
+
+              <div className="space-y-space-md">
+                <h3 className="font-display-xl text-display-xl text-surface leading-tight">
+                  “Your day. Your music. <span className="text-secondary-fixed italic">Our sound.</span>”
+                </h3>
+                <div className="font-editorial-note text-editorial-note text-surface-container space-y-space-md italic leading-relaxed pt-space-xs">
+                  <p>
+                    When I started Pescadero Music, I decided never to be the kind of DJ company that shows up in
+                    branded polo shirts with flickering neon lasers and booming, distorted speakers.
+                  </p>
+                  <p>
+                    Your wedding or event deserves sound that fills the room with clarity and warmth — without
+                    blowing out your grandparents at dinner.
+                  </p>
+                  <p>
+                    I don’t take over your celebration. I build a room-filling atmosphere that lets your guests
+                    connect, dance, and remember how good the night sounded.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-space-lg mt-space-lg gap-space-md border-t border-on-primary/15">
+                <div className="flex flex-col pt-space-md sm:pt-0">
+                  <span className="font-label-lg text-label-lg uppercase tracking-wider text-surface">Garrett</span>
+                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container">
+                    Founder, Pescadero Music
+                  </span>
+                </div>
+                <a
+                  className="inline-flex items-center justify-center bg-secondary hover:bg-secondary-container text-on-secondary font-label-md text-label-md uppercase px-space-lg py-space-sm shadow-[3px_3px_0px_0px_rgba(245,239,224,0.25)] transition-colors"
+                  href="mailto:garrett@pescaderomusic.com"
+                >
+                  Start a Conversation →
+                </a>
+              </div>
+            </div>
+          </section>
         </div>
+      </main>
 
-        {/* Movie Night Pricing */}
-        <div className="pm-movie-box" style={{ background: '#07111A', borderRadius: '8px', padding: '2rem 2.5rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-              <span style={{ fontSize: '1.5rem' }}>🎬</span>
-              <h3 style={{ fontFamily: 'freight-display-pro, serif', fontSize: '1.4rem', fontWeight: 400, color: '#F5EFE0', margin: 0 }}>{moviePackage.name}</h3>
+      {/* FOOTER */}
+      <footer className="w-full bg-surface-container-low">
+        <div className="w-full px-6 md:px-margin py-space-xl">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-space-xl">
+            <div className="flex flex-col gap-space-sm">
+              <div className="bg-primary text-on-primary font-label-md text-label-md px-space-sm py-space-xs uppercase tracking-widest inline-block w-fit">
+                Pescadero Music
+              </div>
+              <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm">
+                Professional DJ &amp; sound for weddings and events, plus self-contained outdoor movie nights, serving
+                Provo and Utah Valley.
+              </p>
             </div>
-            <p style={{ fontSize: '0.9rem', color: 'rgba(245,239,224,0.65)', maxWidth: '440px', lineHeight: 1.6, margin: '0 0 0.75rem' }}>{moviePackage.description}</p>
-            <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#44BEC7' }}>{moviePackage.seasonal} · Private events only</p>
-          </div>
-          <div className="pm-movie-price-col">
-            <div style={{ fontFamily: 'freight-display-pro, serif', fontSize: '2rem', color: '#F5EFE0' }}>
-              <span style={{ color: '#44BEC7' }}>{moviePackage.weekday}</span>
-              <span style={{ fontSize: '1rem', color: 'rgba(245,239,224,0.5)', margin: '0 0.5rem' }}>Mon–Thu</span>
-            </div>
-            <div style={{ fontFamily: 'freight-display-pro, serif', fontSize: '2rem', color: '#F5EFE0', marginTop: '0.25rem' }}>
-              <span style={{ color: '#F5EFE0' }}>{moviePackage.weekend}</span>
-              <span style={{ fontSize: '1rem', color: 'rgba(245,239,224,0.5)', margin: '0 0.5rem' }}>Fri–Sat</span>
-            </div>
-          </div>
-        </div>
-
-        <p style={{ marginTop: '1.5rem', fontSize: '0.85rem', color: 'rgba(7,17,26,0.5)', fontStyle: 'italic' }}>
-          All prices are starting rates. Travel fees may apply for events outside Utah County. Contact for a custom quote.
-        </p>
-      </section>
-
-      {/* ── AVAILABILITY CHECKER ── */}
-      <section id="availability" className="pm-section">
-        <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#44BEC7', marginBottom: '0.75rem' }}>Book Your Date</p>
-        <h2 className="pm-section-heading" style={{ fontFamily: 'freight-display-pro, serif', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400, color: '#F5EFE0', margin: '0 0 2.5rem' }}>
-          Check availability.
-        </h2>
-
-        <div style={{ maxWidth: '560px' }}>
-          {/* Step 1: Event Type */}
-          <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(245,239,224,0.5)', marginBottom: '0.75rem' }}>
-            1 — What kind of event?
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
-            {eventTypes.map(et => (
-              <button
-                key={et.id}
-                onClick={() => setSelectedType(et.id)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '1rem',
-                  padding: '1rem 1.25rem',
-                  background: selectedType === et.id ? 'rgba(68,190,199,0.12)' : 'rgba(245,239,224,0.04)',
-                  border: selectedType === et.id ? '1px solid #44BEC7' : '1px solid rgba(245,239,224,0.12)',
-                  borderRadius: '6px', cursor: 'pointer',
-                  color: '#F5EFE0', textAlign: 'left',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <span style={{ fontSize: '1.25rem' }}>{et.icon}</span>
-                <span style={{ fontFamily: 'inter, sans-serif', fontSize: '0.95rem' }}>{et.label}</span>
-                {selectedType === et.id && <span style={{ marginLeft: 'auto', color: '#44BEC7', fontSize: '0.85rem' }}>✓</span>}
+            <div className="flex flex-col gap-space-xs">
+              <span className="font-label-md text-label-md uppercase tracking-wider text-primary mb-space-sm">Services</span>
+              <button className="text-left font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface" onClick={() => scrollTo('services')}>
+                DJ &amp; Sound
               </button>
-            ))}
+              <button className="text-left font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface" onClick={() => scrollTo('services')}>
+                Outdoor Movie Nights
+              </button>
+              <a className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface" href="/policy">
+                Service Policy
+              </a>
+            </div>
+            <div className="flex flex-col gap-space-xs">
+              <span className="font-label-md text-label-md uppercase tracking-wider text-primary mb-space-sm">Reservations</span>
+              <button className="text-left font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface" onClick={() => scrollTo('checker-widget')}>
+                Calendar Availability
+              </button>
+              <a className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface" href="/auth/login">
+                Client Login
+              </a>
+              <span className="font-body-sm text-body-sm text-on-surface-variant">Provo, UT</span>
+              <span className="font-body-sm text-body-sm text-on-surface-variant">(210) 727-9328</span>
+            </div>
+            <div className="flex flex-col justify-between bg-surface-container p-space-md">
+              <div className="flex flex-col">
+                <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Follow</span>
+                <a
+                  className="font-editorial-note text-editorial-note text-on-surface italic mt-space-xs"
+                  href="https://www.instagram.com/djgarrett_ut"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  @djgarrett_ut
+                </a>
+              </div>
+            </div>
           </div>
-
-          {/* Step 2: Date */}
-          <p style={{ fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(245,239,224,0.5)', marginBottom: '0.75rem' }}>
-            2 — Pick a date
-          </p>
-          <input
-            type="date"
-            value={checkDate}
-            onChange={handleDateCheck}
-            min={new Date().toISOString().split('T')[0]}
-            style={{
-              width: '100%', padding: '0.85rem 1rem',
-              background: 'rgba(245,239,224,0.06)',
-              border: '1px solid rgba(245,239,224,0.15)',
-              borderRadius: '6px', color: '#F5EFE0',
-              fontFamily: 'inter, sans-serif', fontSize: '1rem',
-              boxSizing: 'border-box', marginBottom: '0.75rem',
-            }}
-          />
-
-          {/* Date status */}
-          {dateStatus === 'available' && (
-            <div style={{ background: 'rgba(68,190,199,0.1)', border: '1px solid rgba(68,190,199,0.3)', borderRadius: '6px', padding: '0.75rem 1rem', color: '#44BEC7', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-              ✓ That date looks open — send an inquiry to lock it in.
+          <div className="pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md">
+            <div className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant text-center sm:text-left">
+              © {new Date().getFullYear()} Pescadero Music. All rights reserved.
             </div>
-          )}
-          {dateStatus === 'busy' && (
-            <div style={{ background: 'rgba(200,32,42,0.1)', border: '1px solid rgba(200,32,42,0.3)', borderRadius: '6px', padding: '0.75rem 1rem', color: '#C8202A', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-              ✗ That date is already booked. Try another date or reach out to ask.
+            <div className="flex items-center gap-space-lg font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
+              <span>Provo, Utah</span>
+              <span>Wedding &amp; Event DJ</span>
             </div>
-          )}
-
-          {/* CTA */}
-          <button
-            onClick={handleInquiry}
-            disabled={!selectedType || !checkDate || dateStatus === 'busy'}
-            style={{
-              width: '100%', padding: '0.9rem',
-              background: (!selectedType || !checkDate || dateStatus === 'busy') ? 'rgba(200,32,42,0.35)' : '#C8202A',
-              color: '#F5EFE0', border: 'none', borderRadius: '6px',
-              fontFamily: 'futura-pt-condensed, sans-serif', fontSize: '0.95rem',
-              letterSpacing: '0.12em', textTransform: 'uppercase',
-              cursor: (!selectedType || !checkDate || dateStatus === 'busy') ? 'not-allowed' : 'pointer',
-              transition: 'background 0.2s ease',
-            }}
-          >
-            Send Inquiry
-          </button>
-          {!selectedType && (
-            <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', marginTop: '0.5rem' }}>
-              Select an event type above to continue
-            </p>
-          )}
-        </div>
-      </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="pm-footer" style={{ borderTop: '1px solid rgba(245,239,224,0.08)' }}>
-        <div>
-          <span style={{ fontFamily: 'RetroFloral, serif', fontSize: '15px', fontWeight: 300, color: '#F5EFE0', letterSpacing: '3px', textTransform: 'uppercase' as const }}>Pescadero Music</span>
-          <p style={{ fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', margin: '0.25rem 0 0' }}>Provo, Utah · DJ Garrett</p>
-        </div>
-        <div style={{ display: 'flex', gap: '1.5rem' }}>
-          <a href="/policy" style={{ fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', textDecoration: 'none' }}>Policy</a>
-          <a href="https://www.instagram.com/djgarrett_ut" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', textDecoration: 'none' }}>@djgarrett_ut</a>
-          <a href="/auth/login" style={{ fontSize: '0.8rem', color: 'rgba(245,239,224,0.4)', textDecoration: 'none' }}>Client Login</a>
+          </div>
         </div>
       </footer>
-
     </div>
   )
 }

@@ -1,5 +1,27 @@
 /* Adobe Fonts loaded via <link> in layout.tsx */
-/* Inter, Cormorant Garamond via Adobe Fonts (qmr3yfz) */
+/* Inter, Cormorant Garamond, Futura PT Condensed via Adobe Fonts (qmr3yfz) */
+/* Newsreader loaded via Google Fonts <link> in layout.tsx */
+
+/* Tailwind: components + utilities only. Preflight (base reset) is disabled in
+   tailwind.config.ts since the hand-rolled reset below already covers it, and we
+   don't want Tailwind's reset fighting the existing non-Tailwind pages. */
+@tailwind components;
+@tailwind utilities;
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
 
 :root {
   --navy:       #07111A;
@@ -16,7 +38,40 @@
   --off-white:  #FAFAF8;
 }
 
+@font-face {
+  font-family: 'RetroFloral';
+  src: url('/fonts/Retro Floral.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Browser UA stylesheets bold h1-h6 by default; nothing here resets that for the
+   litho pages, so Newsreader (an elegant regular-weight serif) was rendering
+   artificially heavy. Default headings to normal weight; `font-bold` still works
+   as an explicit opt-in wherever real emphasis is wanted. */
+h1, h2, h3, h4, h5, h6 { font-weight: 400; }
+
+/* Same story for form controls: disabling preflight left the browser's native
+   UA-stylesheet borders/appearance on inputs, selects, textareas and buttons,
+   which showed up as a heavy inset gray box regardless of what Tailwind classes
+   were applied around them. Neutralize the native chrome; components opt into
+   their own look. */
+input, select, textarea, button {
+  font-family: inherit;
+  border: none;
+  outline: none;
+  appearance: none;
+  background: none;
+  border-radius: 0;
+}
+button {
+  cursor: pointer;
+  text-align: inherit;
+  color: inherit;
+}
 
 html { scroll-behavior: smooth; }
 
@@ -138,29 +193,30 @@ body {
 .font-body    { font-family: 'inter', system-ui, sans-serif; }
 .font-accent  { font-family: 'cormorant-garamond', Georgia, serif; font-style: italic; }
 
-/* ── Form inputs ─────────────────────────────────────── */
+/* ── Form inputs: flat litho-ledger style, no rounding, no glow ──────── */
 .pm-input {
   width: 100%;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  padding: 12px 14px;
+  background: rgba(245,239,224,0.045);
+  border: none;
+  border-bottom: 2px solid rgba(245,239,224,0.18);
+  border-radius: 0;
+  padding: 13px 14px;
   color: #F5EFE0;
   font-family: 'inter', sans-serif;
   font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, background 0.2s;
   outline: none;
 }
 .pm-input:focus {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(68,190,199,0.12);
+  border-bottom-color: var(--red);
+  background: rgba(245,239,224,0.08);
 }
 .pm-input::placeholder { color: rgba(245,239,224,0.3); }
 
 .pm-label {
   display: block;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
   font-family: 'futura-pt-condensed', sans-serif;
@@ -168,36 +224,37 @@ body {
   margin-bottom: 6px;
 }
 
-/* ── Buttons ─────────────────────────────────────────── */
+/* ── Buttons: hard-cast litho shadow, sharp corners, no soft glow ────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   background: var(--red);
-  color: white;
+  color: var(--cream);
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
+  border-radius: 0;
+  padding: 14px 24px;
   font-family: 'futura-pt-condensed', sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 16px rgba(200,32,42,0.35);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+  box-shadow: 4px 4px 0px 0px var(--navy);
   text-decoration: none;
 }
-.btn-primary:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(200,32,42,0.45);
+.btn-primary:hover { background: #dc3036; }
+.btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px var(--navy);
 }
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+  box-shadow: 4px 4px 0px 0px var(--navy);
 }
 
 .btn-ghost {
@@ -205,37 +262,39 @@ body {
   align-items: center;
   gap: 8px;
   background: transparent;
-  color: var(--teal);
-  border: 1px solid rgba(68,190,199,0.35);
-  border-radius: 8px;
-  padding: 10px 20px;
+  color: var(--cream);
+  border: 1px solid rgba(245,239,224,0.25);
+  border-radius: 0;
+  padding: 12px 20px;
   font-family: 'futura-pt-condensed', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
 }
 .btn-ghost:hover {
-  background: rgba(68,190,199,0.08);
+  background: rgba(245,239,224,0.06);
   border-color: var(--teal);
+  color: var(--teal);
 }
 
-/* ── Cards ───────────────────────────────────────────── */
+/* ── Cards: flat fill, hard-cast shadow instead of a soft glow ───────── */
 .pm-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 24px;
+  background: rgba(245,239,224,0.03);
+  border: 1px solid rgba(245,239,224,0.12);
+  border-radius: 0;
+  padding: 28px;
+  box-shadow: 6px 6px 0px 0px rgba(0,0,0,0.35);
 }
 
 /* ── Error / success ─────────────────────────────────── */
 .pm-error {
   background: rgba(200,32,42,0.1);
   border: 1px solid rgba(200,32,42,0.3);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 12px 16px;
   font-size: 13px;
   color: #ff8585;
@@ -243,7 +302,7 @@ body {
 .pm-success {
   background: rgba(68,190,199,0.1);
   border: 1px solid rgba(68,190,199,0.3);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 12px 16px;
   font-size: 13px;
   color: var(--teal);
