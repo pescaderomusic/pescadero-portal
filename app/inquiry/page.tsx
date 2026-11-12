@@ -360,18 +360,15 @@ function InquiryWizard() {
           {/* LEFT: persistent poster panel */}
           <aside className="lg:col-span-5 bg-primary text-on-primary p-space-lg flex flex-col justify-between relative overflow-hidden shadow-[6px_6px_0px_0px_#0D1E2B]">
             <div className="relative z-10">
-              <div className="inline-block bg-secondary text-on-secondary font-label-sm text-label-sm uppercase px-space-sm py-0.5 tracking-widest mb-space-md">
+              <div className="inline-block bg-secondary text-on-secondary font-label-sm text-label-sm uppercase px-space-sm py-0.5 tracking-widest">
                 Pescadero Music
               </div>
-              <h2 className="font-headline-md text-headline-md leading-tight text-surface-bright">
-                Real Utah weddings. Real sound.
-              </h2>
             </div>
             <div className="relative z-10 my-space-lg">
               <div className="relative overflow-hidden aspect-[4/3] bg-primary-container border border-surface-container/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  alt="Pescadero Music DJ booth and setup at a real Utah wedding"
+                  alt="Pescadero Music DJ booth and setup at a wedding"
                   className="w-full h-full object-cover contrast-110 saturate-90"
                   src="/images/site/booth-venue.jpg"
                 />
@@ -383,11 +380,7 @@ function InquiryWizard() {
               </div>
             </div>
             <div className="relative z-10 space-y-space-md pt-space-md border-t border-surface-container/20">
-              <blockquote className="font-editorial-note text-title-editorial italic text-surface-bright leading-relaxed">
-                &ldquo;I take one event per date, so every couple gets my full attention.&rdquo;
-              </blockquote>
-              <p className="font-label-sm text-label-sm uppercase tracking-wider text-outline-variant">— Garrett, Founder of Pescadero Music</p>
-              <div className="flex items-center justify-between p-space-sm bg-surface-container-highest/10 border border-surface-container/20 mt-space-md">
+              <div className="flex items-center justify-between p-space-sm bg-surface-container-highest/10 border border-surface-container/20">
                 <div>
                   <span className="font-label-sm text-[10px] uppercase text-outline-variant block tracking-wider">Direct Line</span>
                   <span className="font-label-md text-label-md uppercase tracking-widest text-surface-bright">(210) 727-9328</span>

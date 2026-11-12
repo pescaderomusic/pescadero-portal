@@ -23,9 +23,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             router.push('/')
           }}
         >
-          <div className="w-7 h-7 bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md uppercase">
-            PM
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo.png" alt="" className="w-11 h-11 object-contain" />
           <span className="font-headline-sm text-headline-sm text-primary no-underline">Pescadero Music</span>
         </a>
         <div className="hidden sm:block font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">

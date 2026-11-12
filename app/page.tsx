@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 const ADMIN_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
 const eventTypes = [
-  { id: 'wedding', label: 'Wedding Sound' },
+  { id: 'wedding', label: 'Wedding' },
   { id: 'event', label: 'DJ / Party / Event' },
   { id: 'movie', label: 'Outdoor Movie Night' },
 ] as const
@@ -16,33 +16,26 @@ type EventTypeId = (typeof eventTypes)[number]['id']
 
 const heroContent: Record<
   'wedding' | 'cinema',
-  { kicker: string; headlineLead: string; headlineEmphasis: string; headlineTail: string; description: string; image: string; alt: string; badge: string; badgeTitle: string; badgeBody: string }
+  { headlineLead: string; headlineEmphasis: string; description: string; cta: string; image: string; alt: string; position: string }
 > = {
   wedding: {
-    kicker: 'CATALOG NO. PM-8812 — HIGH-FIDELITY LIVE RECEPTION',
-    headlineLead: 'Boutique Sound for',
-    headlineEmphasis: 'Unforgettable',
-    headlineTail: 'Evenings.',
-    description:
-      'Handcrafted playlists, warm full-range sound, and seamless event flow across Utah Valley, Park City peaks, and mountain destinations. Powered by professional sound systems and careful live mixing.',
-    image: '/images/site/hero-wedding.jpg',
-    alt: 'Pescadero Music DJ booth set up at a wedding reception with string lights',
-    badge: 'FOLIO MASTER 01 • REAL UTAH WEDDINGS',
-    badgeTitle: 'Clean, Powerful Sound — Zero Hassle.',
-    badgeBody: 'Set up and dialed in for the room, every time — ceremony, cocktail hour, and reception.',
+    headlineLead: 'Sound as good as',
+    headlineEmphasis: 'it looks.',
+    description: 'Full-service wedding DJ with professional sound for ceremony, cocktail hour, and reception.',
+    cta: 'Book Your Date',
+    image: '/images/site/hero-garrett.jpg',
+    alt: 'Garrett mixing at the Pescadero Music DJ booth',
+    position: 'center 30%',
   },
   cinema: {
-    kicker: 'CATALOG NO. PM-4090 — OUTDOOR CANVAS',
-    headlineLead: 'Outdoor Movie',
-    headlineEmphasis: 'Nights',
-    headlineTail: 'Under Alpine Stars.',
+    headlineLead: 'Bring the big screen',
+    headlineEmphasis: 'outside.',
     description:
-      'A complete private outdoor cinema for your backyard, neighborhood, or event space. Inflatable screen, HD projector, and crystal-clear sound — self-contained for up to 3 hours, no power hookup needed.',
+      'A complete outdoor cinema experience for private events. Inflatable screen, projector, and crystal-clear sound — no power hookup needed.',
+    cta: 'Check Availability',
     image: 'https://shxcw5yjydy1kgql.public.blob.vercel-storage.com/hero.jpg',
     alt: 'Pescadero Music outdoor movie night setup',
-    badge: 'FOLIO MASTER 02 • PRIVATE EVENTS ONLY',
-    badgeTitle: 'A Big Screen, Anywhere Outside.',
-    badgeBody: 'Large inflatable screen and HD projection for backyard gatherings and private venues. Summer availability only.',
+    position: 'center',
   },
 }
 
@@ -113,9 +106,8 @@ export default function HomePage() {
         <div className="h-20 w-full px-6 md:px-margin flex items-center justify-between">
           <div className="flex items-center gap-space-lg min-w-0">
             <a className="flex items-center gap-space-md group min-w-0" href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/' }}>
-              <div className="bg-primary text-on-primary font-label-md text-label-md px-space-sm py-space-xs uppercase tracking-widest shrink-0">
-                PM
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/logo.png" alt="Pescadero Music" className="h-14 w-14 shrink-0 object-contain" />
               <div className="hidden sm:flex flex-col min-w-0">
                 <span className="font-label-lg text-label-lg uppercase tracking-widest text-primary truncate">
                   Pescadero Music
@@ -135,7 +127,7 @@ export default function HomePage() {
               Pricing
             </button>
             <button className={navBtn} onClick={() => scrollTo('checker-widget')}>
-              Check Dates
+              Book
             </button>
           </nav>
 
@@ -144,7 +136,7 @@ export default function HomePage() {
               className="hidden sm:inline-flex items-center justify-center bg-secondary hover:bg-secondary-container text-on-secondary font-label-md text-label-md uppercase px-space-md py-space-sm shadow-[4px_4px_0px_0px_#07111A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#07111A] transition-all"
               onClick={() => scrollTo('checker-widget')}
             >
-              Check Your Date
+              Book Your Date
             </button>
 
             {user ? (
@@ -211,7 +203,7 @@ export default function HomePage() {
               Pricing
             </button>
             <button className="text-left py-space-sm font-label-md text-label-md uppercase tracking-wider text-on-surface" onClick={() => scrollTo('checker-widget')}>
-              Check Dates
+              Book
             </button>
             {!user && (
               <button className="text-left py-space-sm font-label-md text-label-md uppercase tracking-wider text-secondary" onClick={() => router.push('/auth/login')}>
@@ -242,7 +234,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-12 gap-gutter items-stretch">
-              <div className="col-span-12 lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-space-md">
+              <div className="col-span-12 lg:col-span-7 flex flex-col justify-center pr-0 lg:pr-space-xl">
                 <div className="flex flex-col">
                   <div className="inline-flex bg-surface-container p-1 gap-1 mb-space-md w-fit">
                     <button
@@ -263,11 +255,8 @@ export default function HomePage() {
                     </button>
                   </div>
 
-                  <div className="font-label-lg text-label-lg uppercase tracking-widest text-secondary mb-space-xs">
-                    {h.kicker}
-                  </div>
                   <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight leading-[1.05] mb-space-md">
-                    {h.headlineLead} <span className="italic font-display-xl text-secondary">{h.headlineEmphasis}</span> {h.headlineTail}
+                    {h.headlineLead} <span className="italic font-display-xl text-secondary">{h.headlineEmphasis}</span>
                   </h1>
                   <p className="font-body-lg text-body-lg text-on-surface-variant mb-space-lg leading-relaxed">
                     {h.description}
@@ -278,51 +267,28 @@ export default function HomePage() {
                       className="inline-flex items-center justify-center bg-secondary hover:bg-secondary-container text-on-secondary font-label-lg text-label-lg uppercase px-space-lg py-space-sm shadow-[4px_4px_0px_0px_#07111A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#07111A] transition-all"
                       onClick={() => scrollTo('checker-widget')}
                     >
-                      Check Your Date →
+                      {h.cta} →
                     </button>
                     <button
                       className="inline-flex items-center justify-center bg-surface-container hover:bg-surface-variant text-primary font-label-lg text-label-lg uppercase px-space-lg py-space-sm shadow-[4px_4px_0px_0px_#07111A] transition-all"
-                      onClick={() => scrollTo('pricing-tiers')}
+                      onClick={() => scrollTo('services')}
                     >
-                      Explore Pricing
+                      See Services
                     </button>
-                  </div>
-                </div>
-
-                <div className="bg-surface-container p-space-md mt-space-md">
-                  <div className="grid grid-cols-3 gap-space-sm text-center">
-                    <div className="flex flex-col items-center">
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Sound Rig</span>
-                      <span className="font-headline-sm text-headline-sm text-primary">JBL • Pioneer</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Service Area</span>
-                      <span className="font-headline-sm text-headline-sm text-primary">Utah County</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Booking</span>
-                      <span className="font-headline-sm text-headline-sm text-secondary">1 Event / Date</span>
-                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="col-span-12 lg:col-span-7 relative">
-                <div className="relative w-full h-[420px] md:h-[580px] bg-primary overflow-hidden shadow-[8px_8px_0px_0px_#07111A]">
+              <div className="col-span-12 lg:col-span-5 relative">
+                <div className="relative w-full h-[440px] md:h-[600px] bg-primary overflow-hidden shadow-[8px_8px_0px_0px_#07111A]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     alt={h.alt}
-                    className="absolute inset-0 w-full h-full object-cover object-center filter contrast-125 saturate-90 brightness-95"
+                    className="absolute inset-0 w-full h-full object-cover contrast-110 saturate-[.95]"
+                    style={{ objectPosition: h.position }}
                     src={h.image}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/30 to-transparent mix-blend-multiply" />
-                  <div className="relative z-20 p-space-lg md:p-space-xl text-on-primary">
-                    <div className="inline-block bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-widest px-space-sm py-1 mb-space-xs">
-                      {h.badge}
-                    </div>
-                    <div className="font-headline-md text-headline-md tracking-tight text-surface">{h.badgeTitle}</div>
-                    <p className="font-body-sm text-body-sm text-surface-container max-w-md mt-1">{h.badgeBody}</p>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/35 via-transparent to-transparent" />
                 </div>
               </div>
             </div>
@@ -336,7 +302,7 @@ export default function HomePage() {
                   <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary block">
                     BOOK YOUR DATE
                   </span>
-                  <h2 className="font-headline-md text-headline-md text-primary mt-1">Check Availability</h2>
+                  <h2 className="font-headline-md text-headline-md text-primary mt-1">Check availability.</h2>
                 </div>
               </div>
 
@@ -378,7 +344,7 @@ export default function HomePage() {
                           ✕ Already Booked
                         </div>
                         <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          That date is taken. Try another date or reach out to ask.
+                          That date is already booked. Try another date or reach out to ask.
                         </p>
                       </>
                     )}
@@ -392,9 +358,6 @@ export default function HomePage() {
                         <div className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant mb-1">
                           Pick a date →
                         </div>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          Earlier inquiries get priority — your date isn’t secured until contract + deposit.
-                        </p>
                       </>
                     )}
                   </div>
@@ -403,7 +366,7 @@ export default function HomePage() {
                 <div className="lg:col-span-7 flex flex-col md:flex-row items-center gap-space-md">
                   <div className="w-full flex-1">
                     <label className="block font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-space-xs">
-                      What kind of event?
+                      1 — What kind of event?
                     </label>
                     <select
                       className="w-full bg-surface-container-lowest text-primary font-label-md text-label-md uppercase font-bold p-space-sm outline-none focus:bg-surface-bright focus:border-secondary appearance-none cursor-pointer border-b-2 border-primary/20 transition-colors"
@@ -419,7 +382,7 @@ export default function HomePage() {
                   </div>
                   <div className="w-full flex-1">
                     <label className="block font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-space-xs">
-                      Event Date
+                      2 — Pick a date
                     </label>
                     <input
                       className="w-full bg-surface-container-lowest text-primary font-body-md text-body-md p-space-sm outline-none border-b-2 border-primary/20 focus:border-secondary focus:bg-surface-bright transition-colors"
@@ -450,11 +413,8 @@ export default function HomePage() {
                 <span className="font-label-md text-label-md uppercase tracking-widest text-secondary block">
                   WHAT I DO
                 </span>
-                <h2 className="font-headline-lg text-headline-lg text-primary mt-1">Curated Dual Disciplines</h2>
+                <h2 className="font-headline-lg text-headline-lg text-primary mt-1">Every event deserves a great soundtrack.</h2>
               </div>
-              <p className="font-body-md text-body-md text-on-surface-variant max-w-md mt-space-sm md:mt-0">
-                I specialize strictly in two kinds of events: wedding &amp; event sound, and outdoor movie nights.
-              </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
@@ -463,39 +423,18 @@ export default function HomePage() {
                   <span className="bg-primary text-on-primary font-label-sm text-label-sm uppercase tracking-widest px-space-sm py-1">
                     DJ &amp; SOUND
                   </span>
-                  <span className="font-label-md text-label-md uppercase tracking-wider text-secondary font-bold">
-                    CEREMONY • COCKTAIL • DANCE
-                  </span>
                 </div>
                 <div className="my-space-lg">
                   <span className="font-display-xl text-display-xl leading-none text-primary block tracking-tighter">
-                    Bespoke Wedding
+                    DJ &amp;
                   </span>
                   <span className="font-display-xl text-display-xl leading-none text-secondary italic block tracking-tight -mt-2">
-                    Soundscapes.
+                    Sound.
                   </span>
                   <p className="font-body-lg text-body-lg text-on-surface-variant mt-space-md max-w-xl">
                     Professional DJ service for weddings, receptions, corporate events, grand openings, and private
                     parties. From dance-floor-only sets to full ceremony and reception sound.
                   </p>
-                </div>
-                <div className="bg-surface p-space-md">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
-                    {[
-                      { icon: 'graphic_eq', title: 'DJ-Curated or Custom', body: 'Your playlist, or let Garrett curate the night.' },
-                      { icon: 'music_note', title: 'Full Reception Coverage', body: 'Ceremony, cocktail hour, and dancing — one or all.' },
-                      { icon: 'mic', title: 'Wireless Mics', body: 'Clear, dignified announcements and toasts.' },
-                      { icon: 'straighten', title: 'Custom DJ Booth', body: 'A clean, custom-built white booth with a warm wood top.' },
-                    ].map((f) => (
-                      <div className="flex items-start gap-space-sm" key={f.title}>
-                        <span className="material-symbols-outlined text-secondary text-[20px] mt-0.5">{f.icon}</span>
-                        <div>
-                          <span className="font-label-md text-label-md uppercase text-primary block">{f.title}</span>
-                          <span className="font-body-sm text-body-sm text-on-surface-variant">{f.body}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
 
@@ -504,44 +443,21 @@ export default function HomePage() {
                   <span className="bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-widest px-space-sm py-1">
                     OUTDOOR CINEMA
                   </span>
-                  <span className="font-label-md text-label-md uppercase tracking-wider text-surface-variant">
-                    PRIVATE EVENTS ONLY
-                  </span>
                 </div>
                 <div className="my-space-lg">
                   <span className="font-display-xl text-display-xl leading-none text-surface block tracking-tight">
-                    Open Sky
+                    Outdoor
                   </span>
                   <span className="font-display-xl text-display-xl leading-none text-secondary-fixed italic block tracking-tight -mt-2">
-                    Cinema Nights.
+                    Movie Night.
                   </span>
                   <p className="font-body-md text-body-md text-on-surface-variant mt-space-md">
-                    A complete private outdoor cinema for your backyard, neighborhood, or venue. Self-contained for
-                    up to 3 hours with no power hookup required.
+                    A complete private outdoor cinema for your backyard, neighborhood, or venue. Inflatable screen, HD
+                    projector, and outdoor sound — self-contained for up to 3 hours with no power hookup required.
                   </p>
-                </div>
-                <div className="bg-primary-container p-space-md">
-                  <div className="flex flex-col gap-space-sm">
-                    {[
-                      ['Screen', 'Large Inflatable Screen'],
-                      ['Projector', 'HD Projection'],
-                      ['Audio', 'Outdoor Speaker System'],
-                      ['Power', 'No Hookup Needed'],
-                    ].map(([k, v]) => (
-                      <div className="flex items-center justify-between pb-space-xs" key={k}>
-                        <span className="font-label-md text-label-md uppercase text-surface">{k}</span>
-                        <span className="font-body-sm text-body-sm text-surface-variant">{v}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-space-md pt-space-sm">
-                  <button
-                    className="font-label-md text-label-md uppercase tracking-wider text-secondary-fixed hover:text-on-secondary transition-colors inline-flex items-center gap-space-xs"
-                    onClick={() => scrollTo('pricing-tiers')}
-                  >
-                    See Movie Night Pricing →
-                  </button>
+                  <p className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed mt-space-md">
+                    Private events only · Summer availability
+                  </p>
                 </div>
               </div>
             </div>
@@ -551,12 +467,9 @@ export default function HomePage() {
           <section className="w-full bg-surface-container px-6 md:px-margin py-space-xl" id="pricing-tiers">
             <div className="max-w-4xl mx-auto text-center mb-space-xl">
               <div className="inline-block bg-primary text-on-primary font-label-sm text-label-sm uppercase tracking-widest px-space-md py-space-xs mb-space-sm">
-                FLAT-RATE PRICING • NO SURPRISES
+                Pricing
               </div>
-              <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight">Simple, Transparent Pricing</h2>
-              <p className="font-body-lg text-body-lg text-on-surface-variant mt-space-xs">
-                All prices are starting rates. Travel fees may apply outside Utah County.
-              </p>
+              <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight">Simple, transparent pricing.</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter items-stretch">
@@ -565,22 +478,20 @@ export default function HomePage() {
                 <div>
                   <div className="flex justify-between items-start pb-space-sm mb-space-md">
                     <div>
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">TIER 01</span>
                       <h3 className="font-headline-sm text-headline-sm text-primary">Dance DJ</h3>
                     </div>
-                    <span className="font-label-sm text-label-sm uppercase bg-surface-container px-space-xs py-1">RECEPTION</span>
                   </div>
                   <div className="mb-space-lg">
                     <span className="font-display-xl text-display-xl text-primary font-bold leading-none">$600</span>
                     <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mt-1">
-                      FLAT FEE • UP TO 4 HOURS
+                      Travel fees additional
                     </span>
                   </div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
                     One sound system. Up to 4 hours of DJ service — perfect for receptions, parties, grand openings, and
                     corporate events.
                   </p>
-                  <ul className="space-y-space-sm font-body-sm text-body-sm text-on-surface mb-space-lg">
+                  <ul className="space-y-space-sm font-body-sm text-body-sm text-on-surface mb-space-md">
                     {['Up to 4 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'Wired MC mic'].map((f) => (
                       <li className="flex items-center gap-space-xs" key={f}>
                         <span className="material-symbols-outlined text-secondary text-[18px]">check</span>
@@ -588,12 +499,15 @@ export default function HomePage() {
                       </li>
                     ))}
                   </ul>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
+                    Pricing is flat-rate for events under 4 hours and does not change based on event length.
+                  </p>
                 </div>
                 <button
                   className="w-full text-center bg-surface-container hover:bg-surface-variant text-primary font-label-md text-label-md uppercase tracking-wider py-space-sm transition-all shadow-[2px_2px_0px_0px_#07111A]"
                   onClick={() => scrollTo('checker-widget')}
                 >
-                  Reserve $600 Tier
+                  Check Availability
                 </button>
               </div>
 
@@ -605,21 +519,20 @@ export default function HomePage() {
                 <div>
                   <div className="flex justify-between items-start pb-space-sm mb-space-md">
                     <div>
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed">TIER 02</span>
                       <h3 className="font-headline-sm text-headline-sm text-surface">Full-Service Sound</h3>
                     </div>
                   </div>
                   <div className="mb-space-lg">
                     <span className="font-display-xl text-display-xl text-surface font-bold leading-none">$850</span>
                     <span className="font-label-sm text-label-sm uppercase tracking-wider text-surface-variant block mt-1">
-                      FLAT FEE • UP TO 4 HOURS
+                      Travel fees additional
                     </span>
                   </div>
                   <p className="font-body-sm text-body-sm text-surface-container max-w-sm mb-space-md">
                     Two independent sound systems — one for ceremony or speeches, one for the dance floor. The complete
                     wedding package.
                   </p>
-                  <ul className="space-y-space-sm font-body-sm text-body-sm text-surface mb-space-lg">
+                  <ul className="space-y-space-sm font-body-sm text-body-sm text-surface mb-space-md">
                     {[
                       'Up to 4 hours',
                       'Two independent sound systems',
@@ -628,17 +541,20 @@ export default function HomePage() {
                       'DJ-curated or custom playlist',
                     ].map((f) => (
                       <li className="flex items-center gap-space-xs" key={f}>
-                        <span className="material-symbols-outlined text-secondary-fixed text-[18px]">verified</span>
+                        <span className="material-symbols-outlined text-secondary-fixed text-[18px]">check</span>
                         <span>{f}</span>
                       </li>
                     ))}
                   </ul>
+                  <p className="font-body-sm text-body-sm text-surface-variant mb-space-lg">
+                    Pricing is flat-rate for events under 4 hours and does not change based on event length.
+                  </p>
                 </div>
                 <button
                   className="w-full text-center bg-secondary hover:bg-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider py-space-sm shadow-[4px_4px_0px_0px_#07111A] active:translate-x-[1px] active:translate-y-[1px] transition-all"
                   onClick={() => scrollTo('checker-widget')}
                 >
-                  Book Signature Package →
+                  Check Availability
                 </button>
               </div>
 
@@ -647,10 +563,8 @@ export default function HomePage() {
                 <div>
                   <div className="flex justify-between items-start pb-space-sm mb-space-md">
                     <div>
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">TIER 03</span>
                       <h3 className="font-headline-sm text-headline-sm text-primary">Outdoor Movie Night</h3>
                     </div>
-                    <span className="font-label-sm text-label-sm uppercase bg-surface-container px-space-xs py-1">CINEMA</span>
                   </div>
                   <div className="grid grid-cols-2 gap-space-xs bg-surface-container p-space-sm mb-space-md text-center">
                     <div>
@@ -663,11 +577,11 @@ export default function HomePage() {
                     </div>
                   </div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
-                    A private outdoor cinema for your backyard, neighborhood, or event space. Runs up to 3 hours without
-                    a power hookup. Private events only — summer availability.
+                    A private outdoor cinema for your backyard, neighborhood, or event space. Self-contained rig runs up to
+                    3 hours without a power hookup.
                   </p>
                   <ul className="space-y-space-sm font-body-sm text-body-sm text-on-surface mb-space-lg">
-                    {['Up to 3 hours', 'Large inflatable screen', 'HD projector', 'Outdoor speaker system', 'No power hookup needed'].map((f) => (
+                    {['Up to 3 hours', 'Large inflatable screen', 'HD projector', 'Outdoor speaker system', 'No power hookup needed', 'Private events only'].map((f) => (
                       <li className="flex items-center gap-space-xs" key={f}>
                         <span className="material-symbols-outlined text-secondary text-[18px]">check</span>
                         <span>{f}</span>
@@ -679,110 +593,16 @@ export default function HomePage() {
                   className="w-full text-center bg-surface-container hover:bg-surface-variant text-primary font-label-md text-label-md uppercase tracking-wider py-space-sm transition-all shadow-[2px_2px_0px_0px_#07111A]"
                   onClick={() => scrollTo('checker-widget')}
                 >
-                  Reserve Movie Night
+                  Check Availability
                 </button>
               </div>
             </div>
 
-            <div className="mt-space-lg text-center font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
-              • Travel fees may apply for events outside Utah County •
-            </div>
+            <p className="mt-space-lg text-center font-body-sm text-body-sm italic text-on-surface-variant">
+              All prices are starting rates. Travel fees may apply for events outside Utah County. Contact for a custom quote.
+            </p>
           </section>
 
-          {/* 5. 7-STEP ROADMAP */}
-          <section className="w-full bg-primary text-on-primary px-6 md:px-margin py-space-xl">
-            <div className="flex flex-col md:flex-row md:items-end justify-between pb-space-md mb-space-xl">
-              <div>
-                <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed block">
-                  HOW IT WORKS
-                </span>
-                <h2 className="font-headline-lg text-headline-lg text-surface mt-1">The 7-Step Booking Roadmap</h2>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-space-sm">
-              {[
-                ['01', 'Inquiry', 'Submit your date and details — takes about 3 minutes.'],
-                ['02', 'Consultation', 'A quick call to talk through your vision and vibe.'],
-                ['03', 'Contract', 'Review, sign, and pay your deposit — your date is locked in.'],
-                ['04', 'Planning', 'Submit your music and day-of timeline.'],
-                ['05', 'Final Payment', 'Remaining balance due one week before your event.'],
-                ['06', 'Event Day', 'Garrett arrives 1.5 hours early to set up and sound-check.'],
-                ['07', 'Keepsake', 'A playlist archive of your night to keep forever.'],
-              ].map(([num, title, body], i) => (
-                <div
-                  key={num}
-                  className={`p-space-md flex flex-col justify-between shadow-[3px_3px_0px_0px_rgba(245,239,224,0.15)] ${
-                    i === 5 ? 'bg-secondary text-on-secondary' : 'bg-surface-bright text-on-surface'
-                  }`}
-                >
-                  <div>
-                    <span className={`font-label-md text-label-md uppercase font-bold block mb-space-xs ${i === 5 ? 'text-secondary-fixed' : 'text-secondary'}`}>
-                      {num}
-                    </span>
-                    <h4 className={`font-headline-sm text-headline-sm leading-tight mb-2 ${i === 5 ? 'text-on-secondary' : 'text-primary'}`}>
-                      {title}
-                    </h4>
-                    <p className={`font-body-sm text-body-sm ${i === 5 ? 'text-on-secondary/80' : 'text-on-surface-variant'}`}>
-                      {body}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* 6. PERSONAL NOTE */}
-          <section className="w-full bg-background px-6 md:px-margin py-space-xl">
-            <div className="max-w-4xl mx-auto bg-primary text-on-primary p-space-lg md:p-space-xl shadow-[8px_8px_0px_0px_#C8202A] relative">
-              <div className="flex items-center justify-between pb-space-md mb-space-lg">
-                <div className="flex items-center gap-space-sm">
-                  <div className="w-3 h-3 bg-secondary" />
-                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-surface font-bold">
-                    A NOTE FROM GARRETT
-                  </span>
-                </div>
-                <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container">
-                  PROVO • UTAH
-                </span>
-              </div>
-
-              <div className="space-y-space-md">
-                <h3 className="font-display-xl text-display-xl text-surface leading-tight">
-                  “Your day. Your music. <span className="text-secondary-fixed italic">Our sound.</span>”
-                </h3>
-                <div className="font-editorial-note text-editorial-note text-surface-container space-y-space-md italic leading-relaxed pt-space-xs">
-                  <p>
-                    When I started Pescadero Music, I decided never to be the kind of DJ company that shows up in
-                    branded polo shirts with flickering neon lasers and booming, distorted speakers.
-                  </p>
-                  <p>
-                    Your wedding or event deserves sound that fills the room with clarity and warmth — without
-                    blowing out your grandparents at dinner.
-                  </p>
-                  <p>
-                    I don’t take over your celebration. I build a room-filling atmosphere that lets your guests
-                    connect, dance, and remember how good the night sounded.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-space-lg mt-space-lg gap-space-md border-t border-on-primary/15">
-                <div className="flex flex-col pt-space-md sm:pt-0">
-                  <span className="font-label-lg text-label-lg uppercase tracking-wider text-surface">Garrett</span>
-                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container">
-                    Founder, Pescadero Music
-                  </span>
-                </div>
-                <a
-                  className="inline-flex items-center justify-center bg-secondary hover:bg-secondary-container text-on-secondary font-label-md text-label-md uppercase px-space-lg py-space-sm shadow-[3px_3px_0px_0px_rgba(245,239,224,0.25)] transition-colors"
-                  href="mailto:garrett@pescaderomusic.com"
-                >
-                  Start a Conversation →
-                </a>
-              </div>
-            </div>
-          </section>
         </div>
       </main>
 
@@ -791,13 +611,12 @@ export default function HomePage() {
         <div className="w-full px-6 md:px-margin py-space-xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-space-xl">
             <div className="flex flex-col gap-space-sm">
-              <div className="bg-primary text-on-primary font-label-md text-label-md px-space-sm py-space-xs uppercase tracking-widest inline-block w-fit">
-                Pescadero Music
+              <div className="flex items-center gap-space-sm">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/logo.png" alt="" className="h-12 w-12 object-contain" />
+                <span className="font-label-lg text-label-lg uppercase tracking-widest text-primary">Pescadero Music</span>
               </div>
-              <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm">
-                Professional DJ &amp; sound for weddings and events, plus self-contained outdoor movie nights, serving
-                Provo and Utah Valley.
-              </p>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">Provo, Utah · DJ Garrett</p>
             </div>
             <div className="flex flex-col gap-space-xs">
               <span className="font-label-md text-label-md uppercase tracking-wider text-primary mb-space-sm">Services</span>

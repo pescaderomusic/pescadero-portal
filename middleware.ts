@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { PREVIEW_GATE_ON, PREVIEW_COOKIE, isOpenPath, previewToken } from '@/lib/preview-gate'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -23,6 +24,17 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
+
+  // Under-construction screen for the public (lib/preview-gate.ts).
+  if (PREVIEW_GATE_ON && !user && !isOpenPath(pathname)) {
+    const cookie = request.cookies.get(PREVIEW_COOKIE)?.value
+    if (cookie !== (await previewToken())) {
+      const res = NextResponse.rewrite(new URL('/coming-soon', request.url))
+      res.headers.set('X-Robots-Tag', 'noindex')
+      res.headers.set('Cache-Control', 'no-store')
+      return res
+    }
+  }
 
   const protectedRoutes = ['/dashboard', '/planning', '/contract']
   if (protectedRoutes.some(r => pathname.startsWith(r)) && !user) {
