@@ -67,7 +67,7 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
         if (cRes.data) {
           const c = cRes.data
           setPackagePrice(c.package_price?.toString() || '')
-          setPackageType(c.package_type || (Number(c.package_price) >= 850 ? 'full_service' : 'dance_dj'))
+          setPackageType(c.package_type || (Number(c.package_price) >= 700 ? 'full_service' : 'dance_dj'))
           setTravelFee(c.travel_fee?.toString() || '0')
           setDepositAmount(c.deposit_amount?.toString() || '500')
           setSalesTaxRate(c.sales_tax_rate?.toString() || '0')
@@ -248,11 +248,11 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
                 const val = e.target.value
                 setPackageType(val)
                 if (val === 'dance_dj') setPackagePrice('599')
-                if (val === 'full_service') setPackagePrice('875')
+                if (val === 'full_service') setPackagePrice('749')
               }}
             >
               <option value="dance_dj">Dance DJ — $599</option>
-              <option value="full_service">Full-Service Sound — $875</option>
+              <option value="full_service">Full-Service Sound — $749</option>
               <option value="custom">Custom / Other</option>
             </select>
           </div>
@@ -260,7 +260,7 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
             <div>
               <label style={labelStyle}>Package Price ($) *</label>
               <input style={inputStyle} type="number" value={packagePrice} onChange={e => setPackagePrice(e.target.value)} placeholder="599" />
-              <p style={{ margin: '4px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Dance DJ $599 · Full-Service Sound $875</p>
+              <p style={{ margin: '4px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Dance DJ $599 · Full-Service Sound $749</p>
             </div>
             <div>
               <label style={labelStyle}>Travel Fee ($)</label>

@@ -605,7 +605,7 @@ function InquiryWizard() {
                   <div className="flex flex-col gap-space-sm mb-space-md">
                     {[
                       { val: 'Dance DJ - $599', name: 'Dance DJ', price: '$599', desc: 'One sound system. Up to 3 hours — reception, party, or grand opening.', features: ['Up to 3 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'One wireless mic + one wired mic'] },
-                      { val: 'Full-Service Sound - $875', name: 'Full-Service Sound', price: '$875', desc: 'Two independent sound systems — ceremony/speeches + dance floor.', features: ['Up to 3 hours', 'Two independent sound systems', 'Ceremony & cocktail hour sound', 'One wireless mic + one wired mic', 'DJ-curated or custom playlist'], popular: true },
+                      { val: 'Full-Service Sound - $749', name: 'Full-Service Sound', price: '$749', desc: 'Two independent sound systems — ceremony/speeches + dance floor.', features: ['Up to 3 hours', 'Two independent sound systems', 'Ceremony & cocktail hour sound', 'One wireless mic + one wired mic', 'DJ-curated or custom playlist'], popular: true },
                     ].map((p) => (
                       <label key={p.val} className={`flex gap-3 items-start bg-white border-2 p-space-md cursor-pointer transition-all ${form.weddingPackage === p.val ? 'border-secondary shadow-[4px_4px_0px_0px_#C8202A]' : 'border-primary/15'}`}>
                         <input type="radio" className="mt-1 accent-secondary shrink-0" checked={form.weddingPackage === p.val} onChange={() => set('weddingPackage', p.val)} />
