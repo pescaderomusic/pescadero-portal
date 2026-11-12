@@ -257,11 +257,20 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                       </div>
                       <div className="mt-1.5 font-body-sm text-body-sm text-on-surface-variant">
                         {doneCount === STEPS.length ? 'All steps done' : `Step ${doneCount + 1} of 7 · ${current?.short}`}
-                        {review ? ` · Reviewed ${review.rating}★` : ''}
                       </div>
                     </div>
                   </Link>
-                  {!review && (
+                  {review ? (
+                    <div className="mt-3">
+                    <Link
+                      href="/admin/reviews"
+                      className="w-full inline-flex items-center justify-center gap-2 min-h-[44px] px-4 bg-surface-container text-primary border-2 border-primary font-label-md text-label-md uppercase tracking-wider no-underline hover:bg-primary hover:text-on-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                    >
+                      <span className="material-symbols-outlined text-[20px] text-secondary" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                      Reviewed {review.rating}/5 · See review
+                    </Link>
+                    </div>
+                  ) : (
                     <div className="mt-3">
                       <TextReviewButton
                         message={reviewTextMessage(firstName, booking.client_id)}
@@ -364,7 +373,13 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                             Manage →
                           </Link>
                           {reviewMap[booking.client_id] ? (
-                            <span className="font-label-sm text-label-sm uppercase text-on-surface-variant">Reviewed {reviewMap[booking.client_id].rating}★</span>
+<Link
+                      href="/admin/reviews"
+                      className=" inline-flex items-center justify-center gap-2 min-h-[44px] px-4 bg-surface-container text-primary border-2 border-primary font-label-md text-label-md uppercase tracking-wider no-underline hover:bg-primary hover:text-on-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                    >
+                      <span className="material-symbols-outlined text-[20px] text-secondary" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                      Reviewed {reviewMap[booking.client_id].rating}/5 · See review
+                    </Link>
                           ) : (
                             <TextReviewButton
                               compact

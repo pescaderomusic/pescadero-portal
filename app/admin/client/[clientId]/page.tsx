@@ -129,7 +129,9 @@ export default async function AdminClientPage({ params }: { params: { clientId: 
               )}
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
                 {review ? (
-                  <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>Reviewed — {review.rating}★</p>
+                  <Link href="/admin/reviews" style={{ display: 'block', padding: '13px 8px', borderRadius: 7, border: '1px solid rgba(245,166,35,0.5)', background: 'rgba(245,166,35,0.12)', color: '#F5C46B', fontSize: 13, fontWeight: 700, textDecoration: 'none', textAlign: 'center' }}>
+                    ★ Reviewed {review.rating}/5 · See review
+                  </Link>
                 ) : (
                   <TextReviewButton message={reviewTextMessage(firstName, clientId)} link={reviewUrl(clientId)} phone={inquiry?.phone} />
                 )}
