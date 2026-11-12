@@ -54,6 +54,16 @@ export default function HomePage() {
   const [checkDate, setCheckDate] = useState('')
   const [dateStatus, setDateStatus] = useState<'idle' | 'checking' | 'available' | 'busy'>('idle')
   const [ratingSummary, setRatingSummary] = useState<{ count: number; average: number | null } | null>(null)
+  const [quoteIdx, setQuoteIdx] = useState(0)
+  const [quoteAuto, setQuoteAuto] = useState(true)
+
+  // Rotate testimonials every 9s until someone picks one (never with reduced motion)
+  useEffect(() => {
+    if (!quoteAuto || FEATURED_TESTIMONIALS.length < 2) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const t = setInterval(() => setQuoteIdx((i) => (i + 1) % FEATURED_TESTIMONIALS.length), 9000)
+    return () => clearInterval(t)
+  }, [quoteAuto])
 
   useEffect(() => {
     fetch('/api/reviews/summary')
@@ -286,28 +296,55 @@ export default function HomePage() {
                     </button>
                   </div>
 
-                  {/* Client testimonial + overall rating */}
-                  {FEATURED_TESTIMONIALS[0] && (
-                    <figure className="relative bg-surface-container-lowest p-space-md md:p-space-lg shadow-[4px_4px_0px_0px_#07111A] border-l-4 border-secondary max-w-xl">
-                      <div className="flex items-center gap-0.5 mb-space-xs" role="img" aria-label={`${FEATURED_TESTIMONIALS[0].rating} out of 5 stars`}>
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <span key={i} aria-hidden="true" className="material-symbols-outlined text-[20px] text-secondary" style={{ fontVariationSettings: `'FILL' ${i < FEATURED_TESTIMONIALS[0].rating ? 1 : 0}` }}>
-                            star
-                          </span>
+                  {/* Client testimonials + overall rating */}
+                  {FEATURED_TESTIMONIALS.length > 0 && (
+                    <section aria-label="What clients say" className="relative bg-surface-container-lowest p-space-md md:p-space-lg shadow-[4px_4px_0px_0px_#07111A] border-l-4 border-secondary max-w-xl">
+                      {/* every quote sits in the same grid cell, so the card keeps the tallest one's height */}
+                      <div className="grid">
+                        {FEATURED_TESTIMONIALS.map((t, i) => (
+                          <figure
+                            key={t.name}
+                            aria-hidden={i !== quoteIdx}
+                            className={`[grid-area:1/1] m-0 transition-opacity duration-500 ${i === quoteIdx ? 'opacity-100' : 'opacity-0 invisible'}`}
+                          >
+                            <div className="flex items-center gap-0.5 mb-space-xs" role="img" aria-label={`${t.rating} out of 5 stars`}>
+                              {Array.from({ length: 5 }, (_, k) => (
+                                <span key={k} aria-hidden="true" className="material-symbols-outlined text-[20px] text-secondary" style={{ fontVariationSettings: `'FILL' ${k < t.rating ? 1 : 0}` }}>
+                                  star
+                                </span>
+                              ))}
+                            </div>
+                            <blockquote className="m-0 font-editorial-note text-editorial-note italic text-primary leading-relaxed">
+                              &ldquo;{t.quote}&rdquo;
+                            </blockquote>
+                            <figcaption className="mt-space-sm font-label-md text-label-md uppercase tracking-widest text-primary">— {t.name}</figcaption>
+                          </figure>
                         ))}
                       </div>
-                      <blockquote className="font-editorial-note text-editorial-note italic text-primary leading-relaxed">
-                        &ldquo;{FEATURED_TESTIMONIALS[0].quote}&rdquo;
-                      </blockquote>
-                      <figcaption className="mt-space-sm flex flex-wrap items-center justify-between gap-x-space-md gap-y-1">
-                        <span className="font-label-md text-label-md uppercase tracking-widest text-primary">— {FEATURED_TESTIMONIALS[0].name}</span>
+                      <div className="mt-space-sm flex flex-wrap items-center justify-between gap-x-space-md gap-y-1">
+                        {FEATURED_TESTIMONIALS.length > 1 ? (
+                          <div className="flex items-center -ml-2">
+                            {FEATURED_TESTIMONIALS.map((t, i) => (
+                              <button
+                                key={t.name}
+                                type="button"
+                                onClick={() => { setQuoteIdx(i); setQuoteAuto(false) }}
+                                aria-label={`Show review from ${t.name}`}
+                                aria-pressed={i === quoteIdx}
+                                className="w-11 h-11 flex items-center justify-center"
+                              >
+                                <span className={`block h-2.5 transition-all ${i === quoteIdx ? 'w-6 bg-secondary' : 'w-2.5 bg-on-surface-variant'}`} />
+                              </button>
+                            ))}
+                          </div>
+                        ) : <span />}
                         {ratingSummary?.average && (
                           <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
                             {ratingSummary.average.toFixed(1)} / 5 from {ratingSummary.count} client review{ratingSummary.count === 1 ? '' : 's'}
                           </span>
                         )}
-                      </figcaption>
-                    </figure>
+                      </div>
+                    </section>
                   )}
                 </div>
               </div>
