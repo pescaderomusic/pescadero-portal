@@ -239,7 +239,7 @@ function InquiryWizard() {
       venue: form.venue, venueAddress: form.venueAddress, indoorOutdoor: form.indoorOutdoor, attendance: form.attendance,
       additionalDetails: notes, hearAbout: form.hearAbout, vendorName: form.vendorName, vendorType: form.vendorType,
       otherHear: form.otherHear,
-      weddingPackage: form.weddingPackage || (eventType === 'event' ? 'Dance DJ - $635' : ''),
+      weddingPackage: form.weddingPackage || (eventType === 'event' ? 'Dance DJ - $599' : ''),
       movieLocation: form.movieLocation, eventCategory: eventType,
     }
     try {
@@ -281,7 +281,7 @@ function InquiryWizard() {
     if (eventType === 'wedding' && form.eventTypesChecked.length) rows.push(['Coverage', form.eventTypesChecked.join(', ')])
     if (eventType === 'movie') rows.push(['Location Type', form.movieLocation])
     if (eventType === 'event' && form.secondDate) rows.push(['Second Date', form.secondDate])
-    const pkg = form.weddingPackage || (eventType === 'event' ? 'Dance DJ - $635' : '')
+    const pkg = form.weddingPackage || (eventType === 'event' ? 'Dance DJ - $599' : '')
     if (pkg) rows.push(['Package', pkg])
     rows.push(
       ['Heard About Us', form.hearAbout || '—'],
@@ -604,7 +604,7 @@ function InquiryWizard() {
                 {eventType === 'wedding' && (
                   <div className="flex flex-col gap-space-sm mb-space-md">
                     {[
-                      { val: 'Dance DJ - $635', name: 'Dance DJ', price: '$635', desc: 'One sound system. Up to 3 hours — reception, party, or grand opening.', features: ['Up to 3 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'One wireless mic + one wired mic'] },
+                      { val: 'Dance DJ - $599', name: 'Dance DJ', price: '$599', desc: 'One sound system. Up to 3 hours — reception, party, or grand opening.', features: ['Up to 3 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'One wireless mic + one wired mic'] },
                       { val: 'Full-Service Sound - $875', name: 'Full-Service Sound', price: '$875', desc: 'Two independent sound systems — ceremony/speeches + dance floor.', features: ['Up to 3 hours', 'Two independent sound systems', 'Ceremony & cocktail hour sound', 'One wireless mic + one wired mic', 'DJ-curated or custom playlist'], popular: true },
                     ].map((p) => (
                       <label key={p.val} className={`flex gap-3 items-start bg-white border-2 p-space-md cursor-pointer transition-all ${form.weddingPackage === p.val ? 'border-secondary shadow-[4px_4px_0px_0px_#C8202A]' : 'border-primary/15'}`}>
@@ -631,7 +631,7 @@ function InquiryWizard() {
                   <div className="bg-white border-2 border-primary/15 p-space-md mb-space-md">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-label-lg text-label-lg text-primary uppercase">Dance DJ</span>
-                      <span className="font-headline-sm text-headline-sm text-secondary">$635</span>
+                      <span className="font-headline-sm text-headline-sm text-secondary">$599</span>
                     </div>
                     <p className="font-body-sm text-body-sm text-on-surface-variant mb-2">One sound system. Up to 3 hours. Perfect for parties, grand openings, and corporate events.</p>
                     {['Up to 3 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'One wireless mic + one wired mic'].map((f) => (

@@ -482,7 +482,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="mb-space-lg">
-                    <span className="font-display-xl text-display-xl text-primary font-bold leading-none">$635</span>
+                    <span className="font-display-xl text-display-xl text-primary font-bold leading-none">$599</span>
                     <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mt-1">
                       Travel fees additional
                     </span>
