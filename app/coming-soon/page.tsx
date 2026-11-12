@@ -28,7 +28,7 @@ export default function ComingSoonPage() {
       <meta name="robots" content="noindex" />
       <div className="w-full max-w-md bg-surface p-space-lg md:p-space-xl shadow-[8px_8px_0px_0px_#07111A] flex flex-col items-center text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/logo.png" alt="Pescadero Music" className="w-32 h-32 object-contain mb-space-md" />
+        <img src="/images/logo-round.png" alt="Pescadero Music" className="w-32 h-32 object-contain mb-space-md" />
         <span className="bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-widest px-space-sm py-0.5 mb-space-sm">
           Pescadero Music
         </span>

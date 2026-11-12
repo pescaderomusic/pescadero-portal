@@ -105,9 +105,9 @@ export default function HomePage() {
       <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
         <div className="h-20 w-full px-6 md:px-margin flex items-center justify-between">
           <div className="flex items-center gap-space-lg min-w-0">
-            <a className="flex items-center gap-space-md group min-w-0" href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/' }}>
+            <a className="flex items-center gap-space-md group min-w-0 no-underline" href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/logo.png" alt="Pescadero Music" className="h-14 w-14 shrink-0 object-contain" />
+              <img src="/images/logo-round.png" alt="Pescadero Music" className="h-14 w-14 shrink-0 object-contain" />
               <div className="hidden sm:flex flex-col min-w-0">
                 <span className="font-label-lg text-label-lg uppercase tracking-widest text-primary truncate">
                   Pescadero Music
@@ -613,7 +613,7 @@ export default function HomePage() {
             <div className="flex flex-col gap-space-sm">
               <div className="flex items-center gap-space-sm">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/logo.png" alt="" className="h-12 w-12 object-contain" />
+                <img src="/images/logo-round.png" alt="" className="h-12 w-12 object-contain" />
                 <span className="font-label-lg text-label-lg uppercase tracking-widest text-primary">Pescadero Music</span>
               </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant">Provo, Utah · DJ Garrett</p>

@@ -24,7 +24,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo.png" alt="" className="w-11 h-11 object-contain" />
+          <img src="/images/logo-round.png" alt="" className="w-11 h-11 object-contain" />
           <span className="font-headline-sm text-headline-sm text-primary no-underline">Pescadero Music</span>
         </a>
         <div className="hidden sm:block font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
