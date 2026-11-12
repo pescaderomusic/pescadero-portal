@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { FEATURED_TESTIMONIALS } from '@/lib/testimonials'
 
 const ADMIN_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
@@ -52,6 +53,14 @@ export default function HomePage() {
   const [selectedType, setSelectedType] = useState<EventTypeId>('wedding')
   const [checkDate, setCheckDate] = useState('')
   const [dateStatus, setDateStatus] = useState<'idle' | 'checking' | 'available' | 'busy'>('idle')
+  const [ratingSummary, setRatingSummary] = useState<{ count: number; average: number | null } | null>(null)
+
+  useEffect(() => {
+    fetch('/api/reviews/summary')
+      .then((r) => r.json())
+      .then((d) => { if (d?.count > 0) setRatingSummary(d) })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -276,6 +285,30 @@ export default function HomePage() {
                       See Services
                     </button>
                   </div>
+
+                  {/* Client testimonial + overall rating */}
+                  {FEATURED_TESTIMONIALS[0] && (
+                    <figure className="relative bg-surface-container-lowest p-space-md md:p-space-lg shadow-[4px_4px_0px_0px_#07111A] border-l-4 border-secondary max-w-xl">
+                      <div className="flex items-center gap-0.5 mb-space-xs" role="img" aria-label={`${FEATURED_TESTIMONIALS[0].rating} out of 5 stars`}>
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <span key={i} aria-hidden="true" className="material-symbols-outlined text-[20px] text-secondary" style={{ fontVariationSettings: `'FILL' ${i < FEATURED_TESTIMONIALS[0].rating ? 1 : 0}` }}>
+                            star
+                          </span>
+                        ))}
+                      </div>
+                      <blockquote className="font-editorial-note text-editorial-note italic text-primary leading-relaxed">
+                        &ldquo;{FEATURED_TESTIMONIALS[0].quote}&rdquo;
+                      </blockquote>
+                      <figcaption className="mt-space-sm flex flex-wrap items-center justify-between gap-x-space-md gap-y-1">
+                        <span className="font-label-md text-label-md uppercase tracking-widest text-primary">— {FEATURED_TESTIMONIALS[0].name}</span>
+                        {ratingSummary?.average && (
+                          <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
+                            {ratingSummary.average.toFixed(1)} / 5 from {ratingSummary.count} client review{ratingSummary.count === 1 ? '' : 's'}
+                          </span>
+                        )}
+                      </figcaption>
+                    </figure>
+                  )}
                 </div>
               </div>
 
