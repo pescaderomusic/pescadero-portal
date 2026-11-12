@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
+import PrintButton from '@/components/PrintButton'
 
 const NAVY  = '#07111A'
 const BLUE     = '#44BEC7'
@@ -23,7 +24,7 @@ export default function PolicyPage() {
           <span style={{ fontFamily: WORDMARK, fontSize: 15, letterSpacing: '3px', color: CREAM, textTransform: 'uppercase' }}>Pescadero Music</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <button onClick={() => window.print()} style={{ background: 'none', border: `1px solid rgba(68,190,199,0.3)`, borderRadius: 6, color: BLUE, fontSize: 11, fontWeight: 700, padding: '5px 14px', cursor: 'pointer', fontFamily: UI_FONT, letterSpacing: '1.5px' }}>🖨 Print / Save PDF</button>
+          <PrintButton style={{ background: 'none', border: `1px solid rgba(68,190,199,0.3)`, borderRadius: 6, color: BLUE, fontSize: 11, fontWeight: 700, padding: '5px 14px', cursor: 'pointer', fontFamily: UI_FONT, letterSpacing: '1.5px' }}>🖨 Print / Save PDF</PrintButton>
           <Link href="/dashboard" style={{ fontSize: 11, fontFamily: UI_FONT, color: 'rgba(245,239,224,0.35)', textDecoration: 'none', letterSpacing: '1.5px', textTransform: 'uppercase' }}>← Dashboard</Link>
         </div>
       </nav>
