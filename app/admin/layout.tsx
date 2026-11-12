@@ -5,7 +5,7 @@ import AdminNav from '@/components/admin/AdminNav'
 
 export const metadata: Metadata = {
   title: 'Admin | Pescadero Music',
-  manifest: '/admin.webmanifest',
+  manifest: '/pm-admin.webmanifest',
   appleWebApp: { capable: true, title: 'PM Admin', statusBarStyle: 'black-translucent' },
   robots: { index: false, follow: false },
 }
