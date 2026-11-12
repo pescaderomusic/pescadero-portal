@@ -366,25 +366,25 @@ export default function HomePage() {
 
           {/* 2. DATE AVAILABILITY CHECKER */}
           <section className="w-full bg-surface-container-high px-6 md:px-margin py-space-xl" id="checker-widget">
-            <div className="w-full bg-surface p-space-lg shadow-[6px_6px_0px_0px_#07111A]">
+            <div className="w-full bg-primary text-on-primary p-space-lg shadow-[6px_6px_0px_0px_#C8202A]">
               <div className="flex flex-col md:flex-row md:items-center justify-between pb-space-md mb-space-lg gap-space-sm">
                 <div>
-                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary block">
+                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed-dim block">
                     BOOK YOUR DATE
                   </span>
-                  <h2 className="font-headline-md text-headline-md text-primary mt-1">Check availability.</h2>
+                  <h2 className="font-headline-md text-headline-md text-on-primary mt-1">Check availability.</h2>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
-                <div className="lg:col-span-5 bg-surface-container p-space-md flex items-center gap-space-md">
+                <div className="lg:col-span-5 bg-primary-container border border-on-primary/20 p-space-md flex items-center gap-space-md">
                   <div
                     className={`p-space-sm text-center min-w-[90px] flex flex-col justify-center ${
                       dateStatus === 'available'
-                        ? 'bg-primary text-on-primary'
+                        ? 'bg-tertiary text-on-tertiary'
                         : dateStatus === 'busy'
                         ? 'bg-secondary text-on-secondary'
-                        : 'bg-surface-container-highest text-on-surface-variant'
+                        : 'bg-on-primary/10 text-on-primary'
                     }`}
                   >
                     <span className="material-symbols-outlined text-[28px]">
@@ -400,32 +400,32 @@ export default function HomePage() {
                   <div className="flex flex-col justify-center">
                     {dateStatus === 'available' && (
                       <>
-                        <div className="font-label-md text-label-md uppercase tracking-wider text-primary mb-1">
+                        <div className="font-label-md text-label-md uppercase tracking-wider text-tertiary mb-1">
                           ✓ Date Open
                         </div>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        <p className="font-body-sm text-body-sm text-on-primary-container">
                           That date looks open — send an inquiry to lock it in.
                         </p>
                       </>
                     )}
                     {dateStatus === 'busy' && (
                       <>
-                        <div className="font-label-md text-label-md uppercase tracking-wider text-secondary mb-1">
+                        <div className="font-label-md text-label-md uppercase tracking-wider text-secondary-fixed-dim mb-1">
                           ✕ Already Booked
                         </div>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        <p className="font-body-sm text-body-sm text-on-primary-container">
                           That date is already booked. Try another date or reach out to ask.
                         </p>
                       </>
                     )}
                     {dateStatus === 'checking' && (
-                      <div className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant mb-1">
+                      <div className="font-label-md text-label-md uppercase tracking-wider text-on-primary-container mb-1">
                         Checking calendar…
                       </div>
                     )}
                     {dateStatus === 'idle' && (
                       <>
-                        <div className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant mb-1">
+                        <div className="font-label-md text-label-md uppercase tracking-wider text-on-primary-container mb-1">
                           Pick a date →
                         </div>
                       </>
@@ -435,11 +435,11 @@ export default function HomePage() {
 
                 <div className="lg:col-span-7 flex flex-col md:flex-row items-center gap-space-md">
                   <div className="w-full flex-1">
-                    <label className="block font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-space-xs">
+                    <label className="block font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container mb-space-xs">
                       1 — What kind of event?
                     </label>
                     <select
-                      className="w-full bg-surface-container-lowest text-primary font-label-md text-label-md uppercase font-bold p-space-sm outline-none focus:bg-surface-bright focus:border-secondary appearance-none cursor-pointer border-b-2 border-primary/20 transition-colors"
+                      className="w-full bg-surface-container-lowest text-primary font-label-md text-label-md uppercase font-bold p-space-sm outline-none focus:bg-surface-bright focus:border-secondary appearance-none cursor-pointer border-b-2 border-tertiary transition-colors"
                       value={selectedType}
                       onChange={(e) => setSelectedType(e.target.value as EventTypeId)}
                     >
@@ -451,11 +451,11 @@ export default function HomePage() {
                     </select>
                   </div>
                   <div className="w-full flex-1">
-                    <label className="block font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-space-xs">
+                    <label className="block font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container mb-space-xs">
                       2 — Pick a date
                     </label>
                     <input
-                      className="w-full bg-surface-container-lowest text-primary font-body-md text-body-md p-space-sm outline-none border-b-2 border-primary/20 focus:border-secondary focus:bg-surface-bright transition-colors"
+                      className="w-full bg-surface-container-lowest text-primary font-body-md text-body-md p-space-sm outline-none border-b-2 border-tertiary focus:border-secondary focus:bg-surface-bright transition-colors"
                       type="date"
                       min={new Date().toISOString().split('T')[0]}
                       value={checkDate}
@@ -464,7 +464,7 @@ export default function HomePage() {
                   </div>
                   <div className="w-full md:w-auto self-end pt-space-xs">
                     <button
-                      className="w-full md:w-auto bg-primary hover:bg-on-background text-on-primary font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-sm shadow-[3px_3px_0px_0px_#C8202A] active:translate-x-[1px] active:translate-y-[1px] transition-all whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-full md:w-auto min-h-[44px] bg-secondary hover:bg-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-sm shadow-[3px_3px_0px_0px_#F5EFE0] active:translate-x-[1px] active:translate-y-[1px] transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={handleInquiry}
                       disabled={!checkDate || dateStatus === 'busy' || dateStatus === 'checking'}
                     >
