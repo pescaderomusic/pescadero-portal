@@ -2,7 +2,7 @@
 // aren't signed in see /coming-soon until they enter the entry code. Signed-in
 // clients, sign-in pages and API routes (Stripe, emails) are never blocked.
 // To take the screen down: set PREVIEW_GATE_ON to false.
-export const PREVIEW_GATE_ON = true
+export const PREVIEW_GATE_ON = false
 
 export const PREVIEW_COOKIE = 'pm_preview'
 
