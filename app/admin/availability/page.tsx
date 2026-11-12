@@ -81,17 +81,9 @@ export default function AvailabilityPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.96)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(68,190,199,0.15)', padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <Link href="/admin" style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textDecoration: 'none' }}>← ADMIN</Link>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>📅 Set Availability</span>
-        </div>
-        <button onClick={handleSave} disabled={saving} style={{ background: saved ? 'rgba(76,175,80,0.3)' : RED, border: 'none', borderRadius: 8, color: 'white', padding: '8px 20px', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
-          {saved ? '✓ Saved!' : saving ? 'Saving…' : 'Save Availability'}
-        </button>
-      </nav>
+      
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '32px 24px 80px' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto' }} className="px-4 sm:px-6 pt-6 pb-10">
         <div style={{ marginBottom: 24 }}>
           <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Consultation Scheduling</p>
           <h1 style={{ margin: '0 0 8px', fontFamily: 'Lora, serif', fontStyle: 'italic', fontSize: 24, color: 'white' }}>Set Your Availability</h1>
@@ -152,9 +144,18 @@ export default function AvailabilityPage() {
           ))}
         </div>
 
-        <p style={{ marginTop: 20, fontSize: 12, color: 'rgba(255,255,255,0.25)', textAlign: 'center' }}>
+        <p style={{ marginTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.7)', textAlign: 'center' }}>
           Changes take effect immediately for new consultation requests.
         </p>
+      </div>
+
+      {/* Save bar: sits above the phone tab bar */}
+      <div className="sticky bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0 z-40 px-4 py-3" style={{ background: 'rgba(10,24,40,0.96)', borderTop: '1px solid rgba(68,190,199,0.25)' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto' }}>
+          <button onClick={handleSave} disabled={saving} className="w-full min-h-[48px] focus:outline-none focus-visible:ring-2 focus-visible:ring-tertiary" style={{ background: saved ? '#2E7D32' : RED, border: 'none', borderRadius: 8, color: 'white', cursor: 'pointer', fontSize: 15, fontWeight: 700 }}>
+            {saved ? '✓ Saved!' : saving ? 'Saving…' : 'Save Availability'}
+          </button>
+        </div>
       </div>
     </div>
   )

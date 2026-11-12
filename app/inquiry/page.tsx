@@ -239,7 +239,7 @@ function InquiryWizard() {
       venue: form.venue, venueAddress: form.venueAddress, indoorOutdoor: form.indoorOutdoor, attendance: form.attendance,
       additionalDetails: notes, hearAbout: form.hearAbout, vendorName: form.vendorName, vendorType: form.vendorType,
       otherHear: form.otherHear,
-      weddingPackage: form.weddingPackage || (eventType === 'event' ? 'Dance DJ - $600' : ''),
+      weddingPackage: form.weddingPackage || (eventType === 'event' ? 'Dance DJ - $635' : ''),
       movieLocation: form.movieLocation, eventCategory: eventType,
     }
     try {
@@ -281,7 +281,7 @@ function InquiryWizard() {
     if (eventType === 'wedding' && form.eventTypesChecked.length) rows.push(['Coverage', form.eventTypesChecked.join(', ')])
     if (eventType === 'movie') rows.push(['Location Type', form.movieLocation])
     if (eventType === 'event' && form.secondDate) rows.push(['Second Date', form.secondDate])
-    const pkg = form.weddingPackage || (eventType === 'event' ? 'Dance DJ - $600' : '')
+    const pkg = form.weddingPackage || (eventType === 'event' ? 'Dance DJ - $635' : '')
     if (pkg) rows.push(['Package', pkg])
     rows.push(
       ['Heard About Us', form.hearAbout || '—'],
@@ -604,8 +604,8 @@ function InquiryWizard() {
                 {eventType === 'wedding' && (
                   <div className="flex flex-col gap-space-sm mb-space-md">
                     {[
-                      { val: 'Dance DJ - $600', name: 'Dance DJ', price: '$600', desc: 'One sound system. Up to 4 hours — reception, party, or grand opening.', features: ['Up to 4 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'Wired MC mic'] },
-                      { val: 'Full-Service Sound - $850', name: 'Full-Service Sound', price: '$850', desc: 'Two independent sound systems — ceremony/speeches + dance floor.', features: ['Up to 4 hours', 'Two independent sound systems', 'Ceremony & cocktail hour sound', 'Two wireless mics', 'DJ-curated or custom playlist'], popular: true },
+                      { val: 'Dance DJ - $635', name: 'Dance DJ', price: '$635', desc: 'One sound system. Up to 3 hours — reception, party, or grand opening.', features: ['Up to 3 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'One wireless mic + one wired mic'] },
+                      { val: 'Full-Service Sound - $875', name: 'Full-Service Sound', price: '$875', desc: 'Two independent sound systems — ceremony/speeches + dance floor.', features: ['Up to 3 hours', 'Two independent sound systems', 'Ceremony & cocktail hour sound', 'One wireless mic + one wired mic', 'DJ-curated or custom playlist'], popular: true },
                     ].map((p) => (
                       <label key={p.val} className={`flex gap-3 items-start bg-white border-2 p-space-md cursor-pointer transition-all ${form.weddingPackage === p.val ? 'border-secondary shadow-[4px_4px_0px_0px_#C8202A]' : 'border-primary/15'}`}>
                         <input type="radio" className="mt-1 accent-secondary shrink-0" checked={form.weddingPackage === p.val} onChange={() => set('weddingPackage', p.val)} />
@@ -631,14 +631,14 @@ function InquiryWizard() {
                   <div className="bg-white border-2 border-primary/15 p-space-md mb-space-md">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-label-lg text-label-lg text-primary uppercase">Dance DJ</span>
-                      <span className="font-headline-sm text-headline-sm text-secondary">$600</span>
+                      <span className="font-headline-sm text-headline-sm text-secondary">$635</span>
                     </div>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant mb-2">One sound system. Up to 4 hours. Perfect for parties, grand openings, and corporate events.</p>
-                    {['Up to 4 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'Wired MC mic'].map((f) => (
+                    <p className="font-body-sm text-body-sm text-on-surface-variant mb-2">One sound system. Up to 3 hours. Perfect for parties, grand openings, and corporate events.</p>
+                    {['Up to 3 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'One wireless mic + one wired mic'].map((f) => (
                       <span key={f} className="block font-body-sm text-body-sm text-tertiary-fixed-dim">✓ {f}</span>
                     ))}
                     <p className="font-body-sm text-body-sm text-on-surface-variant mt-3 p-2 bg-tertiary/5 border border-tertiary/20">
-                      Need more than 4 hours or a second sound system? Mention it in the notes below and Garrett will put together a custom quote.
+                      Need more than 3 hours or a second sound system? Mention it in the notes below and Garrett will put together a custom quote.
                     </p>
                   </div>
                 )}

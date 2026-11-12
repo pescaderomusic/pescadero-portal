@@ -96,17 +96,9 @@ export default async function SchedulePage() {
 
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.96)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(68,190,199,0.15)', padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <Link href="/admin" style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textDecoration: 'none' }}>← ADMIN</Link>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>📞 Consultation Schedule</span>
-        </div>
-        <Link href="/admin/availability" style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '5px 12px' }}>
-          Edit Availability →
-        </Link>
-      </nav>
+      
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px 80px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto' }} className="px-4 sm:px-6 pt-6 pb-10">
 
         <div style={{ marginBottom: 28 }}>
           <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Consultation Requests</p>

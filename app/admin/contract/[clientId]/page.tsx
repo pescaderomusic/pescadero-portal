@@ -75,7 +75,7 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
           setGarrettMessage(c.garrett_message || '')
         } else if (bRes.data?.event_date) {
           setPackageType('dance_dj')
-          setPackagePrice('600')
+          setPackagePrice('635')
         }
         setLoading(false)
       })
@@ -247,20 +247,20 @@ export default function ContractEditorPage({ params }: { params: { clientId: str
               onChange={e => {
                 const val = e.target.value
                 setPackageType(val)
-                if (val === 'dance_dj') setPackagePrice('600')
-                if (val === 'full_service') setPackagePrice('850')
+                if (val === 'dance_dj') setPackagePrice('635')
+                if (val === 'full_service') setPackagePrice('875')
               }}
             >
-              <option value="dance_dj">Dance DJ — $600</option>
-              <option value="full_service">Full-Service Sound — $850</option>
+              <option value="dance_dj">Dance DJ — $635</option>
+              <option value="full_service">Full-Service Sound — $875</option>
               <option value="custom">Custom / Other</option>
             </select>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px', marginBottom: 16 }}>
             <div>
               <label style={labelStyle}>Package Price ($) *</label>
-              <input style={inputStyle} type="number" value={packagePrice} onChange={e => setPackagePrice(e.target.value)} placeholder="600" />
-              <p style={{ margin: '4px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Dance DJ $600 · Full-Service Sound $850</p>
+              <input style={inputStyle} type="number" value={packagePrice} onChange={e => setPackagePrice(e.target.value)} placeholder="635" />
+              <p style={{ margin: '4px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Dance DJ $635 · Full-Service Sound $875</p>
             </div>
             <div>
               <label style={labelStyle}>Travel Fee ($)</label>

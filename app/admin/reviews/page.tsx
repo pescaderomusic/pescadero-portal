@@ -64,19 +64,7 @@ export default async function AdminReviewsPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
-
-      {/* Nav */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.96)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(68,190,199,0.15)', padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <Link href="/admin" style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textDecoration: 'none' }}>← PESCADERO ADMIN</Link>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>/ Reviews</span>
-        </div>
-        <Link href="/dashboard?client=true" style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '5px 12px' }}>
-          Switch to Client View →
-        </Link>
-      </nav>
-
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px 80px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }} className="px-4 sm:px-6 pt-6 pb-10">
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
@@ -90,7 +78,7 @@ export default async function AdminReviewsPage() {
         </div>
 
         {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {[
             { label: 'Avg Rating', value: avgRating ? `${avgRating} ★` : '—', color: GOLD, icon: '⭐' },
             { label: 'With Testimonial', value: withTestimonial.length, color: BLUE, icon: '💬' },

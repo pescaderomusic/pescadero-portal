@@ -1,25 +1,30 @@
+import type { Metadata, Viewport } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import DashboardNav from '@/components/DashboardNav'
+import AdminNav from '@/components/admin/AdminNav'
+
+export const metadata: Metadata = {
+  title: 'Admin | Pescadero Music',
+  manifest: '/admin.webmanifest',
+  appleWebApp: { capable: true, title: 'PM Admin', statusBarStyle: 'black-translucent' },
+  robots: { index: false, follow: false },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#07111A',
+  viewportFit: 'cover',
+}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name')
-    .eq('id', user.id)
-    .single()
-
-  const name = profile?.full_name || user.email || ''
-  const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
-
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0F1F35 0%, #0A1828 100%)' }}>
-      <DashboardNav userName={name} userInitials={initials} />
-      {children}
+    <div className="min-h-[100dvh] bg-background" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <AdminNav />
+      {/* room for the phone tab bar */}
+      <div className="pb-[calc(80px+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
     </div>
   )
 }

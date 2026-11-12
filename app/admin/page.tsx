@@ -3,12 +3,15 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import ClientRowActions from '@/components/admin/ClientRowActions'
+import TextReviewButton from '@/components/admin/TextReviewButton'
+import { reviewUrl, reviewTextMessage } from '@/lib/review-link'
 
 export const dynamic = 'force-dynamic'
 
-const GREEN = '#4CAF50'
-const GOLD = '#F5A623'
-const LOCKED = '#9CA3A8'
+const GREEN = '#256A2A'
+const GOLD = '#8A5300'
+const LOCKED = '#5F6B73'
+const RED = '#C8202A'
 const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
 function getAdmin() {
@@ -59,18 +62,21 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
     { data: authUsers },
     { data: inquiries },
     { data: contracts },
+    { data: reviews },
   ] = await Promise.all([
     admin.from('bookings').select('*').order('created_at', { ascending: false }),
     admin.from('profiles').select('id, full_name'),
     admin.auth.admin.listUsers(),
     admin.from('inquiry_submissions').select('*').order('submitted_at', { ascending: false }),
     admin.from('contracts').select('client_id, status, deposit_paid_at, event_type, event_date, deposit_amount, final_payment_amount, final_payment_due'),
+    admin.from('reviews').select('client_id, rating'),
   ])
 
   const profileMap  = Object.fromEntries((profiles || []).map(p => [p.id, p]))
   const emailMap    = Object.fromEntries((authUsers?.users || []).map(u => [u.id, u.email]))
   const inquiryMap  = Object.fromEntries((inquiries || []).map(i => [i.client_id, i]))
   const contractMap = Object.fromEntries((contracts || []).map(c => [c.client_id, c]))
+  const reviewMap   = Object.fromEntries((reviews || []).map(r => [r.client_id, r]))
 
   const activeBookings   = (bookings || []).filter(b => !b.archived_at)
   const archivedBookings = (bookings || []).filter(b => b.archived_at)
@@ -107,39 +113,10 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
   )
 
   return (
-    <div className="min-h-screen bg-background font-body-md text-on-surface">
-      {/* Sub-nav bar (real links — the global DashboardNav above this is untouched) */}
-      <div className="bg-primary text-on-primary">
-        <div className="max-w-[1280px] mx-auto px-6 lg:px-space-xl h-14 flex items-center justify-between">
-          <div className="flex items-center gap-space-lg overflow-x-auto">
-            <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed shrink-0">
-              Pescadero Admin
-            </span>
-            <Link href="/admin/inquiries" className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container hover:text-on-primary transition-colors shrink-0">
-              Inquiries
-            </Link>
-            <Link href="/admin/availability" className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container hover:text-on-primary transition-colors shrink-0">
-              Availability
-            </Link>
-            <Link href="/admin/analytics" className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container hover:text-on-primary transition-colors shrink-0">
-              Analytics
-            </Link>
-            <Link href="/admin/reviews" className="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container hover:text-on-primary transition-colors shrink-0">
-              Reviews
-            </Link>
-          </div>
-          <Link
-            href="/dashboard?client=true"
-            className="font-label-sm text-label-sm uppercase tracking-wider text-secondary-fixed hover:text-on-primary border border-on-primary/20 px-space-sm py-1 whitespace-nowrap transition-colors"
-          >
-            Switch to Client View →
-          </Link>
-        </div>
-      </div>
-
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-space-xl py-space-xl">
+    <div className="bg-background font-body-md text-on-surface">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-space-xl py-space-lg md:py-space-xl">
         {/* Header banner */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md border-b-2 border-primary pb-space-md mb-space-xl">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-sm border-b-2 border-primary pb-space-sm md:pb-space-md mb-space-lg md:mb-space-xl">
           <div className="flex flex-col gap-1">
             <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary">
               {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
@@ -148,13 +125,10 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
               Client Pipeline
             </h1>
           </div>
-          <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant">
-            Curated by Garrett
-          </span>
         </div>
 
         {/* Stats row */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-xl">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-space-md mb-space-lg md:mb-space-xl">
           {[
             { num: '01', label: 'Total Clients', value: total },
             { num: '02', label: 'Consult Needed', value: consultPending },
@@ -163,7 +137,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
           ].map((s) => (
             <div
               key={s.label}
-              className={`p-space-md shadow-[3px_3px_0px_0px_#07111A] flex flex-col justify-between ${
+              className={`p-3 md:p-space-md shadow-[3px_3px_0px_0px_#07111A] flex flex-col justify-between ${
                 s.highlight ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface'
               }`}
             >
@@ -172,9 +146,9 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                   s.highlight ? 'text-secondary-fixed' : 'text-on-surface-variant'
                 }`}
               >
-                {s.num} / {s.label}
+                {s.label}
               </span>
-              <span className={`font-display-xl text-display-xl leading-none mt-space-sm ${s.highlight ? 'text-on-primary' : 'text-primary'}`}>
+              <span className={`font-headline-lg text-headline-lg md:font-display-xl md:text-display-xl leading-none mt-space-sm ${s.highlight ? 'text-on-primary' : 'text-primary'}`}>
                 {s.value}
               </span>
             </div>
@@ -186,9 +160,6 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
           <section className="bg-surface-container-low p-space-md lg:p-space-lg shadow-[4px_4px_0px_0px_#07111A] mb-space-xl">
             <div className="flex items-center justify-between border-b-2 border-primary pb-space-sm mb-space-md">
               <div>
-                <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary block">
-                  Live Desk Bench
-                </span>
                 <h2 className="font-headline-sm text-headline-sm text-primary">Needs Your Action</h2>
               </div>
               <span className="font-label-md text-label-md bg-primary text-on-primary px-2 py-1 uppercase">
@@ -207,13 +178,13 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                     : 'Contract signed — unlock deposit'
                 return (
                   <div key={b.id} className="bg-surface p-space-sm flex items-center justify-between gap-space-sm shadow-[2px_2px_0px_0px_#07111A]">
-                    <div>
+                    <div className="min-w-0">
                       <span className="font-label-lg text-label-lg uppercase text-primary">{profile?.full_name || email}</span>
                       <span className="font-body-sm text-body-sm text-secondary block">{action}</span>
                     </div>
                     <Link
                       href={`/admin/client/${b.client_id}`}
-                      className="font-label-sm text-label-sm uppercase bg-surface-container px-space-sm py-1 hover:bg-primary hover:text-on-primary transition-colors whitespace-nowrap"
+                      className="inline-flex items-center min-h-[44px] font-label-sm text-label-sm uppercase bg-surface-container text-primary px-space-sm hover:bg-primary hover:text-on-primary transition-colors whitespace-nowrap"
                     >
                       {b.step_consultation === 'pending' ? 'View Request →' : 'Take Action →'}
                     </Link>
@@ -244,7 +215,67 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
             </p>
           )}
 
-          <div className="overflow-x-auto">
+          {/* Phone: one card per client */}
+          <ul className="md:hidden flex flex-col gap-3">
+            {visibleBookings.map((booking) => {
+              const profile = profileMap[booking.client_id]
+              const email = emailMap[booking.client_id]
+              const inquiry = inquiryMap[booking.client_id]
+              const contract = contractMap[booking.client_id]
+              const review = reviewMap[booking.client_id]
+              const eventDate = contract?.event_date || inquiry?.event_date
+              const daysAway = eventDate ? Math.ceil((new Date(eventDate + 'T12:00:00').getTime() - now.getTime()) / 86400000) : null
+              const doneCount = STEPS.filter(({ key }) => stepColor(booking[key] || 'locked') === GREEN).length
+              const current = STEPS.find(({ key }) => stepColor(booking[key] || 'locked') !== GREEN)
+              const firstName = (profile?.full_name || '').split(' ')[0]
+              return (
+                <li key={booking.id} className="bg-surface p-4 shadow-[3px_3px_0px_0px_#07111A]">
+                  <Link href={`/admin/client/${booking.client_id}`} className="block no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-title-editorial text-title-editorial font-medium text-primary truncate">{profile?.full_name || 'Unknown'}</div>
+                        <div className="font-body-sm text-body-sm text-on-surface-variant truncate">
+                          {contract?.event_type || inquiry?.event_name || email}
+                        </div>
+                      </div>
+                      {eventDate && (
+                        <div className="text-right shrink-0">
+                          <div className="font-label-md text-label-md text-primary">{fmtDate(eventDate)}</div>
+                          {daysAway !== null && (
+                            <div className="font-label-sm text-label-sm uppercase" style={{ color: daysAway < 0 ? LOCKED : daysAway <= 14 ? RED : daysAway <= 30 ? GOLD : LOCKED }}>
+                              {daysAway < 0 ? `${-daysAway}d ago` : daysAway === 0 ? 'Today' : `in ${daysAway}d`}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-3">
+                      <div className="flex gap-1" aria-hidden="true">
+                        {STEPS.map(({ key }) => (
+                          <span key={key} className="h-1.5 flex-1" style={{ background: stepColor(booking[key] || 'locked'), opacity: stepColor(booking[key] || 'locked') === LOCKED ? 0.35 : 1 }} />
+                        ))}
+                      </div>
+                      <div className="mt-1.5 font-body-sm text-body-sm text-on-surface-variant">
+                        {doneCount === STEPS.length ? 'All steps done' : `Step ${doneCount + 1} of 7 · ${current?.short}`}
+                        {review ? ` · Reviewed ${review.rating}★` : ''}
+                      </div>
+                    </div>
+                  </Link>
+                  {!review && (
+                    <div className="mt-3">
+                      <TextReviewButton
+                        message={reviewTextMessage(firstName, booking.client_id)}
+                        link={reviewUrl(booking.client_id)}
+                        phone={inquiry?.phone}
+                      />
+                    </div>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full border-collapse text-left">
               {visibleBookings.length > 0 && (
                 <thead>
@@ -280,7 +311,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                             <div className="font-label-md text-label-md text-primary">{fmtDate(eventDate)}</div>
                             <span
                               className="inline-block mt-1 px-1.5 py-0.5 font-label-sm text-label-sm uppercase text-on-primary"
-                              style={{ background: daysAway !== null && daysAway <= 14 ? '#C8202A' : daysAway !== null && daysAway <= 30 ? GOLD : '#9CA3A8' }}
+                              style={{ background: daysAway !== null && daysAway <= 14 ? RED : daysAway !== null && daysAway <= 30 ? GOLD : LOCKED }}
                             >
                               {daysAway !== null ? `T-${daysAway}d` : ''}
                             </span>
@@ -303,7 +334,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                                 style={{ borderBottom: `2px solid ${color}` }}
                               >
                                 <span className="text-xs leading-none" style={{ color }}>{sym}</span>
-                                <span className="font-label-sm text-[8px] uppercase tracking-wide whitespace-nowrap" style={{ color }}>{short}</span>
+                                <span className="font-label-sm text-[11px] uppercase tracking-wide whitespace-nowrap" style={{ color }}>{short}</span>
                               </div>
                             )
                           })}
@@ -332,6 +363,16 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                           >
                             Manage →
                           </Link>
+                          {reviewMap[booking.client_id] ? (
+                            <span className="font-label-sm text-label-sm uppercase text-on-surface-variant">Reviewed {reviewMap[booking.client_id].rating}★</span>
+                          ) : (
+                            <TextReviewButton
+                              compact
+                              message={reviewTextMessage((profile?.full_name || '').split(' ')[0], booking.client_id)}
+                              link={reviewUrl(booking.client_id)}
+                              phone={inquiry?.phone}
+                            />
+                          )}
                           <ClientRowActions clientId={booking.client_id} isArchived={!!booking.archived_at} />
                         </div>
                       </td>
@@ -348,7 +389,6 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
           {/* Upcoming events */}
           <section className="lg:col-span-5 bg-surface-container-low p-space-md lg:p-space-lg shadow-[4px_4px_0px_0px_#07111A]">
             <div className="border-b-2 border-primary pb-space-sm mb-space-md">
-              <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary block">Score &amp; Running Order</span>
               <h2 className="font-headline-sm text-headline-sm text-primary">Upcoming Events</h2>
             </div>
             {upcomingEvents.length === 0 && (
@@ -367,7 +407,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                   </div>
                   <span
                     className="font-label-sm text-label-sm uppercase font-bold whitespace-nowrap"
-                    style={{ color: e.daysAway !== null && e.daysAway! <= 7 ? '#C8202A' : GOLD }}
+                    style={{ color: e.daysAway !== null && e.daysAway! <= 7 ? RED : GOLD }}
                   >
                     {fmtDate(e.eventDate || null)} · {e.daysAway}d
                   </span>
@@ -401,7 +441,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
                   href={link.href}
                   target={link.ext ? '_blank' : undefined}
                   rel={link.ext ? 'noopener noreferrer' : undefined}
-                  className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary py-1.5 border-b border-primary/10 transition-colors"
+                  className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary py-2.5 md:py-1.5 border-b border-primary/10 transition-colors"
                 >
                   {link.label}
                 </a>
@@ -416,9 +456,9 @@ export default async function AdminPage({ searchParams }: { searchParams: { view
             </span>
             <div className="flex flex-col gap-space-sm">
               {[
-                { sym: '✓', color: GREEN, label: 'Complete / Paid' },
-                { sym: '●', color: GOLD, label: 'Pending / Sent' },
-                { sym: '○', color: '#9CA3A8', label: 'Locked / Not started' },
+                { sym: '✓', color: '#7BD389', label: 'Complete / Paid' },
+                { sym: '●', color: '#F5A623', label: 'Pending / Sent' },
+                { sym: '○', color: '#BDC7D4', label: 'Locked / Not started' },
               ].map((l) => (
                 <div key={l.label} className="flex items-center gap-space-sm">
                   <span className="text-base w-4" style={{ color: l.color }}>{l.sym}</span>

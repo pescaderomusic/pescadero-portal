@@ -116,16 +116,7 @@ export default function AnalyticsClient({ contracts, bookings, inquiries }: { co
 
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${NAVY} 0%, #0A1828 100%)`, fontFamily: 'Poppins, sans-serif' }}>
-
-      {/* Nav */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,24,40,0.96)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(68,190,199,0.15)', padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <Link href="/admin" style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: BLUE, textDecoration: 'none' }}>← ADMIN</Link>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>📊 Analytics</span>
-        </div>
-      </nav>
-
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px 80px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }} className="px-4 sm:px-6 pt-6 pb-10">
 
         <div style={{ marginBottom: 28 }}>
           <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: BLUE }}>Business Overview</p>
@@ -163,7 +154,7 @@ export default function AnalyticsClient({ contracts, bookings, inquiries }: { co
         </div>
 
         {/* Revenue stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 20 }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
           <Card title="Total Revenue">
             <StatBox value={`$${totalRevenue.toLocaleString()}`} label="All time" color={GREEN} />
           </Card>
@@ -179,7 +170,7 @@ export default function AnalyticsClient({ contracts, bookings, inquiries }: { co
         </div>
 
         {/* Revenue chart + client stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
 
           {/* Monthly chart */}
           <Card title="Monthly Revenue (Last 6 Months)">
@@ -196,7 +187,7 @@ export default function AnalyticsClient({ contracts, bookings, inquiries }: { co
 
           {/* Client stats */}
           <Card title="Client Stats">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <StatBox value={String(totalInquiries)} label="Total inquiries" color={BLUE} />
               <StatBox value={String(totalBookings)} label="Booked clients" color={GREEN} />
               <StatBox value={`${conversionRate}%`} label="Conversion rate" color={GOLD} />

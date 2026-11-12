@@ -67,6 +67,18 @@ input, select, textarea, button {
   background: none;
   border-radius: 0;
 }
+/* ...but keep real checkboxes and radio buttons visible */
+input[type='checkbox'], input[type='radio'] {
+  appearance: auto;
+}
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend { padding: 0; }
+
+/* Keyboard focus is always visible (the reset above removed the browser's) */
+:focus-visible {
+  outline: 2px solid #C8202A;
+  outline-offset: 2px;
+}
 button {
   cursor: pointer;
   text-align: inherit;

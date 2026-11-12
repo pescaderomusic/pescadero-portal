@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
+import { reviewUrl, reviewTextMessage } from '@/lib/review-link'
 
 const GARRETT_ID = '14d81e15-efb6-4a6a-904b-91f9c48899df'
 
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
               <p style="color:#555;line-height:1.7;margin:0 0 24px;">
                 We'd love to hear your feedback — it takes just a few minutes and means the world to us.
               </p>
-              <a href="https://pescaderomusic.com/review"
+              <a href="${reviewUrl(clientId)}"
                  style="display:inline-block;background:#D62828;color:white;text-decoration:none;padding:13px 28px;border-radius:8px;font-weight:700;font-size:14px;">
                 Leave My Review →
               </a>
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
     try {
       const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
       await twilio.messages.create({
-        body: `Hi ${firstName}! 🎵 It was such an honor being part of your day. We'd love your feedback — leave a quick review here: pescaderomusic.com/review  — Garrett, Pescadero Music`,
+        body: reviewTextMessage(firstName, clientId),
         from: process.env.TWILIO_PHONE_NUMBER,
         to: phone.replace(/\D/g, '').replace(/^(\d{10})$/, '+1$1'),
       })

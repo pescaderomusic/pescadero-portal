@@ -482,17 +482,17 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="mb-space-lg">
-                    <span className="font-display-xl text-display-xl text-primary font-bold leading-none">$600</span>
+                    <span className="font-display-xl text-display-xl text-primary font-bold leading-none">$635</span>
                     <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mt-1">
                       Travel fees additional
                     </span>
                   </div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
-                    One sound system. Up to 4 hours of DJ service — perfect for receptions, parties, grand openings, and
+                    One sound system. Up to 3 hours of DJ service — perfect for receptions, parties, grand openings, and
                     corporate events.
                   </p>
                   <ul className="space-y-space-sm font-body-sm text-body-sm text-on-surface mb-space-md">
-                    {['Up to 4 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'Wired MC mic'].map((f) => (
+                    {['Up to 3 hours', 'One pro sound system', 'DJ-curated or custom playlist', 'One wireless mic + one wired mic'].map((f) => (
                       <li className="flex items-center gap-space-xs" key={f}>
                         <span className="material-symbols-outlined text-secondary text-[18px]">check</span>
                         <span>{f}</span>
@@ -500,7 +500,7 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
-                    Pricing is flat-rate for events under 4 hours and does not change based on event length.
+                    Pricing is flat-rate for events up to 3 hours and does not change based on event length.
                   </p>
                 </div>
                 <button
@@ -523,7 +523,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="mb-space-lg">
-                    <span className="font-display-xl text-display-xl text-surface font-bold leading-none">$850</span>
+                    <span className="font-display-xl text-display-xl text-surface font-bold leading-none">$875</span>
                     <span className="font-label-sm text-label-sm uppercase tracking-wider text-surface-variant block mt-1">
                       Travel fees additional
                     </span>
@@ -534,10 +534,10 @@ export default function HomePage() {
                   </p>
                   <ul className="space-y-space-sm font-body-sm text-body-sm text-surface mb-space-md">
                     {[
-                      'Up to 4 hours',
+                      'Up to 3 hours',
                       'Two independent sound systems',
                       'Ceremony & cocktail hour sound',
-                      'Two wireless mics for vows, speeches & toasts',
+                      'One wireless mic + one wired mic',
                       'DJ-curated or custom playlist',
                     ].map((f) => (
                       <li className="flex items-center gap-space-xs" key={f}>
@@ -547,7 +547,7 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <p className="font-body-sm text-body-sm text-surface-variant mb-space-lg">
-                    Pricing is flat-rate for events under 4 hours and does not change based on event length.
+                    Pricing is flat-rate for events up to 3 hours and does not change based on event length.
                   </p>
                 </div>
                 <button

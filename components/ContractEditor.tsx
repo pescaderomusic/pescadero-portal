@@ -42,7 +42,7 @@ export default function ContractEditor({ inquiry, existingContract }: Props) {
     deposit_due_date: existingContract?.deposit_due_date || '',
     final_payment_amount: existingContract?.final_payment_amount || 300,
     final_payment_due: existingContract?.final_payment_due || '',
-    contracted_hours: existingContract?.contracted_hours || '4 hours',
+    contracted_hours: existingContract?.contracted_hours || '3 hours',
     special_notes: existingContract?.special_notes || '',
     garrett_message: existingContract?.garrett_message || '',
   })

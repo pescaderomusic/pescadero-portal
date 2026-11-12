@@ -34,6 +34,7 @@ export function isOpenPath(pathname: string) {
     pathname === '/coming-soon' ||
     pathname.startsWith('/api/') ||
     pathname.startsWith('/auth/') ||
+    pathname.startsWith('/r/') || // personal review links texted to clients
     pathname.startsWith('/_next/') ||
     /\.[a-z0-9]+$/i.test(pathname) // static files: fonts, images, rive, etc.
   )

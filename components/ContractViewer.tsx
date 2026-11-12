@@ -206,19 +206,21 @@ export default function ContractViewer() {
               <SH>{c?.package_type === 'full_service' ? 'Full-Service Sound' : c?.package_type === 'custom' ? 'Your Package' : 'Dance DJ'}</SH>
               <p style={bt}>This agreement covers the following services included in your investment — no add-ons, no hidden fees.</p>
               <div style={{ background: '#f8f5f0', borderRadius: 10, padding: '16px 18px', marginBottom: 12 }}>
-                {(c?.package_type === 'full_service' ? [
-                  ['Up to 4 Hours', 'Dedicated DJ service for your reception'],
+                {/* Package terms changed 2026-11-12 (3 hours; one wireless + one wired mic).
+                    Contracts created before then keep the terms they were written with. */}
+                {(() => { const newTerms = !c?.created_at || new Date(c.created_at) >= new Date('2026-11-12T00:00:00-07:00'); return c?.package_type === 'full_service' ? [
+                  [newTerms ? 'Up to 3 Hours' : 'Up to 4 Hours', 'Dedicated DJ service for your reception'],
                   ['Two Independent Sound Systems', 'One for ceremony & speeches, one for the dance floor'],
-                  ['Two Wireless Microphones', 'For vows, toasts, and speeches'],
+                  newTerms ? ['One Wireless + One Wired Microphone', 'For vows, toasts, and announcements'] : ['Two Wireless Microphones', 'For vows, toasts, and speeches'],
                   ['DJ-Curated or Custom Playlist', 'Your call — as much or as little input as you want'],
                   ['Dance Floor Lighting', 'Handcrafted, venue-matching lighting design'],
                 ] : [
-                  ['Up to 4 Hours', 'Dedicated DJ service for your reception'],
+                  [newTerms ? 'Up to 3 Hours' : 'Up to 4 Hours', 'Dedicated DJ service for your reception'],
                   ['One Professional Sound System', 'For your dance floor'],
-                  ['Wired MC Microphone', 'For announcements and toasts'],
+                  newTerms ? ['One Wireless + One Wired Microphone', 'For toasts and announcements'] : ['Wired MC Microphone', 'For announcements and toasts'],
                   ['DJ-Curated or Custom Playlist', 'Your call — as much or as little input as you want'],
                   ['Dance Floor Lighting', 'Handcrafted, venue-matching lighting design'],
-                ]).map(([title, desc]) => (
+                ] })().map(([title, desc]) => (
                   <div key={title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
                     <span style={{ color: BLUE, fontWeight: 700, fontSize: 14, flexShrink: 0, marginTop: 1 }}>&#10003;</span>
                     <div><span style={{ fontSize: 13, fontWeight: 700, color: '#1A2D3F' }}>{title}</span><span style={{ fontSize: 13, color: '#6A7E8E' }}> — {desc}</span></div>

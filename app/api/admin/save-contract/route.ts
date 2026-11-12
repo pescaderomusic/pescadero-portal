@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     deposit_due_date:     fields.deposit_due_date || null,
     final_payment_amount: Number(fields.final_payment_amount) || 0,
     final_payment_due:    fields.final_payment_due || null,
-    contracted_hours:     fields.contracted_hours || '4',
+    contracted_hours:     fields.contracted_hours || '3',
     additional_charges:   fields.additional_charges || [],
     sales_tax_rate:       taxRate,
     sales_tax_amount:     taxAmt,
